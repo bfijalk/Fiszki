@@ -9,22 +9,35 @@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill fs-5" aria-hidden="true"></span>
+                <span>Home</span>
             </NavLink>
         </div>
-
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="counter">
+                <span class="bi bi-plus-square-fill fs-5" aria-hidden="true"></span>
+                <span>Counter</span>
             </NavLink>
         </div>
-
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="weather">
+                <span class="bi bi-list-nested fs-5" aria-hidden="true"></span>
+                <span>Weather</span>
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="nowa">
+                <span class="bi bi-lightning-fill fs-5" aria-hidden="true"></span>
+                <span>Nowa</span>
             </NavLink>
         </div>
     </nav>
 </div>
+
+<style>
+/* Wyrównanie ikon do środka w poziomie i pionie */
+.nav-link .bi { line-height: 1; display: inline-flex; align-items: center; }
+</style>
+
 
