@@ -5,37 +5,36 @@ Minimalny, aktualny i docelowy zestaw technologii dla projektu.
 ## Core
 - Runtime / Framework: .NET 8 (ASP.NET Core Blazor Server)
 - Język: C# 12
-- BaaS / Baza: Supabase (PostgreSQL, Auth, Row Level Security, Edge Functions)
-- AI Gateway: OpenRouter (wielomodelowy dostęp; JSON jako strict output)
-- Algorytm nauki: Custom SM-2 (plan: możliwość rozszerzenia do FSRS)
+- Baza danych: PostgreSQL (EF Core / Npgsql)
+- ORM: Entity Framework Core 8
+- AI Gateway: OpenRouter
+- Algorytm nauki: SM-2 (plan: możliwe rozszerzenie do FSRS)
 
 ## Frontend / UI
-- Stylowanie: Tailwind CSS (docelowo v4, fallback 3.x)
-- Komponenty: Port wybranych shadcn/ui do Razor (fallback: MudBlazor)
-- Format danych z AI: JSON (ściśle walidowany schema)
+- Stylowanie: (plan) Tailwind CSS
+- Komponenty: (plan) port shadcn/ui do Razor (fallback: MudBlazor)
+- Format danych z AI: JSON (walidowany)
 
 ## Testy / Jakość
-- Jednostkowe: xUnit
-- Komponentowe / UI (plan): bUnit / Playwright
+- Jednostkowe: xUnit (plan)
+- UI: bUnit / Playwright (plan)
 
 ## DevOps / Infra
-- Kontenery: Docker (multi-stage build)
-- CI/CD: GitHub Actions
-- Hosting: DigitalOcean (App Platform lub Droplet)
-- Sekrety / Konfiguracja: Zmienne środowiskowe + GitHub Secrets
-- Observability (MVP): Logi stdout (plan: OpenTelemetry w późniejszym etapie)
+- Kontenery: Docker (plan)
+- CI/CD: GitHub Actions (plan)
+- Hosting: DigitalOcean (plan)
+- Sekrety: zmienne środowiskowe / user-secrets
+- Observability (MVP): logi stdout
 
 ## Bezpieczeństwo
-- Izolacja danych: Supabase RLS
-- Autentykacja: Supabase Auth (JWT)
-- Ograniczenie kluczy: OpenRouter API key per środowisko
+- Autentykacja / Autoryzacja: własna implementacja (users + hasła hashowane)
+- Izolacja danych: logika usług
 
 ## Decyzje skrót (ADR)
-- Supabase zamiast własnego CRUD backendu.
-- Blazor Server na start (szybsze iteracje); opcja migracji do WASM później.
-- OpenRouter dla elastyczności modeli i kontroli kosztów.
-- Tailwind + port shadcn.ui dla spójnego designu.
-- Własna implementacja SM-2 (kontrola, prostota, testowalność).
+- Pełna kontrola backend + baza (rezygnacja z BaaS).
+- Blazor Server na start (szybka iteracja).
+- OpenRouter dla elastyczności modeli.
+- Własna implementacja SM-2.
 
 ---
-Plik ograniczony do esencji technologicznej. Rozszerzony kontekst (wymagania, funkcje) w `prd.md` (jeśli/dopóki istnieje).
+Plik ograniczony do esencji technologicznej. Szczegóły funkcjonalne w `prd.md`.
