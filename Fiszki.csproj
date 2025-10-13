@@ -6,4 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="Fiszki.Database/Fiszki.Database.csproj" />
+    </ItemGroup>
+
+    <!-- Exclude nested project sources to prevent double compilation -->
+    <ItemGroup>
+      <Compile Remove="Fiszki.Database/**/*.cs" />
+      <EmbeddedResource Remove="Fiszki.Database/**/*.resx" />
+      <None Remove="Fiszki.Database/**/*.json" />
+    </ItemGroup>
+
 </Project>

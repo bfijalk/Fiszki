@@ -112,6 +112,32 @@ dotnet run
 
 Navigate to: https://localhost:5001 (or as indicated in console).
 
+### Database (Local PostgreSQL + EF Core Stub)
+
+The solution now includes a `Fiszki.Database` class library with Entity Framework Core configured for PostgreSQL (Npgsql). At this stage there are **no entities or migrations** – the context exists purely to validate connectivity and prepare for upcoming data model work.
+
+Connection strings:
+* `appsettings.json` → `FiszkiDatabase` (generic / production placeholder)
+* `appsettings.Development.json` → `FiszkiDatabase` (points to `fiszki_dev` database)
+
+Sample local PostgreSQL setup (macOS with Homebrew):
+```bash
+brew install postgresql@16
+brew services start postgresql@16
+createdb fiszki_dev
+psql fiszki_dev -c "CREATE USER postgres WITH PASSWORD 'postgres'" 2>/dev/null || true
+```
+
+The application will attempt a lightweight connectivity check on startup (`Database.CanConnectAsync()`). Failures are logged but do not currently prevent the app from running (policy can be tightened later).
+
+Next data steps (not yet implemented):
+1. Introduce initial entities (Flashcard, Deck, Tag, ReviewSession, ReviewLog).
+2. Add first migration: `dotnet ef migrations add InitialCreate -p Fiszki.Database -s Fiszki`.
+3. Apply migrations automatically or via CLI: `dotnet ef database update -p Fiszki.Database -s Fiszki`.
+4. Add repository / service abstractions for querying & persistence.
+
+Until entities are added, running EF Core migration commands will produce an empty model snapshot.
+
 ### Configuration & Secrets
 
 During MVP development, prefer environment variables or user secrets (avoid committing secrets).
@@ -231,9 +257,11 @@ Status: Alpha / Scaffold
 
 Implemented:
 - Blazor Server baseline (`Program.cs`, routing, static files)
+- EF Core PostgreSQL infrastructure (empty DbContext, connection string, DI registration)
 
 Not Yet Implemented:
 - Supabase integration (Auth, DB, RLS)
+- EF Core entities & migrations
 - AI integration (OpenRouter client, prompt/response schema)
 - Flashcard domain model + persistence
 - SM-2 scheduling logic & session UI
@@ -372,3 +400,12 @@ Instrumentation Plan:
 ---
 
 Let us know via Issues if any section needs clarification or if you begin implementing a milestone and discover architectural adjustments are needed.
+
+### Next Steps (Database Layer)
+
+Planned persistence tasks:
+1. Add core entities (Flashcard, Deck, Tag, ReviewSession, ReviewLog) into `Fiszki.Database`.
+2. Create initial EF Core migration and apply to dev database.
+3. Introduce repository/services abstraction layer (query interfaces) to decouple UI/business logic from EF Core specifics.
+4. Add integration tests using a disposable PostgreSQL instance (e.g., Testcontainers) and unit tests for scheduling logic.
+5. Evaluate enabling sensitive data logging only in Development for troubleshooting.

@@ -482,3 +482,36 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# macOS Finder files
+.DS_Store
+
+# Local PostgreSQL (do not commit local database cluster)
+PostgreSQL/
+# Explicitly list common subdirectories & files for clarity (redundant but self-documenting)
+PostgreSQL/base/
+PostgreSQL/global/
+PostgreSQL/pg_wal/
+PostgreSQL/pg_stat/
+PostgreSQL/pg_stat_tmp/
+PostgreSQL/pg_multixact/
+PostgreSQL/pg_xact/
+PostgreSQL/pg_tblspc/
+PostgreSQL/pg_commit_ts/
+PostgreSQL/pg_subtrans/
+PostgreSQL/pg_logical/
+PostgreSQL/pg_replslot/
+PostgreSQL/pg_serial/
+PostgreSQL/pg_snapshots/
+PostgreSQL/pg_dynshmem/
+PostgreSQL/pg_notify/
+PostgreSQL/pg_twophase/
+PostgreSQL/PG_VERSION
+PostgreSQL/postgresql.conf
+PostgreSQL/postgresql.auto.conf
+PostgreSQL/pg_hba.conf
+PostgreSQL/pg_ident.conf
+PostgreSQL/postmaster.pid
+PostgreSQL/postmaster.opts
+PostgreSQL/postgresql.log
+# End PostgreSQL ignores
