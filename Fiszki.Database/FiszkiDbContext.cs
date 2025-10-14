@@ -3,9 +3,19 @@ using Microsoft.EntityFrameworkCore;
 namespace Fiszki.Database;
 
 /// <summary>
-/// Minimal application DbContext (entities to be added later once schema is finalized).
+/// Application DbContext with entity sets. Configuration is in separate classes implementing IEntityTypeConfiguration.
 /// </summary>
 public class FiszkiDbContext : DbContext
 {
     public FiszkiDbContext(DbContextOptions<FiszkiDbContext> options) : base(options) { }
+
+    public DbSet<Entities.User> Users => Set<Entities.User>();
+    public DbSet<Entities.Flashcard> Flashcards => Set<Entities.Flashcard>();
+    public DbSet<Entities.LearningProgress> LearningProgress => Set<Entities.LearningProgress>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FiszkiDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
+    }
 }
