@@ -8,13 +8,19 @@
 
     <ItemGroup>
       <ProjectReference Include="Fiszki.Database/Fiszki.Database.csproj" />
+      <ProjectReference Include="Fiszki.Services/Fiszki.Services.csproj" />
     </ItemGroup>
 
     <!-- Exclude nested project sources to prevent double compilation -->
     <ItemGroup>
+      <!-- Database project sources -->
       <Compile Remove="Fiszki.Database/**/*.cs" />
       <EmbeddedResource Remove="Fiszki.Database/**/*.resx" />
       <None Remove="Fiszki.Database/**/*.json" />
+      <!-- Services project sources -->
+      <Compile Remove="Fiszki.Services/**/*.cs" />
+      <EmbeddedResource Remove="Fiszki.Services/**/*.resx" />
+      <None Remove="Fiszki.Services/**/*.json" />
     </ItemGroup>
 
 </Project>

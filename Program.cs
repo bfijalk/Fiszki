@@ -1,5 +1,6 @@
 using Fiszki.Components;
 using Fiszki.Database;
+using Fiszki.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,9 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 // Minimal direct DbContext registration (no helper extensions)
 builder.Services.AddDbContext<FiszkiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("FiszkiDatabase")));
+
+// Register domain services
+builder.Services.AddFiszkiServices();
 
 var app = builder.Build();
 
