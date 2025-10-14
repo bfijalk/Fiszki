@@ -1,0 +1,53 @@
+@using MudBlazor
+@using Fiszki.Components.Pages.Generate
+
+<MudPaper Class="pa-4">
+    <MudForm @ref="_form" Model="@_model" ValidationDelay="0">
+        <div class="d-flex flex-column gap-4">
+            @* <MudTextField *@
+            @*     $1$ @bind-Value="_model.Text" #1# *@
+            @*     Label="Source Text" *@
+            @*     Variant="Variant.Outlined" *@
+            @*     Lines="5" *@
+            @*     Counter="@(5000)" *@
+            @*     MaxLength="5000" *@
+            @*     Immediate="true" *@
+            @*     HelperText="Enter at least 50 characters of text to generate flashcards from" *@
+            @*     Disabled="@IsGenerating" /> *@
+
+            <div class="d-flex gap-4">
+                <MudSelect 
+                    T="string"
+                    @* @bind-Value="_model.Language" *@
+                    Label="Language"
+                    Variant="Variant.Outlined"
+                    AnchorOrigin="Origin.BottomCenter"
+                    Disabled="@IsGenerating">
+                    <MudSelectItem Value="@("en")">English</MudSelectItem>
+                    <MudSelectItem Value="@("pl")">Polish</MudSelectItem>
+                    <MudSelectItem Value="@("es")">Spanish</MudSelectItem>
+                    <MudSelectItem Value="@("de")">German</MudSelectItem>
+                    <MudSelectItem Value="@("fr")">French</MudSelectItem>
+                </MudSelect>
+
+                <MudNumericField 
+                    @* @bind-Value="_model.MaxCards" *@
+                    Label="Maximum Cards"
+                    Variant="Variant.Outlined"
+                    Min="1"
+                    Max="50"
+                    Disabled="@IsGenerating" />
+            </div>
+
+            <div class="d-flex justify-end">
+                <MudButton 
+                    Variant="Variant.Filled"
+                    Color="Color.Primary"
+                    OnClick="HandleSubmit"
+                    Disabled="@(IsGenerating || string.IsNullOrEmpty(_model.Text) || _model.Text.Length < 50)">
+                    Generate Flashcards
+                </MudButton>
+            </div>
+        </div>
+    </MudForm>
+</MudPaper>

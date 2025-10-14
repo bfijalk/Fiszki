@@ -15,10 +15,13 @@ public static class DependencyInjection
         services.AddScoped<IValidator<LoginCommand>, Validation.LoginCommandValidator>();
         services.AddScoped<IValidator<CreateFlashcardCommand>, Validation.CreateFlashcardCommandValidator>();
         services.AddScoped<IValidator<UpdateFlashcardCommand>, Validation.UpdateFlashcardCommandValidator>();
+        services.AddScoped<IValidator<StartGenerationCommand>, Validation.StartGenerationCommandValidator>();
+        services.AddScoped<IValidator<SaveProposalsCommand>, Validation.SaveProposalsCommandValidator>();
 
         // Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IFlashcardService, FlashcardService>();
+        services.AddScoped<IGenerationService, GenerationService>();
 
         return services;
     }

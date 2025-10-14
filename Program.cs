@@ -2,10 +2,30 @@ using Fiszki.Components;
 using Fiszki.Database;
 using Fiszki.Services;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+// Add HTTP context accessor for pages
+builder.Services.AddHttpContextAccessor();
+
+// Add Razor pages and server components
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+// Add MudBlazor services
+builder.Services.AddMudServices();
+
+// Add authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    });
+builder.Services.AddAuthorization();
 
 // Minimal direct DbContext registration (no helper extensions)
 builder.Services.AddDbContext<FiszkiDbContext>(options =>
@@ -26,6 +46,10 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+// Add authentication middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

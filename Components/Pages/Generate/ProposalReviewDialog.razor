@@ -1,0 +1,41 @@
+@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" Model="@_model" ValidationDelay="0">
+            <div class="d-flex flex-column gap-4">
+                <MudTextField
+                    @bind-Value="_model.Front"
+                    Label="Front Side"
+                    Variant="Variant.Outlined"
+                    Lines="2"
+                    Required="true"
+                    Validation="@(new Func<string, string>(ValidateFront))" />
+                    
+                <MudTextField
+                    @bind-Value="_model.Back"
+                    Label="Back Side"
+                    Variant="Variant.Outlined"
+                    Lines="2"
+                    Required="true"
+                    Validation="@(new Func<string, string>(ValidateBack))" />
+                    
+                <MudTextField
+                    @bind-Value="_model.Example"
+                    Label="Example (Optional)"
+                    Variant="Variant.Outlined"
+                    Lines="2" />
+                    
+                <MudTextField
+                    @bind-Value="_model.Notes"
+                    Label="Notes (Optional)"
+                    Variant="Variant.Outlined"
+                    Lines="2" />
+            </div>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Save Changes</MudButton>
+    </DialogActions>
+</MudDialog>

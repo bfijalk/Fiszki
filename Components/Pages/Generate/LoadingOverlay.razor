@@ -1,0 +1,28 @@
+@using MudBlazor
+
+@if (Visible)
+{
+    <div class="position-fixed overlay d-flex align-center justify-center">
+        <MudPaper Class="pa-8 d-flex flex-column gap-4 align-center">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+            <MudText Typo="Typo.h6">Generating Flashcards...</MudText>
+            <MudButton 
+                Variant="Variant.Outlined"
+                Color="Color.Error"
+                OnClick="@(() => OnCancel.InvokeAsync())">
+                Cancel Generation
+            </MudButton>
+        </MudPaper>
+    </div>
+}
+
+<style>
+    .overlay {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 999;
+    }
+</style>

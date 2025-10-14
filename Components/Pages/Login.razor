@@ -1,0 +1,87 @@
+@page "/login"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Login - Fiszki</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center mt-8">
+    <MudPaper Class="pa-8" Style="min-width: 400px;">
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8">Login</MudText>
+        
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <MudAlert Severity="Severity.Error" Class="mb-4">@_error</MudAlert>
+        }
+        
+        <MudForm @ref="_form">
+            <MudTextField 
+                @bind-Value="_username"
+                Label="Username"
+                Required="true"
+                RequiredError="Username is required"
+                Immediate="true"
+                Class="mb-4" />
+                
+            <MudTextField 
+                @bind-Value="_password"
+                Label="Password"
+                Required="true"
+                RequiredError="Password is required"
+                Immediate="true"
+                InputType="InputType.Password"
+                Class="mb-6" />
+                
+            <MudButton 
+                Variant="Variant.Filled" 
+                Color="Color.Primary" 
+                FullWidth="true"
+                Disabled="@(!IsFormValid())"
+                OnClick="HandleLogin">
+                Login
+            </MudButton>
+        </MudForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private string _username = string.Empty;
+    private string _password = string.Empty;
+    private string _error = string.Empty;
+    private MudForm _form = null!;
+
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
+
+    private bool IsFormValid() => !string.IsNullOrWhiteSpace(_username) && !string.IsNullOrWhiteSpace(_password);
+
+    private async Task HandleLogin()
+    {
+        if (!IsFormValid())
+        {
+            _error = "Invalid credentials";
+            return;
+        }
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name, _username),
+            new(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+        };
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+        };
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+            authProperties);
+
+        NavigationManager.NavigateTo("/");
+    }
+}
