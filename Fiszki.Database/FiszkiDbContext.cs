@@ -16,7 +16,7 @@ public class FiszkiDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("citext");
-        // modelBuilder.HasPostgresExtension("pgcrypto"); // enable later if needed for db-generated UUIDs
+        modelBuilder.HasPostgresExtension("pgcrypto"); // enable later if needed for db-generated UUIDs
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(FiszkiDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
     }
