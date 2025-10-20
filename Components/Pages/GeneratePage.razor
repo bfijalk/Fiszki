@@ -1,42 +1,40 @@
 @page "/generate"
 @using Microsoft.AspNetCore.Authorization
-@using MudBlazor
 @using Fiszki.Components.Pages.Generate
 @using Fiszki.Services.Models.Generation
 @attribute [Authorize]
 
 <PageTitle>Generate Flashcards - Fiszki</PageTitle>
 
-<MudContainer Class="mt-4">
-    <MudText Typo="Typo.h4" Class="mb-4">Generate Flashcards</MudText>
+<div class="container mt-4">
+    <h4 class="mb-4">Generate Flashcards</h4>
     
-    @if (_state.Status == GenerationStatusEnum.Idle)
-    {
-        <EmptyState />
-    }
-    else if (_state.ErrorMessage != null)
-    {
-        <ErrorState Message="@_state.ErrorMessage" OnRetry="HandleRetry" />
-    }
-    else
-    {
-        <div class="d-flex flex-column gap-4">
-            <SourceInputForm 
-                Value="@_state.Source" 
-                OnChange="HandleSourceChange"
-                OnSubmit="HandleGenerateSubmit"
-                IsGenerating="@(_state.Status == GenerationStatusEnum.Generating)" />
-
-            @if (_state.Status != GenerationStatusEnum.Idle)
-            {
-                <MudPaper Class="pa-4">
-                    <MudText>@GetStatusMessage()</MudText>
-                    @if (_state.Status == GenerationStatusEnum.Generating)
-                    {
-                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mt-2" />
-                    }
-                </MudPaper>
-            }
+    <div class="d-flex flex-column gap-4">
+        <SourceInputForm 
+            Value="@_state.Source" 
+            OnChange="HandleSourceChange"
+            OnSubmit="HandleGenerateSubmit"
+            IsGenerating="@(_state.Status == GenerationStatusEnum.Generating)" />
+        
+        @if (_state.Status == GenerationStatusEnum.Idle)
+        {
+            <EmptyState />
+        }
+        else if (_state.ErrorMessage != null)
+        {
+            <ErrorState Message="@_state.ErrorMessage" OnRetry="HandleRetry" />
+        }
+        else
+        {
+            <div class="p-4 border rounded bg-light">
+                <p class="mb-0">@GetStatusMessage()</p>
+                @if (_state.Status == GenerationStatusEnum.Generating)
+                {
+                    <div class="progress mt-2" role="progressbar" aria-label="Generating" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div>
+                    </div>
+                }
+            </div>
 
             @if (_state.Proposals.Any())
             {
@@ -49,9 +47,9 @@
                     OnSaveSelected="HandleSaveSelected"
                     OnEdit="HandleProposalEdit" />
             }
-        </div>
-    }
-</MudContainer>
+        }
+    </div>
+</div>
 
 @if (_state.Status == GenerationStatusEnum.Generating)
 {
