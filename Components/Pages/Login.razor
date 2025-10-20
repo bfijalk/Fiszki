@@ -1,9 +1,11 @@
 @page "/login"
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authentication.Cookies
+@using Fiszki.Services.Interfaces
+@using Fiszki.Services.Commands
+@using Fiszki.Services.Exceptions
+@using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IUserService UserService
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login - Fiszki</PageTitle>
 
@@ -18,11 +20,12 @@
         
         <MudForm @ref="_form">
             <MudTextField 
-                @bind-Value="_username"
-                Label="Username"
+                @bind-Value="_email"
+                Label="Email"
                 Required="true"
-                RequiredError="Username is required"
+                RequiredError="Email is required"
                 Immediate="true"
+                InputType="InputType.Email"
                 Class="mb-4" />
                 
             <MudTextField 
@@ -38,11 +41,11 @@
                 Variant="Variant.Filled" 
                 Color="Color.Primary" 
                 FullWidth="true"
-                Disabled="@(!IsFormValid())"
+                Disabled="@(_isSubmitting || !IsFormValid())"
                 OnClick="HandleLogin">
-                Login
+                @(_isSubmitting ? "Signing in..." : "Login")
             </MudButton>
-            <!-- Added registration navigation button -->
+            <!-- Registration navigation button -->
             <MudButton 
                 Variant="Variant.Text" 
                 Color="Color.Secondary" 
@@ -56,41 +59,46 @@
 </MudContainer>
 
 @code {
-    private string _username = string.Empty;
+    private string _email = string.Empty;
     private string _password = string.Empty;
     private string _error = string.Empty;
+    private bool _isSubmitting;
     private MudForm _form = null!;
 
-    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
-
-    private bool IsFormValid() => !string.IsNullOrWhiteSpace(_username) && !string.IsNullOrWhiteSpace(_password);
+    private bool IsFormValid() => !string.IsNullOrWhiteSpace(_email) && !string.IsNullOrWhiteSpace(_password);
 
     private async Task HandleLogin()
     {
+        if (_isSubmitting) return;
+        _error = string.Empty;
         if (!IsFormValid())
         {
-            _error = "Invalid credentials";
+            _error = "Email and password are required";
             return;
         }
-
-        var claims = new List<Claim>
+        _isSubmitting = true;
+        try
         {
-            new(ClaimTypes.Name, _username),
-            new(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-        };
-
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties
+            var command = new LoginCommand(_email, _password);
+            var user = await UserService.LoginAsync(command);
+            if (AuthStateProvider is Fiszki.Services.Services.CustomAuthStateProvider custom)
+            {
+                custom.MarkUserAsAuthenticated(user);
+            }
+            NavigationManager.NavigateTo("/generate");
+        }
+        catch (UnauthorizedDomainException)
         {
-            IsPersistent = true,
-            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
-        };
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            new ClaimsPrincipal(claimsIdentity),
-            authProperties);
-
-        NavigationManager.NavigateTo("/");
+            _error = "Invalid credentials";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            _error = "Unexpected error. Please try again.";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
     }
 }

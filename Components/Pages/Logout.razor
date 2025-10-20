@@ -1,0 +1,17 @@
+@page "/logout"
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Nav
+
+<PageTitle>Logout</PageTitle>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (AuthStateProvider is Fiszki.Services.Services.CustomAuthStateProvider custom)
+        {
+            custom.MarkUserAsLoggedOut();
+        }
+        Nav.NavigateTo("/");
+    }
+}
+

@@ -4,6 +4,8 @@ using Fiszki.Services;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization; // added
+using Fiszki.Services.Services; // custom provider
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +19,7 @@ builder.Services.AddRazorComponents()
 // Add MudBlazor services
 builder.Services.AddMudServices();
 
-// Add authentication
+// (Optional cookie auth left; not used by custom provider but can stay for future)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -25,7 +27,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/logout";
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
     });
-builder.Services.AddAuthorization();
+
+// Authorization services needed for components
+builder.Services.AddAuthorizationCore(); // per docs for custom auth state provider
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
 // Minimal direct DbContext registration (no helper extensions)
 builder.Services.AddDbContext<FiszkiDbContext>(options =>
@@ -43,11 +49,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-// Add authentication middleware
+// Cookie auth middleware (harmless even if unused by custom provider)
 app.UseAuthentication();
 app.UseAuthorization();
 
