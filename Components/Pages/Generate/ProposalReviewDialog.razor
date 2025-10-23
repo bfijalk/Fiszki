@@ -1,41 +1,79 @@
-@using MudBlazor
-
-<MudDialog>
-    <DialogContent>
-        <MudForm @ref="_form" Model="@_model" ValidationDelay="0">
-            <div class="d-flex flex-column gap-4">
-                <MudTextField
-                    @bind-Value="_model.Front"
-                    Label="Front Side"
-                    Variant="Variant.Outlined"
-                    Lines="2"
-                    Required="true"
-                    Validation="@(new Func<string, string>(ValidateFront))" />
-                    
-                <MudTextField
-                    @bind-Value="_model.Back"
-                    Label="Back Side"
-                    Variant="Variant.Outlined"
-                    Lines="2"
-                    Required="true"
-                    Validation="@(new Func<string, string>(ValidateBack))" />
-                    
-                <MudTextField
-                    @bind-Value="_model.Example"
-                    Label="Example (Optional)"
-                    Variant="Variant.Outlined"
-                    Lines="2" />
-                    
-                <MudTextField
-                    @bind-Value="_model.Notes"
-                    Label="Notes (Optional)"
-                    Variant="Variant.Outlined"
-                    Lines="2" />
+@if (Proposal != null)
+{
+    <div class="proposal-edit-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-start;justify-content:center;z-index:1050;overflow:auto;">
+        <div class="card shadow-sm mt-5 mb-5" style="min-width:320px;max-width:640px;width:90%;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Edit Flashcard</strong>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="Cancel"></button>
             </div>
-        </MudForm>
-    </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Save Changes</MudButton>
-    </DialogActions>
-</MudDialog>
+            <div class="card-body">
+                <EditForm Model="_model" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mb-3">
+                        <label class="form-label">Front Side *</label>
+                        <textarea class="form-control" @bind="_model.Front" rows="2"></textarea>
+                        @if (string.IsNullOrWhiteSpace(_model.Front))
+                        {
+                            <div class="text-danger small">Front side is required</div>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Back Side *</label>
+                        <textarea class="form-control" @bind="_model.Back" rows="2"></textarea>
+                        @if (string.IsNullOrWhiteSpace(_model.Back))
+                        {
+                            <div class="text-danger small">Back side is required</div>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Example (Optional)</label>
+                        <textarea class="form-control" @bind="_model.Example" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" @bind="_model.Notes" rows="2"></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button type="button" class="btn btn-outline-secondary" @onclick="Cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary" disabled="@(!CanSave)">Save Changes</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public FlashcardProposalViewModel Proposal { get; set; } = null!;
+    [Parameter] public EventCallback<FlashcardProposalViewModel> OnSave { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private FlashcardProposalViewModel _model = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Proposal != null)
+        {
+            _model = Proposal with { }; // clone
+        }
+    }
+
+    private bool CanSave => !string.IsNullOrWhiteSpace(_model.Front) && !string.IsNullOrWhiteSpace(_model.Back);
+
+    private async Task Save()
+    {
+        if (!CanSave) return;
+        await OnSave.InvokeAsync(_model);
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}
