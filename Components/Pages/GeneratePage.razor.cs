@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing; // For LocationChangingEventArgs
+using Microsoft.AspNetCore.Components.Authorization; // added for AuthenticationStateProvider
 using Fiszki.Services.Commands;
 using Fiszki.Services.Interfaces;
 using Fiszki.Services.Models.Generation; // Generation models
 using MudBlazor;
 using Fiszki.Components.Pages;
 using Fiszki.Components.Pages.Generate; // Support view models & helpers
+using System.Security.Claims; // added for user id claim
 
 namespace Fiszki.Components.Pages; // Reverted to match .razor generated namespace
 
@@ -14,6 +16,7 @@ public partial class GeneratePage : IDisposable
     [Inject] private IGenerationService GenerationService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IDialogService DialogService { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!; // new
     
     private GenerateFlashcardsViewState _state = new();
     private CancellationTokenSource? _pollCts;
@@ -158,8 +161,19 @@ public partial class GeneratePage : IDisposable
                 .Select(p => p.ToDto())
                 .ToList();
 
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                await DialogService.ShowMessageBox(
+                    "Error",
+                    "Unable to determine current user. Please re-login.",
+                    yesText: "OK");
+                return;
+            }
+
             var command = new SaveProposalsCommand { Proposals = selectedProposals };
-            await GenerationService.SaveProposalsAsync(command);
+            await GenerationService.SaveProposalsAsync(userId, command); // pass real user id
 
             _state.Proposals.Clear();
             _state.Status = GenerationStatusEnum.Idle;

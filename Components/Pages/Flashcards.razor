@@ -1,0 +1,74 @@
+@page "/flashcards"
+@using System.Security.Claims
+@using Fiszki.Services.Interfaces
+@using Fiszki.Services.Models
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+@inject IFlashcardService FlashcardService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Your Flashcards - Fiszki</PageTitle>
+
+<h4 class="mb-3">Your Flashcards</h4>
+
+@if (_isLoading)
+{
+    <p>Loading flashcards...</p>
+}
+else if (_error != null)
+{
+    <div class="alert alert-danger">@_error</div>
+}
+else if (_flashcards.Count == 0)
+{
+    <div class="alert alert-info">You don't have any flashcards yet.</div>
+}
+else
+{
+    <div class="list-group mb-4">
+        @foreach (var card in _flashcards)
+        {
+            <div class="list-group-item">
+                <div class="fw-bold">@card.FrontContent</div>
+                <div class="mb-1">@card.BackContent</div>
+                <small class="text-muted">Created @card.CreatedAt.ToLocalTime().ToString("g")</small>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<FlashcardDto> _flashcards = new();
+    private bool _isLoading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                _error = "Unable to determine current user.";
+                return;
+            }
+            if (!Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                _error = "Invalid user identifier.";
+                return;
+            }
+            var list = await FlashcardService.ListAsync(userId, take: 100);
+            _flashcards = list.ToList();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

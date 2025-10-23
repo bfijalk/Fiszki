@@ -92,15 +92,19 @@ public class GenerationService : IGenerationService
         return Task.CompletedTask;
     }
 
-    public async Task<IReadOnlyList<Guid>> SaveProposalsAsync(SaveProposalsCommand command, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Guid>> SaveProposalsAsync(Guid userId, SaveProposalsCommand command, CancellationToken ct = default)
     {
         await _saveValidator.ValidateAndThrowAsync(command, ct);
 
-        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111"); // TODO: Get from auth context
         var flashcards = command.Proposals
             .Where(p => p.IsAccepted && !p.IsRejected)
             .Select(p => FlashcardMapper.ToEntity(p, userId))
             .ToList();
+
+        if (flashcards.Count == 0)
+        {
+            return Array.Empty<Guid>();
+        }
 
         _dbContext.Flashcards.AddRange(flashcards);
         await _dbContext.SaveChangesAsync(ct);
