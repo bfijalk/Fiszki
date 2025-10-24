@@ -7,13 +7,11 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
 {
     public RegisterUserCommandValidator()
     {
+        // Relaxed: only ensure not empty and length cap (DB column citext required + unique)
         RuleFor(x => x.Email)
-            .NotEmpty().EmailAddress().MaximumLength(255);
+            .NotEmpty().MaximumLength(255);
         RuleFor(x => x.Password)
-            .NotEmpty().MinimumLength(8).MaximumLength(128)
-            .Matches("[A-Z]").WithMessage("Password must contain uppercase letter")
-            .Matches("[a-z]").WithMessage("Password must contain lowercase letter")
+            .NotEmpty().MinimumLength(3).MaximumLength(128)
             .Matches("[0-9]").WithMessage("Password must contain digit");
     }
 }
-

@@ -1,0 +1,138 @@
+@page "/register"
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Fiszki.Services.Interfaces
+@using Fiszki.Services.Commands
+@using Fiszki.Services.Exceptions
+@using Fiszki.Services.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<h1 class="text-center mt-4">Create Account</h1>
+
+<div class="container" style="max-width:480px;">
+    @if (!string.IsNullOrEmpty(_error))
+    {
+        <div class="alert alert-danger py-2 my-3">@_error</div>
+    }
+    @if (!string.IsNullOrEmpty(_success))
+    {
+        <div class="alert alert-success py-2 my-3">@_success</div>
+    }
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">Email</label>
+                <input id="emailInput" class="form-control" type="email" value="@email" @oninput="OnEmailInput" autocomplete="email" />
+            </div>
+            <div class="mb-3">
+                <label for="passwordInput" class="form-label">Password</label>
+                <input id="passwordInput" class="form-control" type="password" value="@password" @oninput="OnPasswordInput" autocomplete="new-password" />
+            </div>
+            <div class="mb-4">
+                <label for="passwordConfirmInput" class="form-label">Confirm Password</label>
+                <input id="passwordConfirmInput" class="form-control" type="password" value="@passwordConfirm" @oninput="OnPasswordConfirmInput" autocomplete="new-password" />
+                @if (ShowPasswordMismatch)
+                {
+                    <div class="form-text text-danger">Passwords don't match.</div>
+                }
+            </div>
+
+            <button type="button" class="btn btn-primary w-100" @onclick="HandleRegister" disabled="@_isSubmitting">
+                @if (_isSubmitting)
+                {<span>Registering...</span>}
+                else
+                {<span>Register</span>}
+            </button>
+            <button type="button" class="btn btn-link w-100 mt-3" @onclick="NavigateLogin">Back to Login</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    // State fields
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private string passwordConfirm = string.Empty;
+
+    private bool _isSubmitting;
+    private string _error = string.Empty;
+    private string _success = string.Empty;
+
+    private bool ShowPasswordMismatch =>
+        passwordConfirm.Length > 0 && password.Length > 0 && password != passwordConfirm;
+
+    // --- Input event handlers (immediate updates via oninput) ---
+    private void OnEmailInput(ChangeEventArgs e)
+    {
+        email = e.Value?.ToString() ?? string.Empty;
+        Console.WriteLine($"Email changed -> '{email}'");
+    }
+
+    private void OnPasswordInput(ChangeEventArgs e)
+    {
+        password = e.Value?.ToString() ?? string.Empty;
+        Console.WriteLine($"Password changed len={password.Length}");
+    }
+
+    private void OnPasswordConfirmInput(ChangeEventArgs e)
+    {
+        passwordConfirm = e.Value?.ToString() ?? string.Empty;
+        Console.WriteLine($"PasswordConfirm changed len={passwordConfirm.Length}");
+    }
+
+    // --- Actions ---
+    private async Task HandleRegister()
+    {
+        Console.WriteLine("HandleRegister clicked");
+        _error = string.Empty;
+        _success = string.Empty;
+
+        if (_isSubmitting) return;
+        _isSubmitting = true;
+        try
+        {
+            var dto = await UserService.RegisterAsync(new RegisterUserCommand(email?.Trim() ?? string.Empty, password?.Trim() ?? string.Empty));
+
+            // Use the same pattern as Login page - cast AuthenticationStateProvider to CustomAuthStateProvider
+            if (AuthStateProvider is CustomAuthStateProvider custom)
+            {
+                custom.MarkUserAsAuthenticated(dto);
+            }
+            
+            _success = "Account created";
+            NavigationManager.NavigateTo("/");
+        }
+        catch (ConflictException ex)
+        {
+            _error = ex.Message;
+        }
+        catch (FluentValidation.ValidationException ex)
+        {
+            _error = string.Join("; ", ex.Errors.Select(er => er.ErrorMessage).Distinct());
+        }
+        catch (Exception ex)
+        {
+            _error = $"Unexpected error: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void NavigateLogin() => NavigationManager.NavigateTo("/login");
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            Console.WriteLine("Register.razor firstRender complete (plain HTML version)");
+        return Task.CompletedTask;
+    }
+}

@@ -1,0 +1,74 @@
+@using MudBlazor
+
+<MudPaper Class="pa-4">
+    <div class="d-flex flex-column gap-4">
+        <div class="d-flex justify-space-between align-center">
+            <MudText Typo="Typo.h6">Generated Flashcards (@SelectionStats.SelectedCount of @SelectionStats.Total selected)</MudText>
+            <div class="d-flex gap-2">
+                <MudButton 
+                    Variant="Variant.Outlined"
+                    Color="Color.Primary"
+                    OnClick="@(() => OnBulkAccept.InvokeAsync())"
+                    Disabled="@(SelectionStats.EditableCount == 0 || Disabled)">
+                    Accept All
+                </MudButton>
+                <MudButton 
+                    Variant="Variant.Outlined"
+                    Color="Color.Error"
+                    OnClick="@(() => OnBulkReject.InvokeAsync())"
+                    Disabled="@(SelectionStats.EditableCount == 0 || Disabled)">
+                    Reject All
+                </MudButton>
+                <MudButton 
+                    Variant="Variant.Filled"
+                    Color="Color.Primary"
+                    OnClick="@(() => OnSaveSelected.InvokeAsync())"
+                    Disabled="@(SelectionStats.SelectedCount == 0 || Disabled)">
+                    Save Selected (@SelectionStats.SelectedCount)
+                </MudButton>
+            </div>
+        </div>
+
+        <MudDivider />
+
+        <div class="d-flex flex-column gap-2">
+            @foreach (var proposal in Proposals)
+            {
+                <MudPaper Elevation="2" Class="pa-3">
+                    <div class="d-flex gap-4">
+                     
+                        
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-space-between align-center">
+                                <MudText Typo="Typo.subtitle1">@proposal.Front</MudText>
+                                <div class="d-flex gap-2">
+                                    @if (!proposal.Rejected)
+                                    {
+                                        <MudIconButton 
+                                            Icon="@Icons.Material.Filled.Edit" 
+                                            OnClick="@(() => OnEditProposal(proposal))"
+                                            Disabled="@Disabled" />
+                                    }
+                                    <MudIconButton 
+                                        Icon="@(proposal.Rejected ? Icons.Material.Filled.Undo : Icons.Material.Filled.Close)"
+                                        Color="@(proposal.Rejected ? Color.Primary : Color.Error)"
+                                        OnClick="@(() => OnToggleReject(proposal))"
+                                        Disabled="@Disabled" />
+                                </div>
+                            </div>
+                            <MudText Typo="Typo.body1" Color="@(proposal.Rejected ? Color.Error : Color.Default)">
+                                @proposal.Back
+                            </MudText>
+                            @if (!string.IsNullOrEmpty(proposal.Example))
+                            {
+                                <MudText Typo="Typo.body2" Color="Color.Primary" Class="mt-1">
+                                    Example: @proposal.Example
+                                </MudText>
+                            }
+                        </div>
+                    </div>
+                </MudPaper>
+            }
+        </div>
+    </div>
+</MudPaper>

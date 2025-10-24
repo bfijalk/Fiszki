@@ -1,0 +1,104 @@
+@page "/login"
+@using Fiszki.Services.Interfaces
+@using Fiszki.Services.Commands
+@using Fiszki.Services.Exceptions
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+@inject IUserService UserService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Login - Fiszki</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center mt-8">
+    <MudPaper Class="pa-8" Style="min-width: 400px;">
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8">Login</MudText>
+        
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <MudAlert Severity="Severity.Error" Class="mb-4">@_error</MudAlert>
+        }
+        
+        <MudForm @ref="_form">
+            <MudTextField 
+                @bind-Value="_email"
+                Label="Email"
+                Required="true"
+                RequiredError="Email is required"
+                Immediate="true"
+                InputType="InputType.Email"
+                Class="mb-4" />
+                
+            <MudTextField 
+                @bind-Value="_password"
+                Label="Password"
+                Required="true"
+                RequiredError="Password is required"
+                Immediate="true"
+                InputType="InputType.Password"
+                Class="mb-6" />
+                
+            <MudButton 
+                Variant="Variant.Filled" 
+                Color="Color.Primary" 
+                FullWidth="true"
+                Disabled="@(_isSubmitting || !IsFormValid())"
+                OnClick="HandleLogin">
+                @(_isSubmitting ? "Signing in..." : "Login")
+            </MudButton>
+            <!-- Registration navigation button -->
+            <MudButton 
+                Variant="Variant.Text" 
+                Color="Color.Secondary" 
+                FullWidth="true"
+                Class="mt-4"
+                Href="/register">
+                Create Account
+            </MudButton>
+        </MudForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private string _error = string.Empty;
+    private bool _isSubmitting;
+    private MudForm _form = null!;
+
+    private bool IsFormValid() => !string.IsNullOrWhiteSpace(_email) && !string.IsNullOrWhiteSpace(_password);
+
+    private async Task HandleLogin()
+    {
+        if (_isSubmitting) return;
+        _error = string.Empty;
+        if (!IsFormValid())
+        {
+            _error = "Email and password are required";
+            return;
+        }
+        _isSubmitting = true;
+        try
+        {
+            var command = new LoginCommand(_email, _password);
+            var user = await UserService.LoginAsync(command);
+            if (AuthStateProvider is Fiszki.Services.Services.CustomAuthStateProvider custom)
+            {
+                custom.MarkUserAsAuthenticated(user);
+            }
+            NavigationManager.NavigateTo("/generate");
+        }
+        catch (UnauthorizedDomainException)
+        {
+            _error = "Invalid credentials";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            _error = "Unexpected error. Please try again.";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}

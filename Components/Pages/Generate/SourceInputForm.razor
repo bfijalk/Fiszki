@@ -1,0 +1,46 @@
+@using Fiszki.Components.Pages.Generate
+
+<!-- Plain HTML version of the source input form (MudBlazor removed) -->
+<div class="p-4 border rounded bg-white">
+    <div class="d-flex flex-column gap-4">
+        <div>
+            <label for="sourceText" class="form-label">Source Text</label>
+            <textarea id="sourceText"
+                      class="form-control"
+                      rows="5"
+                      maxlength="5000"
+                      value="@_model.Text"
+                      @oninput="HandleTextInput"
+                      disabled="@IsGenerating"></textarea>
+            <div class="form-text">
+                Enter at least 50 characters of text to generate flashcards from (current: @_model.Text.Length).
+            </div>
+        </div>
+
+        <div class="d-flex gap-4">
+            <div class="flex-grow-1">
+                <label for="language" class="form-label">Language</label>
+                <select id="language" class="form-select" value="@_model.Language" @onchange="HandleLanguageChange" disabled="@IsGenerating">
+                    <option value="en">English</option>
+                    <option value="pl">Polish</option>
+                    <option value="es">Spanish</option>
+                    <option value="de">German</option>
+                    <option value="fr">French</option>
+                </select>
+            </div>
+            <div style="width: 180px;">
+                <label for="maxCards" class="form-label">Maximum Cards</label>
+                <input id="maxCards" type="number" min="1" max="50" class="form-control" value="@_model.MaxCards" @onchange="HandleMaxCardsChange" disabled="@IsGenerating" />
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button type="button"
+                    class="btn btn-primary"
+                    @onclick="HandleSubmit"
+                    disabled="@(IsGenerating || string.IsNullOrEmpty(_model.Text) || _model.Text.Length < 50)">
+                Generate Flashcards
+            </button>
+        </div>
+    </div>
+</div>

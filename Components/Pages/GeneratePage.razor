@@ -1,0 +1,81 @@
+@page "/generate"
+@using Microsoft.AspNetCore.Authorization
+@using Fiszki.Components.Pages.Generate
+@using Fiszki.Services.Models.Generation
+@attribute [Authorize]
+
+<PageTitle>Generate Flashcards - Fiszki</PageTitle>
+
+<div class="container mt-4">
+    <h4 class="mb-4">Generate Flashcards</h4>
+    
+    <div class="d-flex flex-column gap-4">
+        <SourceInputForm 
+            Value="@_state.Source" 
+            OnChange="HandleSourceChange"
+            OnSubmit="HandleGenerateSubmit"
+            IsGenerating="@(_state.Status == GenerationStatusEnum.Generating)" />
+        
+        @if (_state.Status == GenerationStatusEnum.Idle)
+        {
+            <EmptyState />
+        }
+        else if (_state.ErrorMessage != null)
+        {
+            <ErrorState Message="@_state.ErrorMessage" OnRetry="HandleRetry" />
+        }
+        else
+        {
+            <div class="p-4 border rounded bg-light">
+                <p class="mb-0">@GetStatusMessage()</p>
+                @if (_state.Status == GenerationStatusEnum.Generating)
+                {
+                    <div class="progress mt-2" role="progressbar" aria-label="Generating" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div>
+                    </div>
+                }
+            </div>
+
+            @if (_state.Proposals.Any())
+            {
+                <ProposalsSection 
+                    Proposals="@_state.Proposals"
+                    SelectionStats="@GetSelectionStats()"
+                    Disabled="@_state.IsSaving"
+                    OnBulkAccept="HandleBulkAccept"
+                    OnBulkReject="HandleBulkReject"
+                    OnSaveSelected="HandleSaveSelected"
+                    OnEdit="HandleProposalEdit" />
+            }
+        }
+    </div>
+</div>
+
+@if (_state.Status == GenerationStatusEnum.Generating)
+{
+    <LoadingOverlay 
+        Visible="true"
+        OnCancel="HandleCancelGeneration" />
+}
+
+@if (_state.ActiveProposalId != null)
+{
+    <ProposalReviewDialog 
+        Proposal="@_state.Proposals.FirstOrDefault(p => p.Id == _state.ActiveProposalId)"
+        OnSave="HandleProposalSave"
+        OnCancel="HandleCloseEditDialog" />
+}
+
+@code {
+    private string GetStatusMessage() => _state.Status switch
+    {
+        GenerationStatusEnum.Queued => "Preparing to generate flashcards...",
+        GenerationStatusEnum.Generating => "Generating flashcards...",
+        GenerationStatusEnum.Completed => "Generation completed",
+        GenerationStatusEnum.Failed => "Generation failed",
+        GenerationStatusEnum.Canceled => "Generation canceled",
+        _ => string.Empty
+    };
+    
+    // ...existing code...
+}

@@ -1,0 +1,20 @@
+@using MudBlazor
+
+<MudPaper Class="pa-8 d-flex flex-column align-center gap-4">
+    <MudIcon Icon="@Icons.Material.Filled.Error" Size="Size.Large" Color="Color.Error" />
+    <MudText Typo="Typo.h6" Align="Align.Center">Generation Failed</MudText>
+    <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Error">
+        @Message
+    </MudText>
+    <MudButton 
+        Variant="Variant.Outlined" 
+        Color="Color.Primary"
+        OnClick="@(() => OnRetry.InvokeAsync())">
+        Try Again
+    </MudButton>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public string Message { get; set; } = null!;
+    [Parameter] public EventCallback OnRetry { get; set; }
+}
