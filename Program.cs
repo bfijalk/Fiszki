@@ -38,7 +38,7 @@ builder.Services.AddDbContext<FiszkiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("FiszkiDatabase")));
 
 // Register domain services
-builder.Services.AddFiszkiServices();
+builder.Services.AddFiszkiServices(builder.Configuration);
 
 var app = builder.Build();
 
