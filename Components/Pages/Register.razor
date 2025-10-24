@@ -6,8 +6,11 @@
 @using Fiszki.Services.Interfaces
 @using Fiszki.Services.Commands
 @using Fiszki.Services.Exceptions
+@using Fiszki.Services.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IUserService UserService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 <h1 class="text-center mt-4">Create Account</h1>
 
@@ -61,8 +64,6 @@
     private string _error = string.Empty;
     private string _success = string.Empty;
 
-    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
-
     private bool ShowPasswordMismatch =>
         passwordConfirm.Length > 0 && password.Length > 0 && password != passwordConfirm;
 
@@ -98,21 +99,12 @@
         {
             var dto = await UserService.RegisterAsync(new RegisterUserCommand(email?.Trim() ?? string.Empty, password?.Trim() ?? string.Empty));
 
-            var claims = new List<Claim>
+            // Use the same pattern as Login page - cast AuthenticationStateProvider to CustomAuthStateProvider
+            if (AuthStateProvider is CustomAuthStateProvider custom)
             {
-                new(ClaimTypes.Name, dto.Email),
-                new(ClaimTypes.NameIdentifier, dto.Id.ToString()),
-                new(ClaimTypes.Role, dto.Role)
-            };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-            var authProps = new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
-            };
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProps);
+                custom.MarkUserAsAuthenticated(dto);
+            }
+            
             _success = "Account created";
             NavigationManager.NavigateTo("/");
         }
