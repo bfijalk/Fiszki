@@ -19,12 +19,19 @@
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="Microsoft.Playwright" Version="1.48.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Features/*.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>%(Filename).feature.cs</LastGenOutput>
     </None>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Fiszki.Database/Fiszki.Database.csproj" />
   </ItemGroup>
 </Project>
-
