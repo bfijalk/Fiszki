@@ -16,8 +16,26 @@ Minimalny, aktualny i docelowy zestaw technologii dla projektu.
 - Format danych z AI: JSON (walidowany)
 
 ## Testy / Jakość
-- Jednostkowe: xUnit (plan)
-- UI: bUnit / Playwright (plan)
+
+### Testy jednostkowe
+- **xUnit**: Framework testowy (domyślny dla .NET)
+- **FluentAssertions**: Czytelne asercje i porównania
+- **AutoFixture**: Automatyczne generowanie danych testowych
+- **Moq**: Mockowanie zależności i interfejsów
+- **Microsoft.EntityFrameworkCore.InMemory**: Szybkie testy z bazą w pamięci
+- **Testcontainers**: Integracja z rzeczywistą PostgreSQL w kontenerze
+
+### Testy end-to-end / UI
+- **bUnit**: Testowanie komponentów Blazor Server
+- **Playwright**: Testy e2e w przeglądarce (cross-browser)
+- **AngleSharp**: Parsowanie HTML w testach komponentów
+- **Microsoft.AspNetCore.Mvc.Testing**: Testy integracyjne z TestServer
+
+### Narzędzia jakości
+- **Coverlet**: Analiza pokrycia kodu
+- **ReportGenerator**: Raporty pokrycia w formacie HTML
+- **NBomber**: Testy wydajnościowe i obciążeniowe
+- **BenchmarkDotNet**: Micro-benchmarki algorytmów (SM-2)
 
 ## DevOps / Infra
 - Kontenery: Docker (plan)
@@ -35,6 +53,7 @@ Minimalny, aktualny i docelowy zestaw technologii dla projektu.
 - Blazor Server na start (szybka iteracja).
 - OpenRouter dla elastyczności modeli.
 - Własna implementacja SM-2.
+- xUnit + bUnit + Playwright dla pełnej piramidy testowej.
 
 ---
 Plik ograniczony do esencji technologicznej. Szczegóły funkcjonalne w `prd.md`.

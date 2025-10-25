@@ -25,7 +25,11 @@ public class FlashcardService : IFlashcardService
 
     public async Task<FlashcardDto> CreateAsync(Guid userId, CreateFlashcardCommand command, CancellationToken ct = default)
     {
-        await _createValidator.ValidateAndThrowAsync(command, ct);
+        var vr = await _createValidator.ValidateAsync(new ValidationContext<CreateFlashcardCommand>(command), ct);
+        if (!vr.IsValid)
+        {
+            throw new ValidationException("Validation failed", vr.Errors);
+        }
         var entity = new Flashcard
         {
             Id = Guid.NewGuid(),
@@ -59,7 +63,11 @@ public class FlashcardService : IFlashcardService
 
     public async Task<FlashcardDto> UpdateAsync(Guid userId, UpdateFlashcardCommand command, CancellationToken ct = default)
     {
-        await _updateValidator.ValidateAndThrowAsync(command, ct);
+        var vr = await _updateValidator.ValidateAsync(new ValidationContext<UpdateFlashcardCommand>(command), ct);
+        if (!vr.IsValid)
+        {
+            throw new ValidationException("Validation failed", vr.Errors);
+        }
         var entity = await _db.Flashcards.FirstOrDefaultAsync(f => f.Id == command.FlashcardId && f.UserId == userId, ct);
         if (entity == null)
         {
@@ -88,4 +96,3 @@ public class FlashcardService : IFlashcardService
         await _db.SaveChangesAsync(ct);
     }
 }
-

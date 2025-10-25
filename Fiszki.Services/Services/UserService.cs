@@ -26,7 +26,11 @@ public class UserService : IUserService
 
     public async Task<UserDto> RegisterAsync(RegisterUserCommand command, CancellationToken ct = default)
     {
-        await _registerValidator.ValidateAndThrowAsync(command, ct);
+        var vr = await _registerValidator.ValidateAsync(new ValidationContext<RegisterUserCommand>(command), ct);
+        if (!vr.IsValid)
+        {
+            throw new ValidationException("Validation failed", vr.Errors);
+        }
         var existing = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == command.Email, ct);
         if (existing != null)
         {
@@ -48,7 +52,11 @@ public class UserService : IUserService
 
     public async Task<UserDto> LoginAsync(LoginCommand command, CancellationToken ct = default)
     {
-        await _loginValidator.ValidateAndThrowAsync(command, ct);
+        var vr = await _loginValidator.ValidateAsync(new ValidationContext<LoginCommand>(command), ct);
+        if (!vr.IsValid)
+        {
+            throw new ValidationException("Validation failed", vr.Errors);
+        }
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == command.Email, ct);
         if (user == null || !BCrypt.Net.BCrypt.Verify(command.Password, user.PasswordHash))
         {
@@ -71,4 +79,3 @@ public class UserService : IUserService
         return user.ToDto();
     }
 }
-
