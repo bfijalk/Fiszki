@@ -1,0 +1,9 @@
+{
+  "language": { "feature": "en-US", "tool": "en-US" },
+  "bindingCulture": { "name": "en-US" },
+  "plugins": [
+    { "name": "SpecFlow.xUnit", "type": "runtime" }
+  ],
+  "stepAssemblies": []
+}
+
