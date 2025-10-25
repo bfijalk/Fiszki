@@ -21,6 +21,10 @@
     <Compile Remove="Fiszki.Services/**/*.cs" />
     <EmbeddedResource Remove="Fiszki.Services/**/*.resx" />
     <None Remove="Fiszki.Services/**/*.json" />
+    <!-- Tests project sources (exclude tests and generated obj files) -->
+    <Compile Remove="Fiszki.Tests/**/*.cs" />
+    <EmbeddedResource Remove="Fiszki.Tests/**/*.resx" />
+    <None Remove="Fiszki.Tests/**/*.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MudBlazor" Version="8.13.0" />

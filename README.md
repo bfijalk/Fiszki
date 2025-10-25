@@ -17,17 +17,18 @@ A lightweight Blazor Server application (working name: “Fiszki”, product cod
 2. [Project Description](#project-description)
 3. [Tech Stack](#tech-stack)
 4. [Getting Started Locally](#getting-started-locally)
-5. [Available Scripts](#available-scripts)
-6. [Project Scope](#project-scope)
-7. [Project Status](#project-status)
-8. [License](#license)
-9. [Environment Variables](#environment-variables)
-10. [Architecture (Conceptual)](#architecture-conceptual)
-11. [Security & Privacy](#security--privacy)
-12. [Roadmap / Future Enhancements](#roadmap--future-enhancements)
-13. [Contributing](#contributing)
-14. [Metrics & Success Criteria](#metrics--success-criteria)
-15. [References](#references)
+5. [Testing Strategy](#testing-strategy)
+6. [Available Scripts](#available-scripts)
+7. [Project Scope](#project-scope)
+8. [Project Status](#project-status)
+9. [License](#license)
+10. [Environment Variables](#environment-variables)
+11. [Architecture (Conceptual)](#architecture-conceptual)
+12. [Security & Privacy](#security--privacy)
+13. [Roadmap / Future Enhancements](#roadmap--future-enhancements)
+14. [Contributing](#contributing)
+15. [Metrics & Success Criteria](#metrics--success-criteria)
+16. [References](#references)
 
 ---
 
@@ -53,6 +54,8 @@ MVP Goals:
 - PostgreSQL + EF Core (Npgsql)
 - OpenRouter (LLM gateway)
 - Tailwind CSS (planned)
+- **Testing**: xUnit + bUnit + Playwright
+- **Quality**: FluentAssertions, Moq, Coverlet
 
 ---
 
@@ -144,12 +147,76 @@ Implemented:
 
 ---
 
-## References
-- PRD: `.ai/prd.md`
-- Tech stack: `.ai/tech-stack.md`
-- OpenRouter Docs
-- EF Core Docs
-- PostgreSQL Docs
+## Testing Strategy
+
+### Unit Tests (xUnit)
+```bash
+# Run all unit tests
+dotnet test
+
+# Run with coverage
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+**Core technologies:**
+- **xUnit**: Primary testing framework for .NET
+- **FluentAssertions**: Readable assertions (`result.Should().BeEquivalentTo(expected)`)
+- **AutoFixture**: Automatic test data generation
+- **Moq**: Mocking framework for dependencies
+- **Microsoft.EntityFrameworkCore.InMemory**: Fast in-memory database for tests
+
+**Test coverage:**
+- Domain services (UserService, FlashcardService, GenerationService)
+- FluentValidation validators
+- SM-2 algorithm implementation
+- Entity mapping and business logic
+
+### Integration Tests
+```bash
+# Run integration tests with real PostgreSQL
+dotnet test --filter "Category=Integration"
+```
+
+**Technologies:**
+- **Testcontainers**: Real PostgreSQL instances in Docker
+- **Microsoft.AspNetCore.Mvc.Testing**: TestServer for full app testing
+- **WebApplicationFactory**: End-to-end HTTP testing
+
+### UI Tests (Blazor Components)
+```bash
+# Run component tests
+dotnet test --filter "Category=UI"
+```
+
+**Technologies:**
+- **bUnit**: Testing Blazor Server components
+- **AngleSharp**: HTML parsing and DOM assertions
+- **Playwright**: Browser automation for E2E tests (planned)
+
+**Test coverage:**
+- Authentication flow (Login/Register components)
+- Flashcard generation workflow
+- Study session components
+- Form validation and user interactions
+
+### Performance & Load Testing
+```bash
+# Run performance benchmarks
+dotnet run --project Fiszki.Benchmarks -c Release
+```
+
+**Technologies:**
+- **NBomber**: Load testing framework for .NET
+- **BenchmarkDotNet**: Micro-benchmarks for algorithms
+- **MiniProfiler**: Database query profiling
+
+### Quality Metrics
+- **Target coverage**: 85% for business logic, 70% overall
+- **Performance**: <2s AI generation, <100ms DB queries
+- **Security**: OWASP Top 10 compliance testing
+
+See [Test Plan](plan-testow.md) for detailed testing strategy.
 
 ---
 
+## Available Scripts

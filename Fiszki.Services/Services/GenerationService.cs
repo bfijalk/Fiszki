@@ -37,7 +37,11 @@ public class GenerationService : IGenerationService
 
     public async Task<GenerationJobDto> StartAsync(StartGenerationCommand command, CancellationToken ct = default)
     {
-        await _startValidator.ValidateAndThrowAsync(command, ct);
+        var vr = await _startValidator.ValidateAsync(new ValidationContext<StartGenerationCommand>(command), ct);
+        if (!vr.IsValid)
+        {
+            throw new ValidationException("Validation failed", vr.Errors);
+        }
 
         var job = new GenerationJob
         {
@@ -103,7 +107,11 @@ public class GenerationService : IGenerationService
 
     public async Task<IReadOnlyList<Guid>> SaveProposalsAsync(Guid userId, SaveProposalsCommand command, CancellationToken ct = default)
     {
-        await _saveValidator.ValidateAndThrowAsync(command, ct);
+        var vr = await _saveValidator.ValidateAsync(new ValidationContext<SaveProposalsCommand>(command), ct);
+        if (!vr.IsValid)
+        {
+            throw new ValidationException("Validation failed", vr.Errors);
+        }
 
         var flashcards = command.Proposals
             .Where(p => p.IsAccepted && !p.IsRejected)
