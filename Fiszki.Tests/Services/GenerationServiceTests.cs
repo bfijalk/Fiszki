@@ -116,7 +116,8 @@ public class GenerationServiceTests : IDisposable
         // Assert
         result.Should().NotBeNull();
         result.JobId.Should().NotBeEmpty();
-        result.Status.Should().Be(GenerationStatusEnum.Queued);
+        // When OpenRouter succeeds immediately, generation completes synchronously
+        result.Status.Should().Be(GenerationStatusEnum.Completed);
         result.QueuedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
