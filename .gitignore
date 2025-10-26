@@ -515,3 +515,6 @@ PostgreSQL/postmaster.pid
 PostgreSQL/postmaster.opts
 PostgreSQL/postgresql.log
 # End PostgreSQL ignores
+appsettings.json
+appsettings.Development.json
+appsettings.Development.json

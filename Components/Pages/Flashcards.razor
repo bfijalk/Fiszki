@@ -2,6 +2,7 @@
 @using System.Security.Claims
 @using Fiszki.Services.Interfaces
 @using Fiszki.Services.Models
+@using Fiszki.Services.Commands
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
@@ -10,38 +11,332 @@
 
 <PageTitle>Your Flashcards - Fiszki</PageTitle>
 
-<h4 class="mb-3">Your Flashcards</h4>
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary mb-2">
+                <i class="bi bi-collection me-2"></i>
+                Your Flashcards
+            </h2>
+            <p class="text-muted mb-4">
+                Manage and review your personal flashcard collection
+            </p>
+            <hr />
+        </div>
+    </div>
 
-@if (_isLoading)
-{
-    <p>Loading flashcards...</p>
-}
-else if (_error != null)
-{
-    <div class="alert alert-danger">@_error</div>
-}
-else if (_flashcards.Count == 0)
-{
-    <div class="alert alert-info">You don't have any flashcards yet.</div>
-}
-else
-{
-    <div class="list-group mb-4">
-        @foreach (var card in _flashcards)
+    @if (_isLoading)
+    {
+        <div class="row">
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading your flashcards...</p>
+            </div>
+        </div>
+    }
+    else if (_error != null)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    @_error
+                </div>
+            </div>
+        </div>
+    }
+    else if (_flashcards.Count == 0)
+    {
+        <div class="row">
+            <div class="col-12 text-center">
+                <div class="p-4">
+                    <i class="bi bi-collection display-1 text-muted mb-3"></i>
+                    <h5 class="text-muted mb-3">No flashcards yet</h5>
+                    <p class="text-muted mb-4">Start creating your first flashcards to build your learning collection!</p>
+                    <a href="/generate" class="btn btn-primary me-2">
+                        <i class="bi bi-stars me-2"></i>
+                        Generate with AI
+                    </a>
+                    <button class="btn btn-outline-primary" @onclick="CreateManualCard">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Create Manually
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Flashcards Stats -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-4 mb-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Cards</h5>
+                        <h2>@_flashcards.Count</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 mb-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">AI Generated</h5>
+                        <h2>@_flashcards.Count(f => f.CreationSource == "Ai")</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 mb-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Manual</h5>
+                        <h2>@_flashcards.Count(f => f.CreationSource == "Manual")</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <a href="/generate" class="btn btn-primary me-2">
+                    <i class="bi bi-stars me-2"></i>
+                    Generate More Cards
+                </a>
+                <button class="btn btn-outline-primary me-2" @onclick="CreateManualCard">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Add Manual Card
+                </button>
+                <button class="btn btn-outline-secondary" @onclick="ToggleViewMode">
+                    <i class="bi bi-@(_isCardView ? "list-ul" : "grid-3x3") me-2"></i>
+                    @(_isCardView ? "List View" : "Card View")
+                </button>
+            </div>
+        </div>
+
+        @if (_cardToDelete != null)
         {
-            <div class="list-group-item">
-                <div class="fw-bold">@card.FrontContent</div>
-                <div class="mb-1">@card.BackContent</div>
-                <small class="text-muted">Created @card.CreatedAt.ToLocalTime().ToString("g")</small>
+            <!-- Delete Confirmation Modal -->
+            <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirm Deletion</h5>
+                            <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this flashcard?</p>
+                            <div class="card">
+                                <div class="card-body">
+                                    <strong>Question:</strong> @_cardToDelete.FrontContent
+                                    <br>
+                                    <strong>Answer:</strong> @_cardToDelete.BackContent
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                            <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">
+                                <i class="bi bi-trash me-1"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
-    </div>
-}
+
+        @if (_showCreateModal)
+        {
+            <!-- Create Manual Card Modal -->
+            <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                Create Manual Flashcard
+                            </h5>
+                            <button type="button" class="btn-close" @onclick="CancelCreate"></button>
+                        </div>
+                        <div class="modal-body">
+                            @if (_createError != null)
+                            {
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    @_createError
+                                </div>
+                            }
+                            
+                            <div class="mb-3">
+                                <label for="frontContent" class="form-label">Question (Front)*</label>
+                                <textarea class="form-control" id="frontContent" rows="3" 
+                                          @bind="_newCardFront" placeholder="Enter the question or prompt..."></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="backContent" class="form-label">Answer (Back)*</label>
+                                <textarea class="form-control" id="backContent" rows="3" 
+                                          @bind="_newCardBack" placeholder="Enter the answer or explanation..."></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="tags" class="form-label">Tags (optional)</label>
+                                <input type="text" class="form-control" id="tags" 
+                                       @bind="_newCardTags" placeholder="tag1, tag2, tag3...">
+                                <div class="form-text">Separate multiple tags with commas</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CancelCreate">Cancel</button>
+                            <button type="button" class="btn btn-primary" @onclick="CreateCard" disabled="@_isCreating">
+                                @if (_isCreating)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                }
+                                Create Card
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (_isCardView)
+        {
+            <!-- Card View -->
+            <div class="row">
+                @foreach (var card in _flashcards)
+                {
+                    <div class="col-12 col-sm-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="d-flex align-items-center">
+                                    @if (card.CreationSource == "Ai")
+                                    {
+                                        <i class="bi bi-stars text-primary me-2"></i>
+                                        <small class="text-muted">AI Generated</small>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-pencil text-secondary me-2"></i>
+                                        <small class="text-muted">Manual</small>
+                                    }
+                                </span>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => EditCard(card)" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(card)" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="card-body">
+                                <div class="flashcard-container" style="min-height: 200px;">
+                                    @if (_flippedCards.Contains(card.Id))
+                                    {
+                                        <!-- Back of card -->
+                                        <div class="p-3 text-center flashcard-back border rounded" 
+                                             style="background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%); min-height: 160px; display: flex; align-items: center; justify-content: center;">
+                                            <div>
+                                                <small class="text-muted mb-2 d-block">Answer:</small>
+                                                <div style="font-weight: 500;">
+                                                    @card.BackContent
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <!-- Front of card -->
+                                        <div class="p-3 text-center flashcard-front border rounded" 
+                                             style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); min-height: 160px; display: flex; align-items: center; justify-content: center;">
+                                            <div>
+                                                <small class="text-muted mb-2 d-block">Question:</small>
+                                                <div style="font-weight: 500;">
+                                                    @card.FrontContent
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <button class="btn btn-outline-primary btn-sm"
+                                        @onclick="() => FlipCard(card.Id)">
+                                    <i class="bi bi-arrow-repeat me-1"></i>
+                                    @(_flippedCards.Contains(card.Id) ? "Show Question" : "Show Answer")
+                                </button>
+                                <small class="text-muted">
+                                    @card.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- List View -->
+            <div class="list-group">
+                @foreach (var card in _flashcards)
+                {
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    @if (card.CreationSource == "Ai")
+                                    {
+                                        <i class="bi bi-stars text-primary me-2"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-pencil text-secondary me-2"></i>
+                                    }
+                                    <strong>@card.FrontContent</strong>
+                                </div>
+                                <div class="text-muted mb-2">@card.BackContent</div>
+                                <small class="text-muted">Created @card.CreatedAt.ToLocalTime().ToString("g")</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => EditCard(card)" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(card)" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
 
 @code {
     private List<FlashcardDto> _flashcards = new();
     private bool _isLoading = true;
     private string? _error;
+    private bool _isCardView = true;
+    private HashSet<Guid> _flippedCards = new();
+    private FlashcardDto? _cardToDelete;
+    private bool _showCreateModal = false;
+    private string _newCardFront = string.Empty;
+    private string _newCardBack = string.Empty;
+    private string _newCardTags = string.Empty;
+    private bool _isCreating = false;
+    private string? _createError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,5 +365,129 @@ else
         {
             _isLoading = false;
         }
+    }
+
+    private void FlipCard(Guid cardId)
+    {
+        if (_flippedCards.Contains(cardId))
+        {
+            _flippedCards.Remove(cardId);
+        }
+        else
+        {
+            _flippedCards.Add(cardId);
+        }
+        StateHasChanged();
+    }
+
+    private void ToggleViewMode()
+    {
+        _isCardView = !_isCardView;
+        _flippedCards.Clear(); // Reset flipped state when changing views
+        StateHasChanged();
+    }
+
+    private void CreateManualCard()
+    {
+        _showCreateModal = true;
+        StateHasChanged();
+    }
+
+    private void EditCard(FlashcardDto card)
+    {
+        // TODO: Navigate to edit page or open edit modal
+    }
+
+    private void ShowDeleteConfirmation(FlashcardDto card)
+    {
+        _cardToDelete = card;
+        StateHasChanged();
+    }
+
+    private void CancelDelete()
+    {
+        _cardToDelete = null;
+        StateHasChanged();
+    }
+
+    private void ConfirmDelete()
+    {
+        if (_cardToDelete != null)
+        {
+            try
+            {
+                // TODO: Implement actual delete service call
+                // await FlashcardService.DeleteAsync(_cardToDelete.Id);
+                _flashcards.Remove(_cardToDelete);
+                _flippedCards.Remove(_cardToDelete.Id);
+                _cardToDelete = null;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                _error = ex.Message;
+                _cardToDelete = null;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task CreateCard()
+    {
+        if (string.IsNullOrWhiteSpace(_newCardFront) || string.IsNullOrWhiteSpace(_newCardBack))
+        {
+            _createError = "Question and Answer are required.";
+            return;
+        }
+
+        _createError = null;
+        _isCreating = true;
+        StateHasChanged();
+
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                _createError = "Unable to determine current user.";
+                return;
+            }
+
+            // Parse tags if provided
+            var tags = string.IsNullOrWhiteSpace(_newCardTags) 
+                ? null 
+                : _newCardTags.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(t => t.Trim())
+                    .Where(t => !string.IsNullOrEmpty(t))
+                    .ToArray();
+
+            var command = new CreateFlashcardCommand(_newCardFront.Trim(), _newCardBack.Trim(), tags);
+            var newCard = await FlashcardService.CreateAsync(userId, command);
+
+            _flashcards.Add(newCard);
+            _newCardFront = string.Empty;
+            _newCardBack = string.Empty;
+            _newCardTags = string.Empty;
+            _showCreateModal = false;
+        }
+        catch (Exception ex)
+        {
+            _createError = ex.Message;
+        }
+        finally
+        {
+            _isCreating = false;
+            StateHasChanged();
+        }
+    }
+
+    private void CancelCreate()
+    {
+        _showCreateModal = false;
+        _newCardFront = string.Empty;
+        _newCardBack = string.Empty;
+        _newCardTags = string.Empty;
+        StateHasChanged();
     }
 }
