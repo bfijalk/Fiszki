@@ -1,26 +1,113 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+# CI/CD Pipeline dla Fiszki
+# Minimalny setup zgodny z tech-stack.md
 
-name: .NET
+name: CI/CD Pipeline
 
 on:
   push:
+    branches: [ "**" ]  # Wszystkie branche
   pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:  # Możliwość uruchomienia manualnego
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION_FILE: 'Fiszki.sln'
 
 jobs:
+  # Build aplikacji w konfiguracji Release (produkcyjnej)
   build:
-
+    name: 🔨 Build (Release)
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 🔄 Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+    - name: 🔨 Build (Release)
+      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
+
+    - name: 📦 Publish artifacts
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --configuration Release --no-build --output ./publish
+
+    - name: 🗂️ Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: fiszki-release-build
+        path: ./publish/
+        retention-days: 7
+
+  # Testy jednostkowe (izolowane od testów funkcjonalnych)
+  unit-tests:
+    name: 🧪 Testy jednostkowe
+    runs-on: ubuntu-latest
+    needs: build  # Uruchamiaj po udanym buildzie
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 🔄 Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+    - name: 🔨 Build for tests
+      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Debug --no-restore
+
+    - name: 🧪 Run unit tests
+      run: |
+        dotnet test Fiszki.Tests/Fiszki.Tests.csproj \
+          --configuration Debug \
+          --no-build \
+          --verbosity normal \
+          --logger trx \
+          --results-directory ./test-results \
+          --collect:"XPlat Code Coverage"
+
+    - name: 📊 Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: unit-test-results
+        path: ./test-results/
+        retention-days: 7
+
+    - name: 📈 Upload coverage reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: unit-test-coverage
+        path: ./test-results/**/coverage.cobertura.xml
+        retention-days: 7
+
+  # Status check - podsumowanie wszystkich jobów
+  ci-status:
+    name: ✅ CI Status
+    runs-on: ubuntu-latest
+    needs: [build, unit-tests]
+    if: always()
+
+    steps:
+    - name: 📊 Check CI status
+      run: |
+        if [[ "${{ needs.build.result }}" == "success" && "${{ needs.unit-tests.result }}" == "success" ]]; then
+          echo "✅ CI Pipeline zakończony sukcesem"
+          exit 0
+        else
+          echo "❌ CI Pipeline failed:"
+          echo "Build: ${{ needs.build.result }}"
+          echo "Unit Tests: ${{ needs.unit-tests.result }}"
+          exit 1
+        fi
