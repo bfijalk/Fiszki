@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Fiszki.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fiszki.Database.Migrations
 {
     [DbContext(typeof(FiszkiDbContext))]
-    partial class FiszkiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251026140508_AzureSync")]
+    partial class AzureSync
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

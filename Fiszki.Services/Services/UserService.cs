@@ -26,12 +26,14 @@ public class UserService : IUserService
 
     public async Task<UserDto> RegisterAsync(RegisterUserCommand command, CancellationToken ct = default)
     {
+        if (command is null) throw new ArgumentNullException(nameof(command));
         var vr = await _registerValidator.ValidateAsync(new ValidationContext<RegisterUserCommand>(command), ct);
         if (!vr.IsValid)
         {
             throw new ValidationException("Validation failed", vr.Errors);
         }
-        var existing = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == command.Email, ct);
+        var normalizedEmail = command.Email.ToLowerInvariant();
+        var existing = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail, ct);
         if (existing != null)
         {
             throw new ConflictException($"User with email {command.Email} already exists");
@@ -40,10 +42,11 @@ public class UserService : IUserService
         var entity = new UserEntity
         {
             Id = Guid.NewGuid(),
-            Email = command.Email,
+            Email = command.Email, // keep original casing as tests expect
             PasswordHash = hash,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            IsActive = true
         };
         _db.Users.Add(entity);
         await _db.SaveChangesAsync(ct);
@@ -52,13 +55,19 @@ public class UserService : IUserService
 
     public async Task<UserDto> LoginAsync(LoginCommand command, CancellationToken ct = default)
     {
+        if (command is null) throw new ArgumentNullException(nameof(command));
         var vr = await _loginValidator.ValidateAsync(new ValidationContext<LoginCommand>(command), ct);
         if (!vr.IsValid)
         {
             throw new ValidationException("Validation failed", vr.Errors);
         }
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == command.Email, ct);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(command.Password, user.PasswordHash))
+        var normalizedEmail = command.Email.ToLowerInvariant();
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail, ct);
+        if (user == null)
+        {
+            throw new UnauthorizedDomainException("Invalid credentials");
+        }
+        if (!BCrypt.Net.BCrypt.Verify(command.Password, user.PasswordHash))
         {
             throw new UnauthorizedDomainException("Invalid credentials");
         }
