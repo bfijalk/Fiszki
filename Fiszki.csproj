@@ -25,6 +25,11 @@
     <Compile Remove="Fiszki.Tests/**/*.cs" />
     <EmbeddedResource Remove="Fiszki.Tests/**/*.resx" />
     <None Remove="Fiszki.Tests/**/*.json" />
+    <!-- Functional UI tests sources -->
+    <Compile Remove="Fiszki.FunctionalTests/**/*.cs" />
+    <EmbeddedResource Remove="Fiszki.FunctionalTests/**/*.resx" />
+    <None Remove="Fiszki.FunctionalTests/**/*.feature" />
+    <None Remove="Fiszki.FunctionalTests/**/*.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MudBlazor" Version="8.13.0" />
