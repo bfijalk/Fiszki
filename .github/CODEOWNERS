@@ -1,0 +1,17 @@
+# Code Owners for Fiszki Project
+# This file defines who should be automatically requested for review
+# when files in certain paths are modified in a Pull Request
+
+# Global ownership - all files require review from repository owner
+* @bzfs
+
+# Specific ownership for critical areas
+/.github/workflows/ @bzfs
+/Fiszki.Database/ @bzfs
+/Fiszki.Services/ @bzfs
+*.csproj @bzfs
+*.sln @bzfs
+
+# Documentation
+README.md @bzfs
+*.md @bzfs
