@@ -2,6 +2,7 @@
 @using System.Security.Claims
 @using Fiszki.Services.Interfaces
 @using Fiszki.Services.Models
+@using Fiszki.Services.Commands
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
@@ -147,6 +148,66 @@
             </div>
         }
 
+        @if (_showCreateModal)
+        {
+            <!-- Create Manual Card Modal -->
+            <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                Create Manual Flashcard
+                            </h5>
+                            <button type="button" class="btn-close" @onclick="CancelCreate"></button>
+                        </div>
+                        <div class="modal-body">
+                            @if (_createError != null)
+                            {
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    @_createError
+                                </div>
+                            }
+                            
+                            <div class="mb-3">
+                                <label for="frontContent" class="form-label">Question (Front)*</label>
+                                <textarea class="form-control" id="frontContent" rows="3" 
+                                          @bind="_newCardFront" placeholder="Enter the question or prompt..."></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="backContent" class="form-label">Answer (Back)*</label>
+                                <textarea class="form-control" id="backContent" rows="3" 
+                                          @bind="_newCardBack" placeholder="Enter the answer or explanation..."></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="tags" class="form-label">Tags (optional)</label>
+                                <input type="text" class="form-control" id="tags" 
+                                       @bind="_newCardTags" placeholder="tag1, tag2, tag3...">
+                                <div class="form-text">Separate multiple tags with commas</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CancelCreate">Cancel</button>
+                            <button type="button" class="btn btn-primary" @onclick="CreateCard" disabled="@_isCreating">
+                                @if (_isCreating)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                }
+                                Create Card
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
         @if (_isCardView)
         {
             <!-- Card View -->
@@ -270,6 +331,12 @@
     private bool _isCardView = true;
     private HashSet<Guid> _flippedCards = new();
     private FlashcardDto? _cardToDelete;
+    private bool _showCreateModal = false;
+    private string _newCardFront = string.Empty;
+    private string _newCardBack = string.Empty;
+    private string _newCardTags = string.Empty;
+    private bool _isCreating = false;
+    private string? _createError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -322,8 +389,8 @@
 
     private void CreateManualCard()
     {
-        // TODO: Navigate to manual card creation or open modal
-        // For now, redirect to a create page or implement inline creation
+        _showCreateModal = true;
+        StateHasChanged();
     }
 
     private void EditCard(FlashcardDto card)
@@ -363,5 +430,64 @@
                 StateHasChanged();
             }
         }
+    }
+
+    private async Task CreateCard()
+    {
+        if (string.IsNullOrWhiteSpace(_newCardFront) || string.IsNullOrWhiteSpace(_newCardBack))
+        {
+            _createError = "Question and Answer are required.";
+            return;
+        }
+
+        _createError = null;
+        _isCreating = true;
+        StateHasChanged();
+
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                _createError = "Unable to determine current user.";
+                return;
+            }
+
+            // Parse tags if provided
+            var tags = string.IsNullOrWhiteSpace(_newCardTags) 
+                ? null 
+                : _newCardTags.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(t => t.Trim())
+                    .Where(t => !string.IsNullOrEmpty(t))
+                    .ToArray();
+
+            var command = new CreateFlashcardCommand(_newCardFront.Trim(), _newCardBack.Trim(), tags);
+            var newCard = await FlashcardService.CreateAsync(userId, command);
+
+            _flashcards.Add(newCard);
+            _newCardFront = string.Empty;
+            _newCardBack = string.Empty;
+            _newCardTags = string.Empty;
+            _showCreateModal = false;
+        }
+        catch (Exception ex)
+        {
+            _createError = ex.Message;
+        }
+        finally
+        {
+            _isCreating = false;
+            StateHasChanged();
+        }
+    }
+
+    private void CancelCreate()
+    {
+        _showCreateModal = false;
+        _newCardFront = string.Empty;
+        _newCardBack = string.Empty;
+        _newCardTags = string.Empty;
+        StateHasChanged();
     }
 }
