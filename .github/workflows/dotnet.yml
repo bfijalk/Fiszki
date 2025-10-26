@@ -1,21 +1,21 @@
-# CI/CD Pipeline dla Fiszki
-# Minimalny setup zgodny z tech-stack.md
+# CI/CD Pipeline for Fiszki
+# Minimal setup according to tech-stack.md
 
 name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "**" ]  # Wszystkie branche
+    branches: [ "**" ]  # All branches
   pull_request:
     branches: [ "**" ]
-  workflow_dispatch:  # Możliwość uruchomienia manualnego
+  workflow_dispatch:  # Manual trigger capability
 
 env:
   DOTNET_VERSION: '8.0.x'
   SOLUTION_FILE: 'Fiszki.sln'
 
 jobs:
-  # Build aplikacji w konfiguracji Release (produkcyjnej)
+  # Build application in Release configuration (production)
   build:
     name: 🔨 Build (Release)
     runs-on: ubuntu-latest
@@ -45,11 +45,11 @@ jobs:
         path: ./publish/
         retention-days: 7
 
-  # Testy jednostkowe (izolowane od testów funkcjonalnych)
+  # Unit tests (isolated from functional tests)
   unit-tests:
-    name: 🧪 Testy jednostkowe
+    name: 🧪 Unit Tests
     runs-on: ubuntu-latest
-    needs: build  # Uruchamiaj po udanym buildzie
+    needs: build  # Run after successful build
 
     steps:
     - name: 📥 Checkout code
@@ -92,7 +92,7 @@ jobs:
         path: ./test-results/**/coverage.cobertura.xml
         retention-days: 7
 
-  # Status check - podsumowanie wszystkich jobów
+  # Status check - summary of all jobs
   ci-status:
     name: ✅ CI Status
     runs-on: ubuntu-latest
@@ -103,7 +103,7 @@ jobs:
     - name: 📊 Check CI status
       run: |
         if [[ "${{ needs.build.result }}" == "success" && "${{ needs.unit-tests.result }}" == "success" ]]; then
-          echo "✅ CI Pipeline zakończony sukcesem"
+          echo "✅ CI Pipeline completed successfully"
           exit 0
         else
           echo "❌ CI Pipeline failed:"
