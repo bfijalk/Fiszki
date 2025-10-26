@@ -3,15 +3,15 @@
 # when files in certain paths are modified in a Pull Request
 
 # Global ownership - all files require review from repository owner
-* @bzfs
+* @bfijalk
 
 # Specific ownership for critical areas
-/.github/workflows/ @bzfs
-/Fiszki.Database/ @bzfs
-/Fiszki.Services/ @bzfs
-*.csproj @bzfs
-*.sln @bzfs
+/.github/workflows/ @bfijalk
+/Fiszki.Database/ @bfijalk
+/Fiszki.Services/ @bfijalk
+*.csproj @bfijalk
+*.sln @bfijalk
 
 # Documentation
-README.md @bzfs
-*.md @bzfs
+README.md @bfijalk
+*.md @bfijalk
