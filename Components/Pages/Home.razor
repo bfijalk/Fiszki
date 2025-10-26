@@ -1,7 +1,166 @@
 ﻿@page "/"
+@inject NavigationManager NavigationManager
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Fiszki - AI-Powered Flashcards</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudContainer MaxWidth="MaxWidth.Large" Class="pa-6">
+    <!-- Hero Section -->
+    <MudGrid Justify="Justify.Center" AlignItems="Center" Class="mb-8">
+        <MudItem xs="12" md="8" Class="text-center">
+            <MudText Typo="Typo.h2" Color="Color.Primary" Class="mb-4 font-weight-bold">
+                <MudIcon Icon="@Icons.Material.Filled.Psychology" Size="Size.Large" Class="mr-2" />
+                Fiszki
+            </MudText>
+            <MudText Typo="Typo.h4" Class="mb-4 text-muted">
+                AI-Powered Flashcards for Smarter Learning
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mb-6" Style="font-size: 1.1rem; line-height: 1.6;">
+                Transform any text into effective flashcards instantly. Our AI analyzes your content and creates 
+                personalized study materials, making learning 10x faster and more efficient.
+            </MudText>
+            <MudButton Variant="Variant.Filled" 
+                      Color="Color.Primary" 
+                      Size="Size.Large" 
+                      StartIcon="@Icons.Material.Filled.Login"
+                      OnClick="NavigateToLogin"
+                      Class="px-8 py-3">
+                Get Started - Sign In
+            </MudButton>
+        </MudItem>
+    </MudGrid>
 
-Welcome to your new app.
+    <!-- Features Section -->
+    <MudGrid Class="mb-8">
+        <MudItem xs="12" Class="text-center mb-6">
+            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-3">
+                Why Choose Fiszki?
+            </MudText>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="pa-4 h-100" Elevation="2">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" 
+                            Color="Color.Primary" 
+                            Size="Size.Large" 
+                            Class="mb-3" />
+                    <MudText Typo="Typo.h6" Class="mb-2">AI-Generated Content</MudText>
+                    <MudText Typo="Typo.body2" Class="text-muted">
+                        Paste any text and let our AI create perfect flashcards. 
+                        Save hours of manual work with intelligent question generation.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="pa-4 h-100" Elevation="2">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Schedule" 
+                            Color="Color.Secondary" 
+                            Size="Size.Large" 
+                            Class="mb-3" />
+                    <MudText Typo="Typo.h6" Class="mb-2">Spaced Repetition</MudText>
+                    <MudText Typo="Typo.body2" Class="text-muted">
+                        Built-in spaced repetition algorithm ensures you review cards 
+                        at optimal intervals for maximum retention.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="pa-4 h-100" Elevation="2">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Edit" 
+                            Color="Color.Info" 
+                            Size="Size.Large" 
+                            Class="mb-3" />
+                    <MudText Typo="Typo.h6" Class="mb-2">Full Control</MudText>
+                    <MudText Typo="Typo.body2" Class="text-muted">
+                        Create, edit, and manage your flashcards manually. 
+                        Perfect blend of AI assistance and personal customization.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <!-- How It Works Section -->
+    <MudGrid Class="mb-8">
+        <MudItem xs="12" Class="text-center mb-6">
+            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-3">
+                How It Works
+            </MudText>
+        </MudItem>
+
+        <MudItem xs="12" md="3" Class="text-center">
+            <MudAvatar Color="Color.Primary" Size="Size.Large" Class="mb-3">
+                <MudText Typo="Typo.h6">1</MudText>
+            </MudAvatar>
+            <MudText Typo="Typo.h6" Class="mb-2">Paste Your Text</MudText>
+            <MudText Typo="Typo.body2" Class="text-muted">
+                Copy any study material - textbook chapters, articles, or notes.
+            </MudText>
+        </MudItem>
+
+        <MudItem xs="12" md="3" Class="text-center">
+            <MudAvatar Color="Color.Secondary" Size="Size.Large" Class="mb-3">
+                <MudText Typo="Typo.h6">2</MudText>
+            </MudAvatar>
+            <MudText Typo="Typo.h6" Class="mb-2">AI Generation</MudText>
+            <MudText Typo="Typo.body2" Class="text-muted">
+                Our AI analyzes content and creates relevant flashcards automatically.
+            </MudText>
+        </MudItem>
+
+        <MudItem xs="12" md="3" Class="text-center">
+            <MudAvatar Color="Color.Info" Size="Size.Large" Class="mb-3">
+                <MudText Typo="Typo.h6">3</MudText>
+            </MudAvatar>
+            <MudText Typo="Typo.h6" Class="mb-2">Review & Edit</MudText>
+            <MudText Typo="Typo.body2" Class="text-muted">
+                Accept, edit, or reject generated cards. Add your own manually.
+            </MudText>
+        </MudItem>
+
+        <MudItem xs="12" md="3" Class="text-center">
+            <MudAvatar Color="Color.Success" Size="Size.Large" Class="mb-3">
+                <MudText Typo="Typo.h6">4</MudText>
+            </MudAvatar>
+            <MudText Typo="Typo.h6" Class="mb-2">Smart Study</MudText>
+            <MudText Typo="Typo.body2" Class="text-muted">
+                Study with spaced repetition for optimal learning efficiency.
+            </MudText>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Call to Action -->
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="12" md="8" Class="text-center">
+            <MudPaper Class="pa-6 mud-theme-primary" Style="background: linear-gradient(135deg, #673ab7 0%, #9c27b0 100%);">
+                <MudText Typo="Typo.h5" Class="mb-3" Style="color: white;">
+                    Ready to revolutionize your learning?
+                </MudText>
+                <MudText Typo="Typo.body1" Class="mb-4" Style="color: white; opacity: 0.9;">
+                    Join thousands of students already using AI to create better flashcards and study more effectively.
+                </MudText>
+                <MudButton Variant="Variant.Filled" 
+                          Color="Color.Surface" 
+                          Size="Size.Large"
+                          StartIcon="@Icons.Material.Filled.Login"
+                          OnClick="NavigateToLogin"
+                          Class="px-8 py-3">
+                    Start Learning Today
+                </MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}
