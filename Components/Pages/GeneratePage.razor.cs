@@ -11,7 +11,7 @@ using System.Security.Claims; // added for user id claim
 
 namespace Fiszki.Components.Pages; // Reverted to match .razor generated namespace
 
-public partial class GeneratePage : IDisposable
+public partial class GeneratePage : ComponentBase, IDisposable
 {
     [Inject] private IGenerationService GenerationService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -20,7 +20,6 @@ public partial class GeneratePage : IDisposable
     
     private GenerateFlashcardsViewState _state = new();
     private CancellationTokenSource? _pollCts;
-    private bool _isNavigating;
     
     protected override void OnInitialized()
     {

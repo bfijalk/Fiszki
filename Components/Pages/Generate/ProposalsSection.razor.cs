@@ -3,7 +3,7 @@ using Fiszki.Services.Models.Generation;
 
 namespace Fiszki.Components.Pages.Generate;
 
-public partial class ProposalsSection
+public partial class ProposalsSection : ComponentBase
 {
     [Parameter, EditorRequired] public IReadOnlyList<FlashcardProposalViewModel> Proposals { get; set; } = null!;
     [Parameter, EditorRequired] public SelectionStats SelectionStats { get; set; } = null!;

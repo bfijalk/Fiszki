@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Fiszki.Components.Pages.Generate;
 
-public partial class SourceInputForm
+public partial class SourceInputForm : ComponentBase
 {
     [Parameter] public SourceInputModel Value { get; set; } = new();
     [Parameter] public EventCallback<SourceInputModel> OnChange { get; set; }
