@@ -10,6 +10,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Your Flashcards - Fiszki</PageTitle>
+<link href="~/css/flashcards.css" rel="stylesheet" />
 
 <div class="container mt-4">
     <!-- Header Section -->
@@ -73,26 +74,47 @@
         <!-- Flashcards Stats -->
         <div class="row mb-4">
             <div class="col-12 col-md-4 mb-3">
-                <div class="card bg-primary text-white">
+                <div class="card bg-primary text-white filter-card @(_selectedFilter == null ? "selected" : "")" 
+                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Total")' @ondblclick="ClearFilter">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Total Cards</h5>
-                        <h2>@_flashcards.Count</h2>
+                        <h5 class="card-title d-flex align-items-center justify-content-center">
+                            Total Cards
+                            @if (_selectedFilter == null)
+                            {
+                                <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
+                            }
+                        </h5>
+                        <h2>@_allFlashcards.Count</h2>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-4 mb-3">
-                <div class="card bg-success text-white">
+                <div class="card bg-success text-white filter-card @(_selectedFilter == "Ai" ? "selected" : "")" 
+                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Ai")' @ondblclick="ClearFilter">
                     <div class="card-body text-center">
-                        <h5 class="card-title">AI Generated</h5>
-                        <h2>@_flashcards.Count(f => f.CreationSource == "Ai")</h2>
+                        <h5 class="card-title d-flex align-items-center justify-content-center">
+                            AI Generated
+                            @if (_selectedFilter == "Ai")
+                            {
+                                <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
+                            }
+                        </h5>
+                        <h2>@_allFlashcards.Count(f => f.CreationSource == "Ai")</h2>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-4 mb-3">
-                <div class="card bg-info text-white">
+                <div class="card bg-info text-white filter-card @(_selectedFilter == "Manual" ? "selected" : "")" 
+                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Manual")' @ondblclick="ClearFilter">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Manual</h5>
-                        <h2>@_flashcards.Count(f => f.CreationSource == "Manual")</h2>
+                        <h5 class="card-title d-flex align-items-center justify-content-center">
+                            Manual
+                            @if (_selectedFilter == "Manual")
+                            {
+                                <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
+                            }
+                        </h5>
+                        <h2>@_allFlashcards.Count(f => f.CreationSource == "Manual")</h2>
                     </div>
                 </div>
             </div>
@@ -325,6 +347,7 @@
 </div>
 
 @code {
+    private List<FlashcardDto> _allFlashcards = new();
     private List<FlashcardDto> _flashcards = new();
     private bool _isLoading = true;
     private string? _error;
@@ -337,8 +360,14 @@
     private string _newCardTags = string.Empty;
     private bool _isCreating = false;
     private string? _createError;
+    private string? _selectedFilter = null;
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadFlashcards();
+    }
+
+    private async Task LoadFlashcards()
     {
         try
         {
@@ -355,7 +384,8 @@
                 return;
             }
             var list = await FlashcardService.ListAsync(userId, take: 100);
-            _flashcards = list.ToList();
+            _allFlashcards = list.ToList();
+            ApplyFilter();
         }
         catch (Exception ex)
         {
@@ -364,6 +394,23 @@
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    private void ApplyFilter()
+    {
+        if (_selectedFilter == "Ai")
+        {
+            _flashcards = _allFlashcards.Where(f => f.CreationSource == "Ai").ToList();
+        }
+        else if (_selectedFilter == "Manual")
+        {
+            _flashcards = _allFlashcards.Where(f => f.CreationSource == "Manual").ToList();
+        }
+        else
+        {
+            // No filter selected, show all cards
+            _flashcards = _allFlashcards.ToList();
         }
     }
 
@@ -418,7 +465,8 @@
             {
                 // TODO: Implement actual delete service call
                 // await FlashcardService.DeleteAsync(_cardToDelete.Id);
-                _flashcards.Remove(_cardToDelete);
+                _allFlashcards.Remove(_cardToDelete);
+                ApplyFilter();
                 _flippedCards.Remove(_cardToDelete.Id);
                 _cardToDelete = null;
                 StateHasChanged();
@@ -465,7 +513,8 @@
             var command = new CreateFlashcardCommand(_newCardFront.Trim(), _newCardBack.Trim(), tags);
             var newCard = await FlashcardService.CreateAsync(userId, command);
 
-            _flashcards.Add(newCard);
+            _allFlashcards.Add(newCard);
+            ApplyFilter();
             _newCardFront = string.Empty;
             _newCardBack = string.Empty;
             _newCardTags = string.Empty;
@@ -488,6 +537,44 @@
         _newCardFront = string.Empty;
         _newCardBack = string.Empty;
         _newCardTags = string.Empty;
+        StateHasChanged();
+    }
+
+    private void ToggleFilter(string filter)
+    {
+        if (filter == "Total")
+        {
+            // Clicking Total should clear any filter (show all cards)
+            if (_selectedFilter == null)
+            {
+                // If already showing all, do nothing (or could toggle to some other state)
+                return;
+            }
+            else
+            {
+                _selectedFilter = null;
+            }
+        }
+        else
+        {
+            if (_selectedFilter == filter)
+            {
+                // If the same filter is clicked again, clear the filter
+                _selectedFilter = null;
+            }
+            else
+            {
+                _selectedFilter = filter;
+            }
+        }
+        ApplyFilter();
+        StateHasChanged();
+    }
+
+    private void ClearFilter()
+    {
+        _selectedFilter = null;
+        ApplyFilter();
         StateHasChanged();
     }
 }
