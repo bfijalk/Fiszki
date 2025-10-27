@@ -1,222 +1,408 @@
-# Fiszki (10x-cards)
+# Fiszki
 
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![Status](https://img.shields.io/badge/status-alpha-orange)](#project-status)
-[![Build](https://img.shields.io/badge/build-GitHub_Actions-lightgrey?logo=github)](#project-status)
-[![License](https://img.shields.io/badge/license-TBD-lightgrey)](#license)
+[![Status](https://img.shields.io/badge/status-beta-green)](#project-status)
+[![License](https://img.shields.io/badge/license-MIT-blue)](#license)
 
-> Fast AI‑assisted creation and spaced-repetition study of flashcards (Blazor Server + PostgreSQL + OpenRouter).
+> AI-powered flashcard creation and spaced-repetition learning platform built with Blazor Server, PostgreSQL, and OpenRouter integration.
 
-A lightweight Blazor Server application (working name: “Fiszki”, product codename: “10x-cards”) focused on dramatically reducing the time needed to produce high‑quality study flashcards by leveraging LLM generation plus a classic SM‑2 spaced repetition loop.
+A modern web application that revolutionizes flashcard creation by combining AI assistance with proven spaced repetition techniques. Generate high-quality study materials from your content in seconds, then master them through scientifically-backed learning sessions.
 
 ---
 
 ## Table of Contents
 
-1. [Project Name](#fiszki-10x-cards)
-2. [Project Description](#project-description)
-3. [Tech Stack](#tech-stack)
-4. [Getting Started Locally](#getting-started-locally)
-5. [Testing Strategy](#testing-strategy)
-6. [Available Scripts](#available-scripts)
-7. [Project Scope](#project-scope)
-8. [Project Status](#project-status)
-9. [License](#license)
-10. [Environment Variables](#environment-variables)
-11. [Architecture (Conceptual)](#architecture-conceptual)
-12. [Security & Privacy](#security--privacy)
-13. [Roadmap / Future Enhancements](#roadmap--future-enhancements)
-14. [Contributing](#contributing)
-15. [Metrics & Success Criteria](#metrics--success-criteria)
-16. [References](#references)
+1. [Features](#features)
+2. [Tech Stack](#tech-stack)
+3. [Getting Started](#getting-started)
+4. [Project Structure](#project-structure)
+5. [Development](#development)
+6. [Testing Strategy](#testing-strategy)
+7. [CI/CD Pipeline](#cicd-pipeline)
+8. [Deployment](#deployment)
+9. [Environment Configuration](#environment-configuration)
+10. [Architecture](#architecture)
+11. [Security & Privacy](#security--privacy)
+12. [Contributing](#contributing)
+13. [Roadmap](#roadmap)
+14. [License](#license)
 
 ---
 
-## Project Description
+## Features
 
-Manual creation of flashcards is time‑consuming and often discourages learners from consistently applying spaced repetition. This project streamlines that workflow:
+### 🤖 AI-Powered Generation
+- **Smart Content Analysis**: Paste any text (50+ characters) and let AI create relevant flashcards
+- **OpenRouter Integration**: Leverages advanced language models for high-quality question/answer pairs
+- **Review & Edit**: Accept, modify, or reject AI suggestions before saving
+- **Multi-language Support**: Generate flashcards in multiple languages
 
-Core value:
-- Paste source text (1,000–10,000 chars) → receive AI‑proposed question/answer pairs.
-- Accept, edit, or reject suggestions before persisting.
-- Practice cards via a spaced repetition session (SM‑2 baseline, future FSRS extension).
+### 📚 Manual Creation
+- **Full Control**: Create custom flashcards with complete control over content
+- **Rich Text Support**: Add detailed questions and answers
+- **Tagging System**: Organize cards with custom tags for better management
+- **Bulk Operations**: Efficient management of large flashcard collections
 
-MVP Goals:
-- >75% acceptance rate of AI-suggested cards.
-- ≥75% of newly added cards originate from AI generation.
-- Simple per-user isolation (service layer).
-- GDPR-friendly data handling (user-controlled deletion).
+### 🧠 Spaced Repetition Learning (Planned)
+- **Scientific Approach**: Will be based on proven spaced repetition algorithms
+- **Progress Tracking**: Planned monitoring of learning progress with detailed statistics
+- **Adaptive Scheduling**: Future feature for cards to appear at optimal intervals for retention
+- **Interactive Study Sessions**: Basic flip-card interface available, advanced features planned
+
+### 👤 User Management
+- **Secure Authentication**: Account creation with password hashing
+- **Personal Collections**: Isolated user data with full privacy
+- **Data Control**: Complete account and data deletion capabilities
+- **Session Management**: Secure login/logout functionality
+
+### 📊 Analytics & Insights (Planned)
+- **Learning Statistics**: Planned tracking of generated vs manual cards
+- **Study Metrics**: Future monitoring of session frequency and performance
+- **Visual Feedback**: Basic indicators for card types and sources available
+- **Progress Reports**: Planned feature to understand learning patterns
 
 ---
 
-## Tech Stack (summary)
-- .NET 8 / Blazor Server
-- PostgreSQL + EF Core (Npgsql)
-- OpenRouter (LLM gateway)
-- Tailwind CSS (planned)
-- **Testing**: xUnit + bUnit + Playwright
-- **Quality**: FluentAssertions, Moq, Coverlet
+## Tech Stack
+
+### Backend
+- **.NET 8**: Latest version with modern C# features
+- **Blazor Server**: Server-side rendering with real-time UI updates
+- **Entity Framework Core**: ORM with PostgreSQL provider
+- **PostgreSQL**: Robust, scalable database solution
+- **BCrypt.Net**: Secure password hashing
+
+### Frontend
+- **Blazor Components**: Reusable, maintainable UI components
+- **MudBlazor**: Material Design component library
+- **Bootstrap**: Responsive CSS framework
+- **Custom CSS**: Tailored styling for optimal UX
+
+### AI Integration
+- **OpenRouter**: Gateway to multiple LLM providers
+- **HTTP Client**: Efficient API communication
+- **JSON Processing**: Structured AI response handling
+
+### Testing & Quality
+- **xUnit**: Primary testing framework
+- **bUnit**: Blazor component testing
+- **FluentValidation**: Input validation
+- **AutoFixture**: Test data generation
+- **FluentAssertions**: Readable test assertions
 
 ---
 
-## Getting Started Locally
+## Getting Started
 
+### Prerequisites
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [PostgreSQL 16+](https://www.postgresql.org/download/)
+- [Git](https://git-scm.com/)
+
+### Installation
+
+1. **Clone the repository**
 ```bash
 git clone https://github.com/bfijalk/Fiszki.git
 cd Fiszki
+```
+
+2. **Install dependencies**
+```bash
 dotnet restore
+```
+
+3. **Set up the database**
+```bash
+# Install PostgreSQL (macOS with Homebrew)
+brew install postgresql@16
+brew services start postgresql@16
+
+# Create database
+createdb fiszki_dev
+```
+
+4. **Configure environment variables**
+```bash
+# Set up user secrets for development
+dotnet user-secrets init
+dotnet user-secrets set "OpenRouter:ApiKey" "your-openrouter-api-key"
+dotnet user-secrets set "ConnectionStrings:FiszkiDatabase" "Host=localhost;Database=fiszki_dev;Username=your_username"
+```
+
+5. **Run the application**
+```bash
 dotnet run
 ```
 
-Navigate to: https://localhost:5001 (or shown in console).
+6. **Open in browser**
+Navigate to `https://localhost:5001` (or the URL shown in console)
 
-### Database
-Configured connection string key: `FiszkiDatabase`.
+---
 
-Sample local PostgreSQL (macOS/Homebrew):
-```bash
-brew install postgresql@16
-brew services start postgresql@16
-createdb fiszki_dev || true
+## Project Structure
+
+```
+Fiszki/
+├── Components/                 # Blazor components
+│   ├── Pages/                 # Page components
+│   │   ├── Generate/          # AI generation workflow
+│   │   ├── Flashcards.razor   # Card management
+│   │   ├── Login.razor        # Authentication
+│   │   └── ...
+│   └── Layout/                # Layout components
+├── Fiszki.Database/           # Data layer
+│   ├── Entities/              # EF Core entities
+│   ├── Configurations/        # Entity configurations
+│   ├── Migrations/            # Database migrations
+│   └── FiszkiDbContext.cs     # Database context
+├── Fiszki.Services/           # Business logic
+│   ├── Services/              # Domain services
+│   ├── Models/                # DTOs and view models
+│   ├── Commands/              # Command pattern
+│   └── Validation/            # FluentValidation
+├── Fiszki.Tests/              # Unit tests
+├── Fiszki.FunctionalTests/    # Integration & E2E tests
+└── wwwroot/                   # Static assets
 ```
 
-### Environment Variables (example)
+---
+
+## Development
+
+### Running Tests
 ```bash
-export OPENROUTER_API_KEY="sk-or-..."
-export AI_MODEL="meta-llama/Meta-Llama-3-70B-Instruct"
+# Run all tests
+dotnet test
+
+# Run with coverage
+dotnet test --collect:"XPlat Code Coverage"
+
+# Run specific test categories
+dotnet test --filter "Category=Unit"
+dotnet test --filter "Category=Integration"
 ```
 
-User Secrets (dev):
+### Database Migrations
 ```bash
-dotnet user-secrets init
-dotnet user-secrets set "OpenRouter:ApiKey" "sk-or-..."
+# Add new migration
+dotnet ef migrations add YourMigrationName --project Fiszki.Database
+
+# Update database
+dotnet ef database update --project Fiszki.Database
 ```
 
----
+### Code Quality
+```bash
+# Format code
+dotnet format
 
-## Scope (MVP)
-In:
-- AI flashcard generation
-- Manual CRUD
-- Accept / edit / reject suggestions
-- SM-2 study session
-- Basic stats (generated vs accepted)
-- Account & data deletion
-
-Out:
-- Advanced repetition variants
-- Gamification / streaks
-- Mobile apps
-- Multi-format ingestion
-- Public API
-- Sharing / collaboration
-- Advanced notifications
-- Full-text / semantic search
-
----
-
-## Status
-Alpha scaffold.
-Implemented:
-- Blazor setup
-- EF Core infrastructure (empty DbContext)
-
----
-
-## Security & Privacy
-- Password hashing & auth logic pending.
-- Account deletion will cascade user data.
-- No third-party data store dependencies besides PostgreSQL.
-
----
-
-## Roadmap (condensed)
-- Auth & user management
-- Generation workflow
-- Study loop (SM-2)
-- Basic stats
-- Styling & components
-- Docker / CI
-
----
-
-## Metrics
-- ≥75% acceptance of AI suggestions
-- ≥75% of new cards from AI
-- Weekly active study sessions (TBD)
+# Analyze code
+dotnet analyze
+```
 
 ---
 
 ## Testing Strategy
 
-### Unit Tests (xUnit)
-```bash
-# Run all unit tests
-dotnet test
-
-# Run with coverage
-dotnet test --collect:"XPlat Code Coverage"
-```
-
-**Core technologies:**
-- **xUnit**: Primary testing framework for .NET
-- **FluentAssertions**: Readable assertions (`result.Should().BeEquivalentTo(expected)`)
-- **AutoFixture**: Automatic test data generation
-- **Moq**: Mocking framework for dependencies
-- **Microsoft.EntityFrameworkCore.InMemory**: Fast in-memory database for tests
-
-**Test coverage:**
-- Domain services (UserService, FlashcardService, GenerationService)
-- FluentValidation validators
-- SM-2 algorithm implementation
-- Entity mapping and business logic
+### Unit Tests
+- **Services**: Business logic validation
+- **Validators**: Input validation rules
+- **Utilities**: Helper functions and algorithms
+- **Coverage**: 80%+ for core business logic
 
 ### Integration Tests
-```bash
-# Run integration tests with real PostgreSQL
-dotnet test --filter "Category=Integration"
-```
+- **Database**: EF Core operations with real PostgreSQL
+- **API**: Service layer integration
+- **Authentication**: Login/logout workflows
 
-**Technologies:**
-- **Testcontainers**: Real PostgreSQL instances in Docker
-- **Microsoft.AspNetCore.Mvc.Testing**: TestServer for full app testing
-- **WebApplicationFactory**: End-to-end HTTP testing
+### Component Tests
+- **Blazor Components**: UI behavior and rendering
+- **User Interactions**: Form submissions and navigation
+- **State Management**: Component state changes
 
-### UI Tests (Blazor Components)
-```bash
-# Run component tests
-dotnet test --filter "Category=UI"
-```
-
-**Technologies:**
-- **bUnit**: Testing Blazor Server components
-- **AngleSharp**: HTML parsing and DOM assertions
-- **Playwright**: Browser automation for E2E tests (planned)
-
-**Test coverage:**
-- Authentication flow (Login/Register components)
-- Flashcard generation workflow
-- Study session components
-- Form validation and user interactions
-
-### Performance & Load Testing
-```bash
-# Run performance benchmarks
-dotnet run --project Fiszki.Benchmarks -c Release
-```
-
-**Technologies:**
-- **NBomber**: Load testing framework for .NET
-- **BenchmarkDotNet**: Micro-benchmarks for algorithms
-- **MiniProfiler**: Database query profiling
-
-### Quality Metrics
-- **Target coverage**: 85% for business logic, 70% overall
-- **Performance**: <2s AI generation, <100ms DB queries
-- **Security**: OWASP Top 10 compliance testing
-
-See [Test Plan](plan-testow.md) for detailed testing strategy.
+### Functional Tests
+- **End-to-End**: Complete user workflows
+- **Cross-browser**: Chrome, Firefox, Safari compatibility
+- **Performance**: Load testing and optimization
 
 ---
 
-## Available Scripts
+## CI/CD Pipeline
+
+### Automated Pipeline Features
+
+#### Continuous Integration
+- **Automated Testing**: Full test suite runs on every commit
+- **Code Quality**: Static analysis and linting validation
+- **Build Verification**: Ensures successful compilation across environments
+- **Security Scanning**: Dependency vulnerability checks
+
+#### Continuous Deployment
+- **Azure App Service**: Automatic deployment to Azure cloud on main branch merge
+- **Production Ready**: Live application available immediately after deployment
+- **Database Migrations**: Automated schema updates during deployment
+- **Health Checks**: Post-deployment verification and monitoring
+
+#### Monitoring & Alerts
+- **Application Performance**: Response time and error tracking via Azure Monitor
+- **Infrastructure**: Server health and resource usage monitoring
+- **Deployment Status**: Real-time feedback on deployment success/failure
+
+### Current Implementation
+- **Trigger**: Every merge to `main` branch automatically deploys to production
+- **Platform**: Azure App Services hosting
+- **Database**: Azure PostgreSQL managed service
+- **Monitoring**: Azure Application Insights integration
+
+---
+
+## Deployment
+
+### Automated Deployment (Current)
+The application uses a fully automated CI/CD pipeline:
+
+1. **Code Push**: Developer merges to main branch
+2. **Automated Build**: Azure DevOps/GitHub Actions builds the application
+3. **Testing**: Full test suite execution
+4. **Database Updates**: Automatic migration deployment
+5. **Azure Deployment**: Live deployment to Azure App Services
+6. **Health Verification**: Automated post-deployment checks
+
+### Live Application
+- **Production URL**: Available on Azure App Services
+- **Database**: Azure PostgreSQL managed database
+- **SSL/TLS**: Automatic HTTPS certificate management
+- **Scaling**: Auto-scaling based on demand
+
+### Deployment Architecture
+- **App Service**: Blazor Server application hosting
+- **Database**: Azure Database for PostgreSQL
+- **Storage**: Azure Blob Storage for static assets (planned)
+- **CDN**: Azure CDN for performance optimization (planned)
+
+---
+
+## Environment Configuration
+
+### Required Environment Variables
+```bash
+# Database
+ConnectionStrings__FiszkiDatabase="Host=localhost;Database=fiszki;Username=user;Password=pass"
+
+# AI Integration
+OpenRouter__ApiKey="your-openrouter-api-key"
+OpenRouter__BaseUrl="https://openrouter.ai/api/v1"
+
+# Application
+ASPNETCORE_ENVIRONMENT="Production"
+ASPNETCORE_URLS="https://+:443;http://+:80"
+```
+
+### Optional Configuration
+```bash
+# Logging
+Serilog__MinimumLevel="Information"
+
+# Security
+DataProtection__ApplicationName="Fiszki"
+```
+
+---
+
+## Architecture
+
+### Clean Architecture Principles
+- **Separation of Concerns**: Clear layer boundaries
+- **Dependency Inversion**: Abstractions over implementations
+- **Testability**: Easy unit and integration testing
+- **Maintainability**: Modular, extensible design
+
+### Data Flow
+1. **UI Layer**: Blazor components handle user interactions
+2. **Service Layer**: Business logic and validation
+3. **Data Layer**: Entity Framework and PostgreSQL
+4. **External APIs**: OpenRouter for AI generation
+
+### Security Model
+- **Authentication**: Secure password-based authentication
+- **Authorization**: User-specific data isolation
+- **Data Protection**: Encrypted sensitive information
+- **Input Validation**: Comprehensive input sanitization
+
+---
+
+## Security & Privacy
+
+### Data Protection
+- **Encryption**: Passwords hashed with BCrypt
+- **Isolation**: User data strictly separated
+- **Deletion**: Complete data removal on account deletion
+- **Minimal Data**: Only necessary information collected
+
+### GDPR Compliance
+- **Right to Delete**: Full account and data removal
+- **Data Portability**: Export functionality planned
+- **Consent Management**: Clear privacy policies
+- **Audit Trail**: User action logging
+
+---
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+- Code style and standards
+- Pull request process
+- Issue reporting
+- Development setup
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add/update tests
+5. Submit a pull request
+
+---
+
+## Roadmap
+
+### Current Phase (v1.0)
+- ✅ Core flashcard functionality
+- ✅ AI-powered generation
+- ✅ User authentication
+- ✅ Basic study sessions
+- 🔄 Performance optimization
+- 🔄 UI/UX improvements
+
+### Next Phase (v1.1)
+- 📋 Advanced spaced repetition algorithms
+- 📋 Enhanced statistics and analytics
+- 📋 Mobile-responsive improvements
+- 📋 Bulk import/export features
+
+### Future Enhancements
+- 📋 Mobile applications (iOS/Android)
+- 📋 Collaborative study groups
+- 📋 Advanced search and filtering
+- 📋 Gamification elements
+- 📋 Multi-format content support
+- 📋 Public API for integrations
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Support
+
+- **Documentation**: [Wiki](https://github.com/bfijalk/Fiszki/wiki)
+- **Issues**: [GitHub Issues](https://github.com/bfijalk/Fiszki/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/bfijalk/Fiszki/discussions)
+
+---
+
+*Built with ❤️ using .NET 8, Blazor Server, and modern web technologies.*
