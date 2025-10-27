@@ -61,43 +61,26 @@ public class LoginPage : BasePage, ILoginPage
 
     public async Task EnterEmailAsync(string email)
     {
-        // Try multiple approaches to find the email field
-        ILocator? emailElement = null;
-        
-        // First try the exact selector from the working test
-        try
+        // MudBlazor MudTextField generates specific HTML structure
+        // Try MudBlazor-specific selectors first
+        var mudSelectors = new[]
         {
-            emailElement = Page.GetByRole(AriaRole.Textbox, new() { Name = "Email*" });
-            if (await emailElement.CountAsync() > 0)
-            {
-                await emailElement.FillAsync(email);
-                return;
-            }
-        }
-        catch
-        {
-            // Continue to fallback options
-        }
-
-        // Try alternative role-based selectors
-        var roleBasedSelectors = new[]
-        {
-            () => Page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }),
-            () => Page.GetByRole(AriaRole.Textbox, new() { NameRegex = new System.Text.RegularExpressions.Regex(@".*[Ee]mail.*") }),
             () => Page.GetByLabel("Email"),
-            () => Page.GetByLabel("Email*"),
-            () => Page.GetByPlaceholder("Email"),
-            () => Page.GetByPlaceholder("Enter your email")
+            () => Page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }),
+            () => Page.Locator("input[type='email']"),
+            () => Page.Locator(".mud-input-control input[type='email']"),
+            () => Page.Locator(".mud-text-field input").First,
+            () => Page.Locator("input").Filter(new() { HasText = "" }).First, // First visible input
         };
 
-        foreach (var selectorFunc in roleBasedSelectors)
+        foreach (var selectorFunc in mudSelectors)
         {
             try
             {
-                emailElement = selectorFunc();
-                if (await emailElement.CountAsync() > 0)
+                var element = selectorFunc();
+                if (await element.CountAsync() > 0 && await element.IsVisibleAsync())
                 {
-                    await emailElement.FillAsync(email);
+                    await element.FillAsync(email);
                     return;
                 }
             }
@@ -107,68 +90,29 @@ public class LoginPage : BasePage, ILoginPage
             }
         }
 
-        // Final fallback to CSS selectors
-        var cssSelectors = new[]
-        {
-            "input[type='email']",
-            "input[name*='email']",
-            "input[id*='email']",
-            "input[placeholder*='email']",
-            "input:first-of-type"
-        };
-
-        foreach (var selector in cssSelectors)
-        {
-            var element = Page.Locator(selector);
-            if (await element.CountAsync() > 0)
-            {
-                await element.First.FillAsync(email);
-                return;
-            }
-        }
-
-        throw new InvalidOperationException("Could not find email input field with any of the attempted selectors");
+        throw new InvalidOperationException("Could not find email input field. The page might not be loaded correctly or the selectors need updating for MudBlazor components.");
     }
 
     public async Task EnterPasswordAsync(string password)
     {
-        // Try multiple approaches to find the password field
-        ILocator? passwordElement = null;
-        
-        // First try the exact selector from the working test
-        try
+        // MudBlazor MudTextField generates specific HTML structure
+        var mudSelectors = new[]
         {
-            passwordElement = Page.GetByRole(AriaRole.Textbox, new() { Name = "Password*" });
-            if (await passwordElement.CountAsync() > 0)
-            {
-                await passwordElement.FillAsync(password);
-                return;
-            }
-        }
-        catch
-        {
-            // Continue to fallback options
-        }
-
-        // Try alternative role-based selectors
-        var roleBasedSelectors = new[]
-        {
-            () => Page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }),
-            () => Page.GetByRole(AriaRole.Textbox, new() { NameRegex = new System.Text.RegularExpressions.Regex(@".*[Pp]assword.*") }),
             () => Page.GetByLabel("Password"),
-            () => Page.GetByLabel("Password*"),
-            () => Page.GetByPlaceholder("Password"),
-            () => Page.GetByPlaceholder("Enter your password")
+            () => Page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }),
+            () => Page.Locator("input[type='password']"),
+            () => Page.Locator(".mud-input-control input[type='password']"),
+            () => Page.Locator(".mud-text-field input").Nth(1), // Second input field (password)
         };
 
-        foreach (var selectorFunc in roleBasedSelectors)
+        foreach (var selectorFunc in mudSelectors)
         {
             try
             {
-                passwordElement = selectorFunc();
-                if (await passwordElement.CountAsync() > 0)
+                var element = selectorFunc();
+                if (await element.CountAsync() > 0 && await element.IsVisibleAsync())
                 {
-                    await passwordElement.FillAsync(password);
+                    await element.FillAsync(password);
                     return;
                 }
             }
@@ -178,27 +122,7 @@ public class LoginPage : BasePage, ILoginPage
             }
         }
 
-        // Final fallback to CSS selectors
-        var cssSelectors = new[]
-        {
-            "input[type='password']",
-            "input[name*='password']",
-            "input[id*='password']",
-            "input[placeholder*='password']",
-            "input:nth-of-type(2)"
-        };
-
-        foreach (var selector in cssSelectors)
-        {
-            var element = Page.Locator(selector);
-            if (await element.CountAsync() > 0)
-            {
-                await element.First.FillAsync(password);
-                return;
-            }
-        }
-
-        throw new InvalidOperationException("Could not find password input field with any of the attempted selectors");
+        throw new InvalidOperationException("Could not find password input field. The page might not be loaded correctly or the selectors need updating for MudBlazor components.");
     }
 
     public async Task<bool> IsLoginButtonDisabledAsync() => await LoginButton.IsDisabledAsync();

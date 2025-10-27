@@ -90,7 +90,7 @@ public class PlaywrightHooks
     [AfterScenario]
     public async Task AfterScenario(ScenarioContext scenarioContext)
     {
-        if (scenarioContext.TryGetValue(Support.TestContextKeys.Page, out IPage? page))
+        if (scenarioContext.TryGetValue(Support.TestContextKeys.Page, out IPage? page) && page != null)
         {
             var ctx = page.Context;
             Console.WriteLine("[Scenario] Closing page/context.");
