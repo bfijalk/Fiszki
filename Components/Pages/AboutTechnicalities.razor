@@ -1,0 +1,439 @@
+@page "/about-technicalities"
+
+<PageTitle>About Technicalities - Fiszki</PageTitle>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center mb-5">
+                <h1 class="display-4 text-primary mb-3">
+                    <i class="bi bi-gear-fill me-3"></i>About Technicalities
+                </h1>
+                <p class="lead text-muted">
+                    Technical overview of the Fiszki flashcard application architecture, technologies, and deployment
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Overview -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <h2 class="text-primary mb-4">
+                        <i class="bi bi-info-circle-fill me-2"></i>Project Overview
+                    </h2>
+                    <p class="lead mb-4">
+                        <strong>Fiszki</strong> is a modern web application designed to help users learn Polish vocabulary through AI-generated flashcards. 
+                        The application leverages cutting-edge technologies to provide an intelligent, scalable, and user-friendly language learning platform.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">Core Features</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>AI-powered flashcard generation</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Interactive learning sessions</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>User authentication & authorization</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Progress tracking</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Responsive web design</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">Technical Goals</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-target text-info me-2"></i>Scalable cloud-native architecture</li>
+                                <li class="mb-2"><i class="bi bi-target text-info me-2"></i>Modern .NET 8 ecosystem</li>
+                                <li class="mb-2"><i class="bi bi-target text-info me-2"></i>CI/CD automation</li>
+                                <li class="mb-2"><i class="bi bi-target text-info me-2"></i>High code quality & testing</li>
+                                <li class="mb-2"><i class="bi bi-target text-info me-2"></i>Azure cloud integration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <h2 class="text-primary mb-4">
+                        <i class="bi bi-stack me-2"></i>Technology Stack
+                    </h2>
+                    
+                    <div class="row">
+                        <!-- Frontend -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="bg-light p-4 rounded h-100">
+                                <h4 class="text-primary mb-3">
+                                    <i class="bi bi-display me-2"></i>Frontend
+                                </h4>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><strong>Blazor Server</strong> - Interactive web UI</li>
+                                    <li class="mb-2"><strong>ASP.NET Core 8</strong> - Web framework</li>
+                                    <li class="mb-2"><strong>Bootstrap 5</strong> - CSS framework</li>
+                                    <li class="mb-2"><strong>Bootstrap Icons</strong> - Icon library</li>
+                                    <li class="mb-2"><strong>Razor Components</strong> - Component architecture</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Backend -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="bg-light p-4 rounded h-100">
+                                <h4 class="text-primary mb-3">
+                                    <i class="bi bi-server me-2"></i>Backend
+                                </h4>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><strong>.NET 8</strong> - Runtime platform</li>
+                                    <li class="mb-2"><strong>Entity Framework Core</strong> - ORM</li>
+                                    <li class="mb-2"><strong>PostgreSQL</strong> - Primary database</li>
+                                    <li class="mb-2"><strong>FluentValidation</strong> - Input validation</li>
+                                    <li class="mb-2"><strong>Dependency Injection</strong> - IoC container</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- AI Integration -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="bg-light p-4 rounded h-100">
+                                <h4 class="text-primary mb-3">
+                                    <i class="bi bi-robot me-2"></i>AI Integration
+                                </h4>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><strong>OpenRouter API</strong> - LLM gateway</li>
+                                    <li class="mb-2"><strong>Structured JSON</strong> - Schema validation</li>
+                                    <li class="mb-2"><strong>Async Processing</strong> - Background jobs</li>
+                                    <li class="mb-2"><strong>Error Handling</strong> - Resilient AI calls</li>
+                                    <li class="mb-2"><strong>Token Management</strong> - Cost optimization</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <h2 class="text-primary mb-4">
+                        <i class="bi bi-diagram-3-fill me-2"></i>System Architecture
+                    </h2>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h5 class="text-primary mb-3">Component Interaction</h5>
+                            <div class="mb-4">
+                                <h6 class="fw-bold">1. Presentation Layer (Blazor Components)</h6>
+                                <p class="ms-3 text-muted">
+                                    Razor components handle user interactions, form validation, and real-time UI updates. 
+                                    Interactive server-side rendering provides responsive user experience.
+                                </p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="fw-bold">2. Service Layer (Business Logic)</h6>
+                                <p class="ms-3 text-muted">
+                                    <code>Fiszki.Services</code> contains business logic, command handling, validation, and external API integration. 
+                                    Services are injected using built-in DI container.
+                                </p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="fw-bold">3. Data Access Layer (EF Core)</h6>
+                                <p class="ms-3 text-muted">
+                                    <code>Fiszki.Database</code> manages PostgreSQL database interactions through Entity Framework Core with 
+                                    code-first migrations and fluent configuration.
+                                </p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="fw-bold">4. External Services Integration</h6>
+                                <p class="ms-3 text-muted">
+                                    OpenRouter API integration for AI-powered flashcard generation with structured JSON responses, 
+                                    retry logic, and comprehensive error handling.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="bg-primary text-white p-4 rounded">
+                                <h5 class="mb-3">Key Architectural Patterns</h5>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2"><i class="bi bi-arrow-right me-2"></i>Clean Architecture</li>
+                                    <li class="mb-2"><i class="bi bi-arrow-right me-2"></i>CQRS (Command Query)</li>
+                                    <li class="mb-2"><i class="bi bi-arrow-right me-2"></i>Repository Pattern</li>
+                                    <li class="mb-2"><i class="bi bi-arrow-right me-2"></i>Dependency Injection</li>
+                                    <li class="mb-2"><i class="bi bi-arrow-right me-2"></i>Async/Await Pattern</li>
+                                    <li class="mb-2"><i class="bi bi-arrow-right me-2"></i>Exception Handling</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CI/CD Pipeline -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <h2 class="text-primary mb-4">
+                        <i class="bi bi-gear-wide-connected me-2"></i>CI/CD Pipeline
+                    </h2>
+                    
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h5 class="text-primary mb-3">GitHub Actions Workflow</h5>
+                            <div class="mb-3">
+                                <h6 class="fw-bold text-success">✅ Build Stage</h6>
+                                <ul class="list-unstyled ms-3">
+                                    <li>• .NET 8 SDK setup</li>
+                                    <li>• NuGet package restoration</li>
+                                    <li>• Release configuration build</li>
+                                    <li>• Artifact generation</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="fw-bold text-info">🧪 Test Stage</h6>
+                                <ul class="list-unstyled ms-3">
+                                    <li>• Unit test execution</li>
+                                    <li>• Code coverage analysis</li>
+                                    <li>• Test result reporting</li>
+                                    <li>• Quality gate validation</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="fw-bold text-warning">🚀 Deploy Stage</h6>
+                                <ul class="list-unstyled ms-3">
+                                    <li>• Azure Web App deployment</li>
+                                    <li>• Production slot targeting</li>
+                                    <li>• Database migration execution</li>
+                                    <li>• Health check validation</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6">
+                            <h5 class="text-primary mb-3">Pipeline Triggers & Features</h5>
+                            
+                            <div class="alert alert-info">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="bi bi-info-circle me-2"></i>Trigger Strategy
+                                </h6>
+                                <ul class="mb-0">
+                                    <li><strong>Pull Requests:</strong> Build + Test (validation)</li>
+                                    <li><strong>Main Branch Push:</strong> Full pipeline with deployment</li>
+                                    <li><strong>Manual Dispatch:</strong> On-demand deployment</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-light p-3 rounded">
+                                <h6 class="fw-bold mb-2">Testing Strategy</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1">🔍 <strong>Unit Tests:</strong> Service layer validation</li>
+                                    <li class="mb-1">🔍 <strong>Integration Tests:</strong> Database interactions</li>
+                                    <li class="mb-1">🔍 <strong>Functional Tests:</strong> End-to-end scenarios</li>
+                                    <li class="mb-1">🔍 <strong>Coverage Reports:</strong> Quality metrics</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Azure Deployment -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow border-0 border-top border-primary border-4">
+                <div class="card-body p-5">
+                    <h2 class="text-primary mb-4">
+                        <i class="bi bi-cloud-fill me-2"></i>Azure Cloud Deployment
+                    </h2>
+                    
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="bi bi-globe me-2"></i>Azure App Service
+                                    </h5>
+                                    <table class="table table-sm table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td class="fw-bold">Service Name:</td>
+                                                <td><code>Fiszki</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Runtime:</td>
+                                                <td>.NET 8 (LTS)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Deployment Slot:</td>
+                                                <td>Production</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Scaling:</td>
+                                                <td>Auto-scale enabled</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">SSL/TLS:</td>
+                                                <td>Managed certificates</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="bi bi-database-fill me-2"></i>PostgreSQL Database
+                                    </h5>
+                                    <table class="table table-sm table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td class="fw-bold">Service Type:</td>
+                                                <td>Azure Database for PostgreSQL</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Version:</td>
+                                                <td>PostgreSQL 15+</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Connectivity:</td>
+                                                <td>Private endpoint</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Backup:</td>
+                                                <td>Automated daily backups</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Security:</td>
+                                                <td>Encrypted connections</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-success">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="bi bi-shield-check me-2"></i>Production Environment Features
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="mb-0">
+                                            <li>Application Insights monitoring</li>
+                                            <li>Custom domain with SSL</li>
+                                            <li>Environment-specific configuration</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="mb-0">
+                                            <li>Database connection pooling</li>
+                                            <li>Automated health checks</li>
+                                            <li>Zero-downtime deployments</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Development & Quality -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="text-primary mb-3">
+                        <i class="bi bi-code-slash me-2"></i>Development Practices
+                    </h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Clean Code principles</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>SOLID design patterns</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Async/await best practices</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Comprehensive error handling</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Logging & monitoring</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Security best practices</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="text-primary mb-3">
+                        <i class="bi bi-shield-check me-2"></i>Quality Assurance
+                    </h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Unit test coverage</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Integration testing</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Functional test automation</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Code quality gates</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Performance monitoring</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Security scanning</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+    
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    .border-4 {
+        border-width: 4px !important;
+    }
+    
+    code {
+        background-color: #f1f3f4;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    
+    .table td {
+        padding: 0.3rem 0.5rem;
+    }
+    
+    .alert ul {
+        margin-bottom: 0;
+    }
+</style>
