@@ -1,0 +1,488 @@
+@page "/how-to-start"
+<PageTitle>How to Start - Fiszki</PageTitle>
+
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="text-primary mb-3">
+                <i class="bi bi-play-circle me-3"></i>
+                How to Start with Fiszki
+            </h1>
+            <p class="lead text-muted">
+                Welcome to Fiszki! This comprehensive guide will walk you through everything you need to know 
+                to start creating and managing your flashcards effectively.
+            </p>
+            <hr />
+        </div>
+    </div>
+
+    <!-- Getting Started Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-secondary mb-4">
+                <i class="bi bi-person-plus me-2"></i>
+                1. Getting Started - Registration & Login
+            </h2>
+            
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h4 class="text-primary">Create Your Account</h4>
+                    <p>To start using Fiszki, you'll need to create an account first:</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Click on "Register" in the navigation</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Fill in your email and password</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Confirm your account details</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>You're ready to start!</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="image-container" @onclick='() => ShowImageModal("Images/Instruction/Rejestracja.png", "Registration Screenshot")'>
+                            <img src="Images/Instruction/Rejestracja.png" class="card-img-top clickable-image" alt="Registration Screenshot" />
+                            <div class="image-overlay">
+                                <i class="bi bi-zoom-in"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">Registration form - Create your account to get started</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="image-container" @onclick='() => ShowImageModal("Images/Instruction/Logowanie.png", "Login Screenshot")'>
+                            <img src="Images/Instruction/Logowanie.png" class="card-img-top clickable-image" alt="Login Screenshot" />
+                            <div class="image-overlay">
+                                <i class="bi bi-zoom-in"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">Login form - Access your flashcards collection</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <h4 class="text-primary">Login to Your Account</h4>
+                    <p>Once you have an account, simply:</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Click "Login" in the navigation</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Enter your email and password</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Access your personal flashcard collection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Generation Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-secondary mb-4">
+                <i class="bi bi-robot me-2"></i>
+                2. AI-Powered Flashcard Generation
+            </h2>
+            
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Powered by OpenRouter:</strong> Our AI generation feature uses OpenRouter's advanced language models 
+                to create high-quality flashcards from your content automatically.
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h4 class="text-primary">How AI Generation Works</h4>
+                    <p>Let artificial intelligence create flashcards for you:</p>
+                    <ol class="list-group list-group-numbered">
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Input Your Content:</strong> Paste text, articles, or study material (minimum 50 characters)
+                        </li>
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Choose Settings:</strong> Select language and maximum number of cards (1-50)
+                        </li>
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Generate Cards:</strong> Our AI analyzes your content and creates relevant flashcards
+                        </li>
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Review & Edit:</strong> Review generated cards, edit if needed, and save your favorites
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="image-container" @onclick='() => ShowImageModal("Images/Instruction/Fiszki generowanie.png", "AI Generation Screenshot")'>
+                            <img src="Images/Instruction/Fiszki generowanie.png" class="card-img-top clickable-image" alt="AI Generation Screenshot" />
+                            <div class="image-overlay">
+                                <i class="bi bi-zoom-in"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">AI Generation interface - Let AI create flashcards from your content</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">
+                                <i class="bi bi-lightbulb me-2"></i>
+                                AI Generation Tips
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="bi bi-star text-warning me-2"></i>Use clear, well-structured content</li>
+                                        <li class="mb-2"><i class="bi bi-star text-warning me-2"></i>Include key concepts and definitions</li>
+                                        <li class="mb-2"><i class="bi bi-star text-warning me-2"></i>Longer content produces better results</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="bi bi-star text-warning me-2"></i>Review and edit generated cards</li>
+                                        <li class="mb-2"><i class="bi bi-star text-warning me-2"></i>Save only the cards you need</li>
+                                        <li class="mb-2"><i class="bi bi-star text-warning me-2"></i>Experiment with different content types</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Creation Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-secondary mb-4">
+                <i class="bi bi-pencil me-2"></i>
+                3. Manual Flashcard Creation
+            </h2>
+            
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="image-container" @onclick='() => ShowImageModal("Images/Instruction/Fiszki manual creation.png", "Manual Creation Screenshot")'>
+                            <img src="Images/Instruction/Fiszki manual creation.png" class="card-img-top clickable-image" alt="Manual Creation Screenshot" />
+                            <div class="image-overlay">
+                                <i class="bi bi-zoom-in"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">Manual creation form - Create custom flashcards with full control</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <h4 class="text-primary">Create Cards Manually</h4>
+                    <p>Sometimes you want full control over your flashcards:</p>
+                    <ol class="list-group list-group-numbered">
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Navigate to Flashcards:</strong> Go to your flashcards collection
+                        </li>
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Click "Add Manual Card":</strong> Start creating a new flashcard
+                        </li>
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Fill in Content:</strong> Add your question and answer
+                        </li>
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Add Tags (Optional):</strong> Organize with custom tags
+                        </li>
+                        <li class="list-group-item border-0 ps-0">
+                            <strong>Save Your Card:</strong> Add to your collection instantly
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="alert alert-success mt-3">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong>Perfect Control:</strong> Manual creation gives you complete control over question phrasing, 
+                answer detail, and card organization. Great for specific terminology or custom learning needs.
+            </div>
+        </div>
+    </div>
+
+    <!-- Managing Flashcards Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-secondary mb-4">
+                <i class="bi bi-collection me-2"></i>
+                4. Managing Your Flashcards
+            </h2>
+            
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h4 class="text-primary">Card View & Organization</h4>
+                    <p>Your flashcards are organized and easy to manage:</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-eye text-primary me-2"></i><strong>Card View:</strong> Visual flashcard layout</li>
+                        <li class="mb-2"><i class="bi bi-list text-primary me-2"></i><strong>List View:</strong> Compact overview of all cards</li>
+                        <li class="mb-2"><i class="bi bi-filter text-primary me-2"></i><strong>Smart Filtering:</strong> Filter by AI-generated, Manual, or All cards</li>
+                        <li class="mb-2"><i class="bi bi-flip-horizontal text-primary me-2"></i><strong>Interactive Cards:</strong> Click to flip between question and answer</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="image-container" @onclick='() => ShowImageModal("Images/Instruction/Fiszki widok.png", "Card View Screenshot")'>
+                            <img src="Images/Instruction/Fiszki widok.png" class="card-img-top clickable-image" alt="Card View Screenshot" />
+                            <div class="image-overlay">
+                                <i class="bi bi-zoom-in"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">Card view - Interactive flashcards with flip functionality</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="image-container" @onclick='() => ShowImageModal("Images/Instruction/Fiszki widok listy.png", "List View Screenshot")'>
+                            <img src="Images/Instruction/Fiszki widok listy.png" class="card-img-top clickable-image" alt="List View Screenshot" />
+                            <div class="image-overlay">
+                                <i class="bi bi-zoom-in"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">List view - Compact overview of all your flashcards</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <h4 class="text-primary">Advanced Features</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-funnel text-success me-2"></i>
+                            <strong>Smart Filtering:</strong> Click on "Total Cards", "AI Generated", or "Manual" to filter your collection
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-pencil-square text-info me-2"></i>
+                            <strong>Edit Cards:</strong> Modify any flashcard content as needed
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-trash text-danger me-2"></i>
+                            <strong>Delete Cards:</strong> Remove cards you no longer need
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-tag text-warning me-2"></i>
+                            <strong>Tagging System:</strong> Organize cards with custom tags
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Start Guide -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="bi bi-rocket me-2"></i>
+                        Quick Start Guide
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>For AI Generation:</h5>
+                            <ol class="mb-3">
+                                <li>Register → Login</li>
+                                <li>Go to "Generate" page</li>
+                                <li>Paste your study material</li>
+                                <li>Click "Generate Flashcards"</li>
+                                <li>Review and save your cards</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>For Manual Creation:</h5>
+                            <ol class="mb-3">
+                                <li>Register → Login</li>
+                                <li>Go to "Flashcards" page</li>
+                                <li>Click "Add Manual Card"</li>
+                                <li>Fill question and answer</li>
+                                <li>Save your card</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h4 class="card-title text-info">
+                        <i class="bi bi-question-circle me-2"></i>
+                        Need Help?
+                    </h4>
+                    <p class="card-text">
+                        If you have any questions or need assistance, feel free to explore the "About Me" section 
+                        to learn more about the developer, or check out "About Technicalities" for technical details 
+                        about how Fiszki works behind the scenes.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="/about" class="btn btn-outline-info me-2">
+                                <i class="bi bi-person-circle me-1"></i>
+                                About Developer
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/about-technicalities" class="btn btn-outline-info">
+                                <i class="bi bi-gear me-1"></i>
+                                Technical Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    @if (_showImageModal)
+    {
+        <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.8);" @onclick="CloseImageModal">
+            <div class="modal-dialog modal-xl modal-dialog-centered" @onclick:stopPropagation="true">
+                <div class="modal-content bg-transparent border-0">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title text-white">@_modalImageAlt</h5>
+                        <button type="button" class="btn-close btn-close-white" @onclick="CloseImageModal"></button>
+                    </div>
+                    <div class="modal-body text-center p-0">
+                        <img src="@_modalImageSrc" class="img-fluid" alt="@_modalImageAlt" style="max-height: 80vh; width: auto;" />
+                    </div>
+                    <div class="modal-footer border-0 pt-2">
+                        <small class="text-white-50">Click outside or press the X to close</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .card img {
+        width: 100%;
+        height: 280px;
+        object-fit: contain;
+        object-position: center;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        display: block;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0;
+    }
+    
+    .image-container {
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+    }
+    
+    .image-container:hover .clickable-image {
+        transform: scale(1.02);
+    }
+    
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        font-size: 14px;
+    }
+    
+    .image-container:hover .image-overlay {
+        opacity: 1;
+    }
+    
+    .image-overlay i {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+    
+    .clickable-image {
+        transition: transform 0.3s ease;
+    }
+    
+    .list-group-numbered .list-group-item {
+        background: transparent;
+    }
+    
+    .alert {
+        border-left: 4px solid;
+    }
+    
+    .alert-info {
+        border-left-color: #0dcaf0;
+    }
+    
+    .alert-success {
+        border-left-color: #198754;
+    }
+    
+    .modal-xl {
+        max-width: 90vw;
+    }
+    
+    @@media (max-width: 768px) {
+        .card img {
+            height: 220px;
+        }
+    }
+    
+    @@media (min-width: 1200px) {
+        .card img {
+            height: 320px;
+        }
+    }
+</style>
+
+@code {
+    private bool _showImageModal = false;
+    private string _modalImageSrc = "";
+    private string _modalImageAlt = "";
+
+    private void ShowImageModal(string imageSrc, string imageAlt)
+    {
+        _modalImageSrc = imageSrc;
+        _modalImageAlt = imageAlt;
+        _showImageModal = true;
+        StateHasChanged();
+    }
+
+    private void CloseImageModal()
+    {
+        _showImageModal = false;
+        StateHasChanged();
+    }
+}
