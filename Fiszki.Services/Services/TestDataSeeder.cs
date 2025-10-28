@@ -62,11 +62,11 @@ public class TestDataSeeder
         };
 
         // Add a user without any flashcards for testing empty page scenarios
-        var emptyUser = new User
+        var empty1User = new User
         {
             Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-            Email = "empty@example.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("empty123"),
+            Email = "empty1@example.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("empty1123"),
             Role = UserRole.Basic,
             IsActive = true,
             TotalCardsGenerated = 0,
@@ -103,7 +103,7 @@ public class TestDataSeeder
             UpdatedAt = DateTime.UtcNow
         };
 
-        _context.Users.AddRange(testUser, adminUser, demoUser, emptyUser, empty2User, empty3User);
+        _context.Users.AddRange(testUser, adminUser, demoUser, empty1User, empty2User, empty3User);
         await _context.SaveChangesAsync();
 
         // Create test flashcards
