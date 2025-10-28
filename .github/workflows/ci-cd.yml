@@ -177,6 +177,8 @@ jobs:
         ASPNETCORE_ENVIRONMENT: Test
         TestMode: true
         ASPNETCORE_URLS: http://localhost:5000
+        CHECKSECRET: ${{ secrets.CHECKSECRET }}
+        OPENROUTER__APIKEY: ${{ secrets.OPENROUTER__APIKEY }}
     
     - name: 🧪 Run functional tests
       run: |

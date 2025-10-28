@@ -119,7 +119,7 @@ public class PlaywrightHooks
         // Get viewport configuration from settings
         int viewportWidth = 1280; // Default
         int viewportHeight = 800; // Default
-        int defaultTimeout = 7000; // Default
+        int defaultTimeout = 30000; // Increased from 7000 to 30000 for CI environment
         
         if (_configuration != null)
         {
