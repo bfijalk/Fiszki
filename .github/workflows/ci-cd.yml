@@ -134,6 +134,8 @@ jobs:
         export ASPNETCORE_URLS="http://localhost:5000"
         export TestMode=true
         export OpenRouter__ApiKey=$OPENROUTER__APIKEY
+        export CheckSecrets=$CHECKSECRET
+        echo $CeckSecrets
         nohup dotnet run --project Fiszki.csproj --environment Test --urls "http://localhost:5000" > app.log 2>&1 &
         APP_PID=$!
         echo $APP_PID > app.pid
