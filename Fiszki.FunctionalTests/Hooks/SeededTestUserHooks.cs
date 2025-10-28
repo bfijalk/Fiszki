@@ -20,13 +20,13 @@ public class SeededTestUserHooks
         var tags = _scenarioContext.ScenarioInfo.Tags;
         
         // Assign appropriate seeded test user based on scenario requirements
-        if (tags.Contains("empty3") || scenarioTitle.Contains("empty3", StringComparison.OrdinalIgnoreCase))
+        if (tags.Contains("empty1") || scenarioTitle.Contains("empty1", StringComparison.OrdinalIgnoreCase))
         {
-            // Use the third empty user for guaranteed empty state testing
-            _scenarioContext[TestContextKeys.TestUserEmail] = "empty3@example.com";
-            _scenarioContext[TestContextKeys.TestUserPassword] = "empty3123";
-            _scenarioContext[TestContextKeys.TestUserType] = "empty3";
-            Console.WriteLine($"[Seeded User] Assigned empty3 user for scenario: {scenarioTitle}");
+            // Use the first empty user for guaranteed empty state testing
+            _scenarioContext[TestContextKeys.TestUserEmail] = "empty1@example.com";
+            _scenarioContext[TestContextKeys.TestUserPassword] = "empty1123";
+            _scenarioContext[TestContextKeys.TestUserType] = "empty1";
+            Console.WriteLine($"[Seeded User] Assigned empty1 user for scenario: {scenarioTitle}");
         }
         else if (tags.Contains("empty2") || scenarioTitle.Contains("empty2", StringComparison.OrdinalIgnoreCase))
         {
@@ -36,13 +36,21 @@ public class SeededTestUserHooks
             _scenarioContext[TestContextKeys.TestUserType] = "empty2";
             Console.WriteLine($"[Seeded User] Assigned empty2 user for scenario: {scenarioTitle}");
         }
-        else if (tags.Contains("empty") || scenarioTitle.Contains("empty", StringComparison.OrdinalIgnoreCase))
+        else if (tags.Contains("empty3") || scenarioTitle.Contains("empty3", StringComparison.OrdinalIgnoreCase))
         {
-            // Use the third empty user for main empty state scenarios
+            // Use the third empty user for guaranteed empty state testing
             _scenarioContext[TestContextKeys.TestUserEmail] = "empty3@example.com";
             _scenarioContext[TestContextKeys.TestUserPassword] = "empty3123";
             _scenarioContext[TestContextKeys.TestUserType] = "empty3";
             Console.WriteLine($"[Seeded User] Assigned empty3 user for scenario: {scenarioTitle}");
+        }
+        else if (tags.Contains("empty") || scenarioTitle.Contains("empty", StringComparison.OrdinalIgnoreCase))
+        {
+            // Generic empty tag - this should not happen with proper tagging, but fallback to empty1
+            _scenarioContext[TestContextKeys.TestUserEmail] = "empty1@example.com";
+            _scenarioContext[TestContextKeys.TestUserPassword] = "empty1123";
+            _scenarioContext[TestContextKeys.TestUserType] = "empty1";
+            Console.WriteLine($"[Seeded User] WARNING: Generic @empty tag used, assigned empty1 user for scenario: {scenarioTitle}");
         }
         else if (tags.Contains("admin") || scenarioTitle.Contains("admin", StringComparison.OrdinalIgnoreCase))
         {
