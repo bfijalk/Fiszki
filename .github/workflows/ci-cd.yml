@@ -130,6 +130,10 @@ jobs:
     - name: 🚀 Start application in test mode (background)
       run: |
         echo "Starting application in test mode..."
+        export ASPNETCORE_ENVIRONMENT=Test
+        export ASPNETCORE_URLS="http://localhost:5000"
+        export TestMode=true
+        export OpenRouter__ApiKey=$OPENROUTER__APIKEY
         nohup dotnet run --project Fiszki.csproj --environment Test --urls "http://localhost:5000" > app.log 2>&1 &
         APP_PID=$!
         echo $APP_PID > app.pid
@@ -155,6 +159,10 @@ jobs:
         fi
         
         echo "Application is running and healthy"
+      env:
+        ASPNETCORE_ENVIRONMENT: Test
+        TestMode: true
+        ASPNETCORE_URLS: http://localhost:5000
     
     - name: 🧪 Run functional tests
       run: |
