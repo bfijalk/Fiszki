@@ -96,7 +96,7 @@ jobs:
 
   functional-tests:
     name: 🎭 Functional Tests (E2E)
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # Changed from ubuntu-latest to windows-latest
     needs: [build, unit-tests]
     if: github.event_name == 'pull_request' && github.base_ref == 'main'
     
@@ -124,41 +124,54 @@ jobs:
       run: |
         cd Fiszki.FunctionalTests
         dotnet build
-        # Install Playwright browsers using the proper method for GitHub Actions
+        # Use PowerShell for Windows - install Playwright browsers
         pwsh ./bin/Debug/net8.0/playwright.ps1 install chromium --with-deps
       
     - name: 🚀 Start application in test mode (background)
       run: |
-        echo "Starting application in test mode..."
-        export ASPNETCORE_ENVIRONMENT=Test
-        export ASPNETCORE_URLS="http://localhost:5000"
-        export TestMode=true
-        export OpenRouter__ApiKey=$OPENROUTER__APIKEY
-        nohup dotnet run --project Fiszki.csproj --environment Test --urls "http://localhost:5000" > app.log 2>&1 &
-        APP_PID=$!
-        echo $APP_PID > app.pid
-        echo "Application started with PID: $APP_PID"
+        Write-Host "Starting application in test mode..."
+        $env:ASPNETCORE_ENVIRONMENT = "Test"
+        $env:ASPNETCORE_URLS = "http://localhost:5000"
+        $env:TestMode = "true"
+        $env:OpenRouter__ApiKey = $env:OPENROUTER__APIKEY
         
-        # Wait for application to start
-        echo "Waiting for application to start..."
-        for i in {1..60}; do
-          if curl -s http://localhost:5000 > /dev/null 2>&1; then
-            echo "Application is ready!"
-            break
-          fi
-          echo "Attempt $i: Application not ready yet..."
-          sleep 2
-        done
+        # Start the application in the background using PowerShell
+        $process = Start-Process -FilePath "dotnet" -ArgumentList "run", "--project", "Fiszki.csproj", "--environment", "Test", "--urls", "http://localhost:5000" -RedirectStandardOutput "app.log" -RedirectStandardError "app.log" -PassThru -WindowStyle Hidden
+        $process.Id | Out-File -FilePath "app.pid"
+        Write-Host "Application started with PID: $($process.Id)"
         
-        # Verify application is running
-        if ! curl -s http://localhost:5000 > /dev/null 2>&1; then
-          echo "Application failed to start properly"
-          echo "Application logs:"
-          cat app.log
-          exit 1
-        fi
+        # Wait for application to start with Windows-compatible approach
+        Write-Host "Waiting for application to start..."
+        $timeout = 120  # 2 minutes timeout
+        $elapsed = 0
+        do {
+            try {
+                $response = Invoke-WebRequest -Uri "http://localhost:5000" -TimeoutSec 2 -ErrorAction SilentlyContinue
+                if ($response.StatusCode -eq 200) {
+                    Write-Host "Application is ready!"
+                    break
+                }
+            } catch {
+                # Continue waiting
+            }
+            Start-Sleep -Seconds 2
+            $elapsed += 2
+            Write-Host "Attempt $($elapsed/2): Application not ready yet..."
+        } while ($elapsed -lt $timeout)
         
-        echo "Application is running and healthy"
+        # Final verification
+        try {
+            $response = Invoke-WebRequest -Uri "http://localhost:5000" -TimeoutSec 5
+            Write-Host "Application is running and healthy"
+        } catch {
+            Write-Host "Application failed to start properly"
+            if (Test-Path "app.log") {
+                Write-Host "Application logs:"
+                Get-Content "app.log"
+            }
+            exit 1
+        }
+      shell: pwsh
       env:
         ASPNETCORE_ENVIRONMENT: Test
         TestMode: true
@@ -167,7 +180,37 @@ jobs:
     - name: 🧪 Run functional tests
       run: |
         cd Fiszki.FunctionalTests
-        dotnet test --no-build --verbosity normal --logger "trx;LogFileName=functional-test-results.trx"
+        Write-Host "=== Starting functional tests ==="
+        Write-Host "Environment: $env:ASPNETCORE_ENVIRONMENT"
+        Write-Host "Base URL: $env:FISZKI_BASE_URL"
+        Write-Host "Headless mode: $env:PW_HEADLESS"
+        
+        # Test if the application is responsive before running tests
+        Write-Host "=== Testing application health ==="
+        try {
+            $response = Invoke-WebRequest -Uri "$env:FISZKI_BASE_URL/health" -TimeoutSec 5
+            Write-Host "Health endpoint is accessible - Status: $($response.StatusCode)"
+        } catch {
+            Write-Host "Health endpoint not available: $_"
+        }
+        
+        try {
+            $response = Invoke-WebRequest -Uri "$env:FISZKI_BASE_URL/" -TimeoutSec 5
+            Write-Host "Home page is accessible - Status: $($response.StatusCode)"
+        } catch {
+            Write-Host "Home page not accessible: $_"
+        }
+        
+        try {
+            $response = Invoke-WebRequest -Uri "$env:FISZKI_BASE_URL/login" -TimeoutSec 5
+            Write-Host "Login page is accessible - Status: $($response.StatusCode)"
+        } catch {
+            Write-Host "Login page not accessible: $_"
+        }
+        
+        # Run the tests with verbose output
+        dotnet test --no-build --verbosity normal --logger "trx;LogFileName=functional-test-results.trx" --logger "console;verbosity=detailed"
+      shell: pwsh
       env:
         ASPNETCORE_ENVIRONMENT: Test
         FISZKI_BASE_URL: http://localhost:5000
@@ -176,34 +219,31 @@ jobs:
     - name: 📋 Show application logs (if tests fail)
       if: failure()
       run: |
-        echo "=== Application Logs ==="
-        cat app.log || echo "No application logs found"
+        Write-Host "=== Application Logs ==="
+        if (Test-Path "app.log") {
+            Get-Content "app.log"
+        } else {
+            Write-Host "No application logs found"
+        }
+      shell: pwsh
     
     - name: 🛑 Stop application
       if: always()
       run: |
-        if [ -f app.pid ]; then
-          APP_PID=$(cat app.pid)
-          if [ ! -z "$APP_PID" ]; then
-            echo "Stopping application with PID: $APP_PID"
-            kill $APP_PID || true
-            sleep 2
-            kill -9 $APP_PID 2>/dev/null || true
-          fi
-          rm -f app.pid
-        fi
-    
-    - name: 📊 Upload functional test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: functional-test-results
-        path: |
-          **/TestResults/**/*
-          **/test-results/**/*
-          Fiszki.FunctionalTests/**/*test-results.trx
-          app.log
-        retention-days: 7
+        if (Test-Path "app.pid") {
+            $appPid = Get-Content "app.pid"
+            if ($appPid) {
+                Write-Host "Stopping application with PID: $appPid"
+                try {
+                    Stop-Process -Id $appPid -Force -ErrorAction SilentlyContinue
+                    Write-Host "Application stopped successfully"
+                } catch {
+                    Write-Host "Could not stop application: $_"
+                }
+            }
+            Remove-Item "app.pid" -ErrorAction SilentlyContinue
+        }
+      shell: pwsh
 
   required-status-check:
     name: 🛡️ Required Status Check
