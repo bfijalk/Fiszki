@@ -167,7 +167,19 @@ jobs:
     - name: 🧪 Run functional tests
       run: |
         cd Fiszki.FunctionalTests
-        dotnet test --no-build --verbosity normal --logger "trx;LogFileName=functional-test-results.trx"
+        echo "=== Starting functional tests ==="
+        echo "Environment: $ASPNETCORE_ENVIRONMENT"
+        echo "Base URL: $FISZKI_BASE_URL"
+        echo "Headless mode: $PW_HEADLESS"
+        
+        # Test if the application is responsive before running tests
+        echo "=== Testing application health ==="
+        curl -v $FISZKI_BASE_URL/health 2>&1 || echo "Health endpoint not available"
+        curl -v $FISZKI_BASE_URL/ 2>&1 || echo "Home page not accessible"
+        curl -v $FISZKI_BASE_URL/login 2>&1 || echo "Login page not accessible"
+        
+        # Run the tests with verbose output
+        dotnet test --no-build --verbosity normal --logger "trx;LogFileName=functional-test-results.trx" --logger "console;verbosity=detailed"
       env:
         ASPNETCORE_ENVIRONMENT: Test
         FISZKI_BASE_URL: http://localhost:5000

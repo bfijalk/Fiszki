@@ -73,6 +73,9 @@ app.UseAuthorization();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
+// Add health check endpoint for testing
+app.MapGet("/health", () => new { Status = "Healthy", Timestamp = DateTime.UtcNow, Environment = app.Environment.EnvironmentName });
+
 // Database initialization
 try
 {
