@@ -225,7 +225,7 @@ jobs:
     name: 🛡️ Required Status Check
     runs-on: ubuntu-latest
     needs: [build, unit-tests, functional-tests]
-    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    if: always() && (github.event_name == 'pull_request' || github.event_name == 'push')
     steps:
       - name: 🔍 Verify all jobs passed
         run: |
@@ -233,15 +233,31 @@ jobs:
           echo "Build status: ${{ needs.build.result }}"
           echo "Unit Tests status: ${{ needs.unit-tests.result }}"
           echo "Functional Tests status: ${{ needs.functional-tests.result }}"
+          
+          # Check if build failed
           if [[ "${{ needs.build.result }}" != "success" ]]; then
             echo "❌ Build job failed or was cancelled"; exit 1; fi
+          
+          # Check if unit tests failed
           if [[ "${{ needs.unit-tests.result }}" != "success" ]]; then
             echo "❌ Unit Tests job failed or was cancelled"; exit 1; fi
-          if [[ "${{ needs.functional-tests.result }}" == "skipped" ]]; then
-            echo "⚠️ Functional tests were skipped (no PR to main) - deploying based on build and unit tests only"
-          elif [[ "${{ needs.functional-tests.result }}" != "success" ]]; then
-            echo "❌ Functional Tests job failed or was cancelled"; exit 1; fi
-          echo "✅ All required jobs passed - safe to deploy to Azure"
+          
+          # For functional tests, handle different scenarios
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "main" ]]; then
+            # This is a PR to main, functional tests should have run
+            if [[ "${{ needs.functional-tests.result }}" != "success" ]]; then
+              echo "❌ Functional Tests job failed or was cancelled"; exit 1; fi
+            echo "✅ All required jobs passed including functional tests"
+          else
+            # This is either a push or PR not to main, functional tests are expected to be skipped
+            if [[ "${{ needs.functional-tests.result }}" == "skipped" ]]; then
+              echo "⚠️ Functional tests were skipped (not a PR to main) - proceeding based on build and unit tests only"
+            elif [[ "${{ needs.functional-tests.result }}" == "success" ]]; then
+              echo "✅ Functional tests ran and passed"
+            else
+              echo "❌ Functional Tests job failed unexpectedly"; exit 1; fi
+            echo "✅ Required jobs passed - safe to proceed"
+          fi
 
   deploy:
     name: 🚀 Deploy to Azure (main)
