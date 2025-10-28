@@ -59,20 +59,21 @@ public class DynamicLoginSteps : BaseSteps
         await Task.Delay(2000);
         
         // Verify we're not still on the login page after successful login
-        var currentUrl = LoginPage.PageInstance.Url;
+        var loginPageConcrete = (LoginPage)LoginPage;
+        var currentUrl = loginPageConcrete.PageInstance.Url;
         if (currentUrl.Contains("/login"))
         {
-            Console.WriteLine($"[Dynamic Login] Warning: Still on login page after login attempt. URL: {currentUrl}");
+            Console.WriteLine("[Dynamic Login] Warning: Still on login page after login attempt. URL: " + currentUrl);
             // Wait a bit more and check again
             await Task.Delay(3000);
-            currentUrl = LoginPage.PageInstance.Url;
+            currentUrl = loginPageConcrete.PageInstance.Url;
             if (currentUrl.Contains("/login"))
             {
-                throw new InvalidOperationException($"Login failed - still on login page after extended wait. Current URL: {currentUrl}");
+                throw new InvalidOperationException("Login failed - still on login page after extended wait. Current URL: " + currentUrl);
             }
         }
         
-        Console.WriteLine($"[Dynamic Login] Login process completed for user: {testUserEmail}. Final URL: {currentUrl}");
+        Console.WriteLine("[Dynamic Login] Login process completed for user: " + testUserEmail + ". Final URL: " + currentUrl);
     }
 
     /// <summary>
