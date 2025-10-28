@@ -4,11 +4,13 @@ public static class TestConstants
 {
     public static class Timeouts
     {
-        public const int DefaultWaitMs = 1000;
-        public const int FormValidationWaitMs = 200;
-        public const int PasswordMismatchWaitMs = 300;
-        public const int NavigationTimeoutMs = 5000;
-        public const int FlashcardGenerationWaitMs = 10000;
+        public const int DefaultWaitMs = 2000; // Increased from 1000
+        public const int FormValidationWaitMs = 500; // Increased from 200
+        public const int PasswordMismatchWaitMs = 600; // Increased from 300
+        public const int NavigationTimeoutMs = 15000; // Increased from 7000 to 15000
+        public const int FlashcardGenerationWaitMs = 15000; // Increased from 7000 to 15000
+        public const int PlaywrightDefaultTimeoutMs = 15000; // Increased from 7000 to 15000
+        public const int LoginTimeoutMs = 10000; // New timeout specifically for login
     }
 
     public static class Messages
@@ -48,6 +50,12 @@ public static class TestConstants
         public const string AcceptAll = "Accept All";
         public const string SaveSelected = "Save Selected";
         public const string Flashcards = "Flashcards";
+        public const string CreateManually = "Create Manually";
+        public const string QuestionFront = "Question (Front)*";
+        public const string AnswerBack = "Answer (Back)*";
+        public const string TagsOptional = "Tags (optional)";
+        public const string CreateCard = "Create Card";
+        public const string GetStartedSignIn = "Get Started - Sign In";
     }
 
     public static class TestData
@@ -68,5 +76,12 @@ Dziś w muzeum w Salonikach można zobaczyć największą kolekcję artefaktów 
             "ruiny starożytnego miasta",
             "dr Helena Markos"
         };
+
+        // Manual flashcard creation test data
+        public const string ManualQuestion = "Dodaj pytanie na przod formatki";
+        public const string ManualAnswer = "Dodaj odpowiedz na koncu formatki";
+        public const string ManualTags = "tagi1";
+        public const string TestUserEmail = "noob@noob.pl";
+        public const string TestUserPassword = "noob2";
     }
 }

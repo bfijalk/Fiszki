@@ -122,45 +122,39 @@ namespace Fiszki.FunctionalTests.Features
     await testRunner.GivenAsync("I am on the Login page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 11
-    await testRunner.WhenAsync("I enter email \"test@test.pl\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 12
-    await testRunner.AndAsync("I enter password \"test2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 13
-    await testRunner.AndAsync("I click Login", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 14
     await testRunner.ThenAsync("I should be redirected to the Flashcard Generation page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 13
     await testRunner.WhenAsync("I enter the sample source text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 16
+#line 14
     await testRunner.AndAsync("I set maximum cards to 5", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 17
+#line 15
     await testRunner.AndAsync("I click Generate Flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 18
+#line 16
     await testRunner.ThenAsync("I should see the \"Generation completed\" message", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 19
+#line 17
     await testRunner.AndAsync("I should see generated flashcards on the page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 20
+#line 18
     await testRunner.AndAsync("I should see the correct flashcard count displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 21
+#line 19
     await testRunner.AndAsync("the generated flashcards should contain expected content", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 22
+#line 20
     await testRunner.WhenAsync("I click Accept All", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 23
+#line 21
     await testRunner.ThenAsync("all flashcards should be selected", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 24
+#line 22
     await testRunner.AndAsync("the Save Selected button should be enabled", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

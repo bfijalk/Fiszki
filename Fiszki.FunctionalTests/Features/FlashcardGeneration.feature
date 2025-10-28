@@ -8,9 +8,7 @@ Feature: Flashcard Generation Validation
 
   Scenario: Generate flashcards and validate they appear on generation page
     Given I am on the Login page
-    When I enter email "test@test.pl"
-    And I enter password "test2"
-    And I click Login
+    When I login with my test user
     Then I should be redirected to the Flashcard Generation page
     When I enter the sample source text
     And I set maximum cards to 5

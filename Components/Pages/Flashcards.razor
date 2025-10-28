@@ -8,6 +8,7 @@
 
 @inject IFlashcardService FlashcardService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
 
 <PageTitle>Your Flashcards - Fiszki</PageTitle>
 <link href="~/css/flashcards.css" rel="stylesheet" />
@@ -57,10 +58,10 @@
                     <i class="bi bi-collection display-1 text-muted mb-3"></i>
                     <h5 class="text-muted mb-3">No flashcards yet</h5>
                     <p class="text-muted mb-4">Start creating your first flashcards to build your learning collection!</p>
-                    <a href="/generate" class="btn btn-primary me-2">
+                    <button class="btn btn-primary me-2" @onclick="NavigateToGenerate">
                         <i class="bi bi-stars me-2"></i>
                         Generate with AI
-                    </a>
+                    </button>
                     <button class="btn btn-outline-primary" @onclick="CreateManualCard">
                         <i class="bi bi-plus-circle me-2"></i>
                         Create Manually
@@ -123,10 +124,10 @@
         <!-- Action Buttons -->
         <div class="row mb-4">
             <div class="col-12">
-                <a href="/generate" class="btn btn-primary me-2">
+                <button class="btn btn-primary me-2" @onclick="NavigateToGenerate">
                     <i class="bi bi-stars me-2"></i>
                     Generate More Cards
-                </a>
+                </button>
                 <button class="btn btn-outline-primary me-2" @onclick="CreateManualCard">
                     <i class="bi bi-plus-circle me-2"></i>
                     Add Manual Card
@@ -163,66 +164,6 @@
                             <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">
                                 <i class="bi bi-trash me-1"></i>
                                 Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-
-        @if (_showCreateModal)
-        {
-            <!-- Create Manual Card Modal -->
-            <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">
-                                <i class="bi bi-plus-circle me-2"></i>
-                                Create Manual Flashcard
-                            </h5>
-                            <button type="button" class="btn-close" @onclick="CancelCreate"></button>
-                        </div>
-                        <div class="modal-body">
-                            @if (_createError != null)
-                            {
-                                <div class="alert alert-danger">
-                                    <i class="bi bi-exclamation-triangle me-2"></i>
-                                    @_createError
-                                </div>
-                            }
-                            
-                            <div class="mb-3">
-                                <label for="frontContent" class="form-label">Question (Front)*</label>
-                                <textarea class="form-control" id="frontContent" rows="3" 
-                                          @bind="_newCardFront" placeholder="Enter the question or prompt..."></textarea>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="backContent" class="form-label">Answer (Back)*</label>
-                                <textarea class="form-control" id="backContent" rows="3" 
-                                          @bind="_newCardBack" placeholder="Enter the answer or explanation..."></textarea>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="tags" class="form-label">Tags (optional)</label>
-                                <input type="text" class="form-control" id="tags" 
-                                       @bind="_newCardTags" placeholder="tag1, tag2, tag3...">
-                                <div class="form-text">Separate multiple tags with commas</div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="CancelCreate">Cancel</button>
-                            <button type="button" class="btn btn-primary" @onclick="CreateCard" disabled="@_isCreating">
-                                @if (_isCreating)
-                                {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-plus-circle me-2"></i>
-                                }
-                                Create Card
                             </button>
                         </div>
                     </div>
@@ -343,6 +284,67 @@
                 }
             </div>
         }
+    }
+
+    @* Move the create modal outside all conditional blocks so it's always available *@
+    @if (_showCreateModal)
+    {
+        <!-- Create Manual Card Modal -->
+        <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Create Manual Flashcard
+                        </h5>
+                        <button type="button" class="btn-close" @onclick="CancelCreate"></button>
+                    </div>
+                    <div class="modal-body">
+                        @if (_createError != null)
+                        {
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                @_createError
+                            </div>
+                        }
+                        
+                        <div class="mb-3">
+                            <label for="frontContent" class="form-label">Question (Front)*</label>
+                            <textarea class="form-control" id="frontContent" rows="3" 
+                                      @bind="_newCardFront" placeholder="Enter the question or prompt..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backContent" class="form-label">Answer (Back)*</label>
+                            <textarea class="form-control" id="backContent" rows="3" 
+                                      @bind="_newCardBack" placeholder="Enter the answer or explanation..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Tags (optional)</label>
+                            <input type="text" class="form-control" id="tags" 
+                                   @bind="_newCardTags" placeholder="tag1, tag2, tag3...">
+                            <div class="form-text">Separate multiple tags with commas</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CancelCreate">Cancel</button>
+                        <button type="button" class="btn btn-primary" @onclick="CreateCard" disabled="@_isCreating">
+                            @if (_isCreating)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-plus-circle me-2"></i>
+                            }
+                            Create Card
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 </div>
 
@@ -576,5 +578,10 @@
         _selectedFilter = null;
         ApplyFilter();
         StateHasChanged();
+    }
+
+    private void NavigateToGenerate()
+    {
+        Navigation.NavigateTo("/generate");
     }
 }

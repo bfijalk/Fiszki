@@ -36,7 +36,7 @@ public class InfrastructureSteps
                 if (status >= 200 && status < 400)
                 {
                     var content = await Page.ContentAsync();
-                    if (content.Contains("Hello, world!"))
+                    if (content.Contains("Fiszki") || content.Contains("AI-Powered Flashcards"))
                     {
                         return; // success
                     }
