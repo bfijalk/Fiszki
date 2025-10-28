@@ -230,30 +230,97 @@ dotnet analyze
 
 ## CI/CD Pipeline
 
-### Automated Pipeline Features
+### Fully Integrated CI/CD Process
+
+Our application features a comprehensive **double-gate CI/CD pipeline** that ensures maximum quality and reliability before any code reaches production.
 
 #### Continuous Integration
-- **Automated Testing**: Full test suite runs on every commit
-- **Code Quality**: Static analysis and linting validation
+- **Automated Testing**: Multi-stage testing pipeline with **independent job execution**
+- **Build Stage**: .NET compilation and artifact generation
+- **Unit Testing Stage**: Fast, isolated service layer validation with xUnit
+- **Integration Testing Stage**: Database interactions with EF Core
+- **E2E Testing Stage**: Comprehensive browser automation with Playwright
+- **Test Environment**: Application runs in **isolated test mode with in-memory database**
+- **Browser Automation**: **Real user interaction simulation** across multiple browsers
+- **Code Quality**: Static analysis, linting validation, and comprehensive coverage reports
 - **Build Verification**: Ensures successful compilation across environments
-- **Security Scanning**: Dependency vulnerability checks
+- **Security Scanning**: Dependency vulnerability checks and security validation
+
+#### Double-Gate Validation Strategy
+1. **Gate 1 - Pull Request Validation**:
+   - ✅ **Build Stage**: Compilation and artifact generation
+   - ✅ **Unit Testing Stage**: Service layer validation with xUnit (independent job)
+   - ✅ **Integration Testing Stage**: Database interactions with EF Core (independent job)
+   - ✅ **E2E Testing Stage (Playwright)**: Full application workflow testing (independent job)
+   - ✅ Quality gate validation (blocks merge if any stage fails)
+
+2. **Gate 2 - Pre-Deployment Validation**:
+   - ✅ **Build Stage**: Complete rebuild and artifact generation
+   - ✅ **Unit Testing Stage**: Re-execution of service layer tests (independent job)
+   - ✅ **Integration Testing Stage**: Re-execution of database interaction tests (independent job)  
+   - ✅ **E2E Testing Stage (Playwright)**: Re-execution of full workflow tests (independent job)
+   - ✅ **Application startup verification in test mode**
+   - ✅ **Deployment readiness validation**
+
+#### Pipeline Stages Breakdown
+
+##### 🔨 Build Stage
+- .NET 8 SDK setup and environment preparation
+- NuGet package restoration and dependency resolution
+- Release configuration compilation
+- Build artifact generation and packaging
+
+##### 🧪 Unit Testing Stage
+- **Purpose**: Fast feedback on business logic and service layer
+- **Framework**: xUnit with FluentAssertions and AutoFixture
+- **Scope**: Service layer validation, input validation rules, utility functions
+- **Execution**: Independent job running in parallel after build
+- **Coverage**: 80%+ target for core business logic
+- **Results**: TRX reports and code coverage analysis
+
+##### 🎭 E2E Testing Stage (Playwright)
+- **Purpose**: Full application workflow validation with real browser automation
+- **Framework**: Playwright with Chrome/Firefox support
+- **Environment**: Isolated application instance with **in-memory database**
+- **Scope**: Complete user workflows from login to flashcard management
+- **Execution**: Independent job requiring **application startup in test mode**
+- **Coverage**: Critical user paths and cross-browser compatibility
+- **Results**: Test artifacts, screenshots, and application logs
+
+##### 🚀 Deployment Stage
+- **Azure Web App deployment** to production slot
+- Database migration execution and validation
+- Post-deployment health checks and monitoring
+- Zero-downtime rolling deployment strategy
 
 #### Continuous Deployment
-- **Azure App Service**: Automatic deployment to Azure cloud on main branch merge
-- **Production Ready**: Live application available immediately after deployment
+- **Azure App Service**: Automatic deployment to Azure cloud on successful validation
+- **Production Ready**: Live application available immediately after comprehensive testing
 - **Database Migrations**: Automated schema updates during deployment
 - **Health Checks**: Post-deployment verification and monitoring
+- **Zero-Downtime**: Rolling deployment strategy
+
+#### End-to-End Testing Details
+- **Playwright Integration**: Modern browser automation framework
+- **Test Environment**: Isolated application instance with **in-memory database**
+- **Real Browser Testing**: Chrome/Firefox automation with **actual user interactions**
+- **Application Modes**: Full testing in dedicated **test mode configuration**
+- **Coverage**: Complete user workflows from login to flashcard management
+- **Environment Variables**: Secure handling of test secrets and API keys
 
 #### Monitoring & Alerts
 - **Application Performance**: Response time and error tracking via Azure Monitor
 - **Infrastructure**: Server health and resource usage monitoring
 - **Deployment Status**: Real-time feedback on deployment success/failure
+- **Test Results**: Comprehensive reporting with artifacts and logs
 
 ### Current Implementation
-- **Trigger**: Every merge to `main` branch automatically deploys to production
-- **Platform**: Azure App Services hosting
-- **Database**: Azure PostgreSQL managed service
-- **Monitoring**: Azure Application Insights integration
+- **Trigger Strategy**: 
+  - **Pull Requests**: Build + Unit + Integration + E2E tests (validation gate)
+  - **Main Branch Merge**: Full double-validation + deployment to production
+- **Platform**: Azure App Services hosting with PostgreSQL managed database
+- **Testing Framework**: xUnit + Playwright + EF Core InMemory for comprehensive coverage
+- **Monitoring**: Azure Application Insights integration with custom dashboards
 
 ---
 
