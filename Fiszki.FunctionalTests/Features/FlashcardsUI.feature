@@ -6,7 +6,7 @@ Feature: Flashcards UI Interactions
   Background:
     Given the application is running
 
-  @empty
+  @empty1
   Scenario: Empty flashcards state
     Given I am on the Login page
     When I login with my test user
@@ -31,7 +31,7 @@ Feature: Flashcards UI Interactions
     Then I should see the flashcard "What is the capital of Poland?"
     And I should see the flashcard statistics
 
-  @empty
+  @empty2
   Scenario: Create manual flashcard with validation error
     Given I am on the Login page
     When I login with my test user
