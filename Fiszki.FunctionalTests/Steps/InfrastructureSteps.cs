@@ -24,7 +24,7 @@ public class InfrastructureSteps
     {
         var attempts = 0;
         Exception? lastEx = null;
-        while (attempts < 8)
+        while (attempts < 20)
         {
             attempts++;
             try
