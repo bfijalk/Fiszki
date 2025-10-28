@@ -1,6 +1,7 @@
 using Fiszki.Components;
 using Fiszki.Database;
 using Fiszki.Services;
+using Fiszki.Services.Services;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -33,9 +34,22 @@ builder.Services.AddAuthorizationCore(); // per docs for custom auth state provi
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
-// Minimal direct DbContext registration (no helper extensions)
-builder.Services.AddDbContext<FiszkiDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("FiszkiDatabase")));
+// Database configuration - support for test mode with in-memory database
+var isTestMode = builder.Environment.IsEnvironment("Test") || 
+                 builder.Configuration.GetValue<bool>("TestMode") ||
+                 args.Contains("--test-mode");
+
+if (isTestMode)
+{
+    Console.WriteLine("[Startup] Running in TEST MODE with in-memory database.");
+    builder.Services.AddDbContext<FiszkiDbContext>(options =>
+        options.UseInMemoryDatabase("FiszkiTestDb"));
+}
+else
+{
+    builder.Services.AddDbContext<FiszkiDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("FiszkiDatabase")));
+}
 
 // Register domain services
 builder.Services.AddFiszkiServices(builder.Configuration);
@@ -59,20 +73,39 @@ app.UseAuthorization();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-// --- Simple database connectivity check (synchronous) ---
+// Database initialization
 try
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<FiszkiDbContext>();
-    var canConnect = db.Database.CanConnect();
-    Console.WriteLine(canConnect
-        ? "[Startup] Database connection successful."
-        : "[Startup] Database connection FAILED.");
+    
+    if (isTestMode)
+    {
+        // For in-memory database, ensure the database is created
+        await db.Database.EnsureCreatedAsync();
+        Console.WriteLine("[Startup] In-memory database initialized successfully.");
+        
+        // Seed test data
+        var testDataSeeder = scope.ServiceProvider.GetRequiredService<TestDataSeeder>();
+        await testDataSeeder.SeedAsync();
+        Console.WriteLine("[Startup] Test data seeding completed.");
+    }
+    else
+    {
+        // For PostgreSQL, just check connectivity
+        var canConnect = db.Database.CanConnect();
+        Console.WriteLine(canConnect
+            ? "[Startup] Database connection successful."
+            : "[Startup] Database connection FAILED.");
+    }
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"[Startup] Database connection FAILED with exception: {ex.Message}");
+    Console.WriteLine($"[Startup] Database initialization FAILED with exception: {ex.Message}");
+    if (!isTestMode)
+    {
+        throw; // Re-throw for production/development environments
+    }
 }
-// -------------------------------------------------------
 
 app.Run();

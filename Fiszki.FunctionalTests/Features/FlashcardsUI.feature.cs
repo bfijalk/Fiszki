@@ -99,12 +99,14 @@ namespace Fiszki.FunctionalTests.Features
         [Xunit.SkippableFactAttribute(DisplayName="Empty flashcards state")]
         [Xunit.TraitAttribute("FeatureTitle", "Flashcards UI Interactions")]
         [Xunit.TraitAttribute("Description", "Empty flashcards state")]
+        [Xunit.TraitAttribute("Category", "empty")]
         public async System.Threading.Tasks.Task EmptyFlashcardsState()
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = new string[] {
+                    "empty"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Empty flashcards state", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 9
+#line 10
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -117,40 +119,42 @@ namespace Fiszki.FunctionalTests.Features
 #line 6
   this.FeatureBackgroundAsync();
 #line hidden
-#line 10
+#line 11
     await testRunner.GivenAsync("I am on the Login page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 11
+#line 12
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 12
+#line 13
     await testRunner.ThenAsync("I should be redirected to the Flashcard Generation page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 13
+#line 14
     await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 14
+#line 15
     await testRunner.ThenAsync("I should see the empty state message", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 16
     await testRunner.AndAsync("I should see the \"Generate with AI\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 17
     await testRunner.AndAsync("I should see the \"Create Manually\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Create a manual flashcard")]
+        [Xunit.SkippableFactAttribute(DisplayName="Create a manual flashcard from empty state")]
         [Xunit.TraitAttribute("FeatureTitle", "Flashcards UI Interactions")]
-        [Xunit.TraitAttribute("Description", "Create a manual flashcard")]
-        public async System.Threading.Tasks.Task CreateAManualFlashcard()
+        [Xunit.TraitAttribute("Description", "Create a manual flashcard from empty state")]
+        [Xunit.TraitAttribute("Category", "empty3")]
+        public async System.Threading.Tasks.Task CreateAManualFlashcardFromEmptyState()
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = new string[] {
+                    "empty3"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a manual flashcard", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 18
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a manual flashcard from empty state", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 20
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -163,40 +167,40 @@ namespace Fiszki.FunctionalTests.Features
 #line 6
   this.FeatureBackgroundAsync();
 #line hidden
-#line 19
+#line 21
     await testRunner.GivenAsync("I am on the Login page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 20
+#line 22
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 21
+#line 23
     await testRunner.ThenAsync("I should be redirected to the Flashcard Generation page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 22
+#line 24
     await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 23
+#line 25
     await testRunner.AndAsync("I click Add Manual Card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 24
+#line 26
     await testRunner.ThenAsync("I should see the create card modal", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 25
+#line 27
     await testRunner.WhenAsync("I enter question \"What is the capital of Poland?\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 28
     await testRunner.AndAsync("I enter answer \"Warsaw\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 27
+#line 29
     await testRunner.AndAsync("I enter tags \"geography, poland, capitals\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 28
+#line 30
     await testRunner.AndAsync("I click Create Card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 29
+#line 31
     await testRunner.ThenAsync("I should see the flashcard \"What is the capital of Poland?\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 30
+#line 32
     await testRunner.AndAsync("I should see the flashcard statistics", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -206,12 +210,14 @@ namespace Fiszki.FunctionalTests.Features
         [Xunit.SkippableFactAttribute(DisplayName="Create manual flashcard with validation error")]
         [Xunit.TraitAttribute("FeatureTitle", "Flashcards UI Interactions")]
         [Xunit.TraitAttribute("Description", "Create manual flashcard with validation error")]
+        [Xunit.TraitAttribute("Category", "empty")]
         public async System.Threading.Tasks.Task CreateManualFlashcardWithValidationError()
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = new string[] {
+                    "empty"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create manual flashcard with validation error", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 32
+#line 35
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -224,49 +230,49 @@ namespace Fiszki.FunctionalTests.Features
 #line 6
   this.FeatureBackgroundAsync();
 #line hidden
-#line 33
+#line 36
     await testRunner.GivenAsync("I am on the Login page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 34
+#line 37
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 35
+#line 38
     await testRunner.ThenAsync("I should be redirected to the Flashcard Generation page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 36
+#line 39
     await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 37
+#line 40
     await testRunner.AndAsync("I click Add Manual Card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 38
+#line 41
     await testRunner.ThenAsync("I should see the create card modal", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 39
+#line 42
     await testRunner.WhenAsync("I click Create Card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 40
+#line 43
     await testRunner.ThenAsync("I should see a validation error", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 41
+#line 44
     await testRunner.WhenAsync("I cancel card creation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 42
+#line 45
     await testRunner.ThenAsync("the create card modal should be closed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="View flashcard statistics and filters with generated flashcards")]
+        [Xunit.SkippableFactAttribute(DisplayName="View existing flashcards and statistics")]
         [Xunit.TraitAttribute("FeatureTitle", "Flashcards UI Interactions")]
-        [Xunit.TraitAttribute("Description", "View flashcard statistics and filters with generated flashcards")]
-        public async System.Threading.Tasks.Task ViewFlashcardStatisticsAndFiltersWithGeneratedFlashcards()
+        [Xunit.TraitAttribute("Description", "View existing flashcards and statistics")]
+        public async System.Threading.Tasks.Task ViewExistingFlashcardsAndStatistics()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("View flashcard statistics and filters with generated flashcards", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 44
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("View existing flashcards and statistics", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 47
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -279,53 +285,74 @@ namespace Fiszki.FunctionalTests.Features
 #line 6
   this.FeatureBackgroundAsync();
 #line hidden
-#line 45
+#line 48
     await testRunner.GivenAsync("I am on the Login page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 46
+#line 49
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 47
+#line 50
     await testRunner.ThenAsync("I should be redirected to the Flashcard Generation page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 48
-    await testRunner.WhenAsync("I enter the sample source text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 49
-    await testRunner.AndAsync("I set maximum cards to 3", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 50
-    await testRunner.AndAsync("I click Generate Flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
 #line 51
-    await testRunner.AndAsync("I click Accept All", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 52
-    await testRunner.AndAsync("I click Save Selected", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 53
     await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
+#line 52
+    await testRunner.ThenAsync("I should see existing flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 53
+    await testRunner.AndAsync("I should see the flashcard statistics", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
 #line 54
-    await testRunner.ThenAsync("I should see the flashcard statistics", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    await testRunner.AndAsync("I should see flashcards like \"Hello\", \"Thank you\", \"Good morning\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 55
-    await testRunner.WhenAsync("I click the \"Ai\" filter", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 56
-    await testRunner.ThenAsync("I should see only AI generated flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="View flashcard statistics and filters with more flashcards")]
+        [Xunit.TraitAttribute("FeatureTitle", "Flashcards UI Interactions")]
+        [Xunit.TraitAttribute("Description", "View flashcard statistics and filters with more flashcards")]
+        [Xunit.TraitAttribute("Category", "demo")]
+        public async System.Threading.Tasks.Task ViewFlashcardStatisticsAndFiltersWithMoreFlashcards()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "demo"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("View flashcard statistics and filters with more flashcards", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 57
-    await testRunner.WhenAsync("I click the \"Manual\" filter", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 6
+  this.FeatureBackgroundAsync();
 #line hidden
 #line 58
-    await testRunner.ThenAsync("I should see only manual flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    await testRunner.GivenAsync("I am on the Login page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 59
-    await testRunner.WhenAsync("I click the \"Manual\" filter", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 60
-    await testRunner.ThenAsync("I should see all flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    await testRunner.ThenAsync("I should be redirected to the Flashcard Generation page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 61
+    await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 62
+    await testRunner.ThenAsync("I should see existing flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 63
+    await testRunner.AndAsync("I should see the flashcard statistics", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 64
+    await testRunner.AndAsync("I should see flashcards like \"Book\", \"Water\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -339,7 +366,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Toggle between card and list view", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 62
+#line 66
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -352,34 +379,34 @@ namespace Fiszki.FunctionalTests.Features
 #line 6
   this.FeatureBackgroundAsync();
 #line hidden
-#line 63
+#line 67
     await testRunner.GivenAsync("I am on the Login page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 64
+#line 68
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 65
-    await testRunner.AndAsync("I have dummy flashcards in my account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 66
+#line 69
     await testRunner.ThenAsync("I should be redirected to the Flashcard Generation page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 67
+#line 70
     await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 68
-    await testRunner.ThenAsync("I should be in \"card\" view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 69
-    await testRunner.WhenAsync("I toggle the view mode", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 70
-    await testRunner.ThenAsync("I should be in \"list\" view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
 #line 71
-    await testRunner.WhenAsync("I toggle the view mode", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    await testRunner.ThenAsync("I should see existing flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 72
+    await testRunner.ThenAsync("I should be in \"card\" view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 73
+    await testRunner.WhenAsync("I toggle the view mode", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 74
+    await testRunner.ThenAsync("I should be in \"list\" view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 75
+    await testRunner.WhenAsync("I toggle the view mode", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 76
     await testRunner.ThenAsync("I should be in \"card\" view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -394,7 +421,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Flip flashcards in card view", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 74
+#line 78
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -407,35 +434,32 @@ namespace Fiszki.FunctionalTests.Features
 #line 6
   this.FeatureBackgroundAsync();
 #line hidden
-#line 75
+#line 79
     await testRunner.GivenAsync("I am on the Login page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 76
+#line 80
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 77
-    await testRunner.AndAsync("I have dummy flashcards in my account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 78
+#line 81
     await testRunner.ThenAsync("I should be redirected to the Flashcard Generation page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 79
+#line 82
     await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 80
+#line 83
     await testRunner.AndAsync("I am in card view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 81
-    await testRunner.WhenAsync("I flip the card \"Heliora\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 82
-    await testRunner.ThenAsync("the card \"Heliora\" should be flipped", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 83
-    await testRunner.WhenAsync("I flip the card \"Heliora\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
 #line 84
-    await testRunner.ThenAsync("the card \"Heliora\" should show the question", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    await testRunner.WhenAsync("I flip any available card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 85
+    await testRunner.ThenAsync("the card should be flipped", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 86
+    await testRunner.WhenAsync("I flip the same card again", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 87
+    await testRunner.ThenAsync("the card should show the question", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

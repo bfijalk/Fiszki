@@ -1,0 +1,284 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "**" ]  # Trigger on all branches
+  pull_request:
+    branches: [ main ]   # Only on PRs to main
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION_FILE: 'Fiszki.sln'
+  ARTIFACT_NAME: 'fiszki-release-build'
+  PUBLISH_DIR: './publish'
+
+jobs:
+  build:
+    name: 🔨 Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: ⚙️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: 🔄 Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+    
+    - name: 🔨 Build (Release)
+      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
+    
+    - name: 📦 Publish artifacts (main branch only)
+      if: github.ref == 'refs/heads/main'
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --configuration Release --no-build --output ${{ env.PUBLISH_DIR }}
+    
+    - name: 🗂️ Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          **/bin/Release/**
+          **/obj/**
+        retention-days: 1
+    
+    - name: 🗂️ Upload publish artifacts (main branch only)
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.ARTIFACT_NAME }}
+        path: ${{ env.PUBLISH_DIR }}/
+        retention-days: 7
+
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: ⚙️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: 📥 Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+    
+    - name: 🔄 Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+    
+    - name: 🧪 Run unit tests
+      run: |
+        dotnet test Fiszki.Tests/Fiszki.Tests.csproj \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          --logger trx \
+          --results-directory ./test-results \
+          --collect:"XPlat Code Coverage"
+    
+    - name: 📊 Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: unit-test-results
+        path: ./test-results/
+        retention-days: 7
+
+  functional-tests:
+    name: 🎭 Functional Tests (E2E)
+    runs-on: ubuntu-latest
+    needs: [build, unit-tests]
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    environment:
+      name: Functional tests environment
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: ⚙️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: 📥 Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+    
+    - name: 🔄 Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+    
+    - name: 🔨 Build for tests
+      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Debug --no-restore
+    
+    - name: 🎭 Install Playwright dependencies
+      run: |
+        cd Fiszki.FunctionalTests
+        dotnet build
+        # Install Playwright browsers using the proper method for GitHub Actions
+        pwsh ./bin/Debug/net8.0/playwright.ps1 install chromium --with-deps
+      
+    - name: 🔍 Check environment variables
+      run: |
+        echo "Checking environment variables visibility..."
+        echo "CheckSecrets value: $CHECKSECRET"
+        echo "OpenRouter API Key is set: $(if [ -n "$OPENROUTER__APIKEY" ]; then echo "YES"; else echo "NO"; fi)"
+        echo "Environment variables check completed."
+      env:
+        CHECKSECRET: ${{ secrets.CHECKSECRET }}
+        OPENROUTER__APIKEY: ${{ secrets.OPENROUTER__APIKEY }}
+      
+    - name: 🚀 Start application in test mode (background)
+      run: |
+        echo "Starting application in test mode..."
+        export ASPNETCORE_ENVIRONMENT=Test
+        export ASPNETCORE_URLS="http://localhost:5000"
+        export TestMode=true
+        export OpenRouter__ApiKey=$OPENROUTER__APIKEY
+        export CheckSecrets=$CHECKSECRET
+        echo $CheckSecrets
+        nohup dotnet run --project Fiszki.csproj --environment Test --urls "http://localhost:5000" > app.log 2>&1 &
+        APP_PID=$!
+        echo $APP_PID > app.pid
+        echo "Application started with PID: $APP_PID"
+        
+        # Wait for application to start
+        echo "Waiting for application to start..."
+        for i in {1..60}; do
+          if curl -s http://localhost:5000 > /dev/null 2>&1; then
+            echo "Application is ready!"
+            break
+          fi
+          echo "Attempt $i: Application not ready yet..."
+          sleep 2
+        done
+        
+        # Verify application is running
+        if ! curl -s http://localhost:5000 > /dev/null 2>&1; then
+          echo "Application failed to start properly"
+          echo "Application logs:"
+          cat app.log
+          exit 1
+        fi
+        
+        echo "Application is running and healthy"
+      env:
+        ASPNETCORE_ENVIRONMENT: Test
+        TestMode: true
+        ASPNETCORE_URLS: http://localhost:5000
+        CHECKSECRET: ${{ secrets.CHECKSECRET }}
+        OPENROUTER__APIKEY: ${{ secrets.OPENROUTER__APIKEY }}
+    
+    - name: 🧪 Run functional tests
+      run: |
+        cd Fiszki.FunctionalTests
+        dotnet test --no-build --verbosity normal --logger "trx;LogFileName=functional-test-results.trx"
+      env:
+        ASPNETCORE_ENVIRONMENT: Test
+        FISZKI_BASE_URL: http://localhost:5000
+        PW_HEADLESS: true
+    
+    - name: 📋 Show application logs (if tests fail)
+      if: failure()
+      run: |
+        echo "=== Application Logs ==="
+        cat app.log || echo "No application logs found"
+    
+    - name: 🛑 Stop application
+      if: always()
+      run: |
+        if [ -f app.pid ]; then
+          APP_PID=$(cat app.pid)
+          if [ ! -z "$APP_PID" ]; then
+            echo "Stopping application with PID: $APP_PID"
+            kill $APP_PID || true
+            sleep 2
+            kill -9 $APP_PID 2>/dev/null || true
+          fi
+          rm -f app.pid
+        fi
+    
+    - name: 📊 Upload functional test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: functional-test-results
+        path: |
+          **/TestResults/**/*
+          **/test-results/**/*
+          Fiszki.FunctionalTests/**/*test-results.trx
+          app.log
+        retention-days: 7
+
+  required-status-check:
+    name: 🛡️ Required Status Check
+    runs-on: ubuntu-latest
+    needs: [build, unit-tests, functional-tests]
+    if: always() && (github.event_name == 'pull_request' || github.event_name == 'push')
+    steps:
+      - name: 🔍 Verify all jobs passed
+        run: |
+          echo "Checking status of all required jobs..."
+          echo "Build status: ${{ needs.build.result }}"
+          echo "Unit Tests status: ${{ needs.unit-tests.result }}"
+          echo "Functional Tests status: ${{ needs.functional-tests.result }}"
+          
+          # Check if build failed
+          if [[ "${{ needs.build.result }}" != "success" ]]; then
+            echo "❌ Build job failed or was cancelled"; exit 1; fi
+          
+          # Check if unit tests failed
+          if [[ "${{ needs.unit-tests.result }}" != "success" ]]; then
+            echo "❌ Unit Tests job failed or was cancelled"; exit 1; fi
+          
+          # For functional tests, handle different scenarios
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "main" ]]; then
+            # This is a PR to main, functional tests should have run
+            if [[ "${{ needs.functional-tests.result }}" != "success" ]]; then
+              echo "❌ Functional Tests job failed or was cancelled"; exit 1; fi
+            echo "✅ All required jobs passed including functional tests"
+          else
+            # This is either a push or PR not to main, functional tests are expected to be skipped
+            if [[ "${{ needs.functional-tests.result }}" == "skipped" ]]; then
+              echo "⚠️ Functional tests were skipped (not a PR to main) - proceeding based on build and unit tests only"
+            elif [[ "${{ needs.functional-tests.result }}" == "success" ]]; then
+              echo "✅ Functional tests ran and passed"
+            else
+              echo "❌ Functional Tests job failed unexpectedly"; exit 1; fi
+            echo "✅ Required jobs passed - safe to proceed"
+          fi
+
+  deploy:
+    name: 🚀 Deploy to Azure (main)
+    runs-on: ubuntu-latest
+    needs: [required-status-check]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.required-status-check.result == 'success'
+    environment:
+      name: Production
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - name: 📥 Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.PUBLISH_DIR }}
+
+      - name: 🚀 Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'Fiszki'
+          slot-name: 'Production'
+          package: ${{ env.PUBLISH_DIR }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_93FA90C48A7B43BE9A3E282FD84CA1DA }}

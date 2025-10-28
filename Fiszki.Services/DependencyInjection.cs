@@ -30,6 +30,9 @@ public static class DependencyInjection
         services.AddScoped<IFlashcardService, FlashcardService>();
         services.AddScoped<IGenerationService, GenerationService>();
 
+        // Test Data Seeder (for test mode)
+        services.AddScoped<TestDataSeeder>();
+
         // OpenRouter Services
         services.AddHttpClient<OpenRouterChatService>((serviceProvider, client) =>
         {

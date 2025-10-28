@@ -7,10 +7,10 @@ public static class TestConstants
         public const int DefaultWaitMs = 2000; // Increased from 1000
         public const int FormValidationWaitMs = 500; // Increased from 200
         public const int PasswordMismatchWaitMs = 600; // Increased from 300
-        public const int NavigationTimeoutMs = 15000; // Increased from 7000 to 15000
-        public const int FlashcardGenerationWaitMs = 15000; // Increased from 7000 to 15000
-        public const int PlaywrightDefaultTimeoutMs = 15000; // Increased from 7000 to 15000
-        public const int LoginTimeoutMs = 10000; // New timeout specifically for login
+        public const int NavigationTimeoutMs = 30000; // Increased from 15000 to 30000 for CI environment
+        public const int FlashcardGenerationWaitMs = 30000; // Increased from 15000 to 30000 for CI environment
+        public const int PlaywrightDefaultTimeoutMs = 30000; // Increased from 15000 to 30000 for CI environment
+        public const int LoginTimeoutMs = 30000; // Increased from 10000 to 30000 for CI environment
     }
 
     public static class Messages

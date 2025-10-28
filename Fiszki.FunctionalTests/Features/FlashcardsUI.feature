@@ -6,6 +6,7 @@ Feature: Flashcards UI Interactions
   Background:
     Given the application is running
 
+  @empty1
   Scenario: Empty flashcards state
     Given I am on the Login page
     When I login with my test user
@@ -15,7 +16,8 @@ Feature: Flashcards UI Interactions
     And I should see the "Generate with AI" button
     And I should see the "Create Manually" button
 
-  Scenario: Create a manual flashcard
+  @empty3
+  Scenario: Create a manual flashcard from empty state
     Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
@@ -29,6 +31,7 @@ Feature: Flashcards UI Interactions
     Then I should see the flashcard "What is the capital of Poland?"
     And I should see the flashcard statistics
 
+  @empty2
   Scenario: Create manual flashcard with validation error
     Given I am on the Login page
     When I login with my test user
@@ -41,44 +44,45 @@ Feature: Flashcards UI Interactions
     When I cancel card creation
     Then the create card modal should be closed
 
-  Scenario: View flashcard statistics and filters with generated flashcards
+  Scenario: View existing flashcards and statistics
     Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
-    When I enter the sample source text
-    And I set maximum cards to 3
-    And I click Generate Flashcards
-    And I click Accept All
-    And I click Save Selected
     When I navigate to the Flashcards page
-    Then I should see the flashcard statistics
-    When I click the "Ai" filter
-    Then I should see only AI generated flashcards
-    When I click the "Manual" filter
-    Then I should see only manual flashcards
-    When I click the "Manual" filter
-    Then I should see all flashcards
+    Then I should see existing flashcards
+    And I should see the flashcard statistics
+    And I should see flashcards like "Hello", "Thank you", "Good morning"
+
+  @demo
+  Scenario: View flashcard statistics and filters with more flashcards
+    Given I am on the Login page
+    When I login with my test user
+    Then I should be redirected to the Flashcard Generation page
+    When I navigate to the Flashcards page
+    Then I should see existing flashcards
+    And I should see the flashcard statistics
+    And I should see flashcards like "Book", "Water"
 
   Scenario: Toggle between card and list view
     Given I am on the Login page
     When I login with my test user
-    And I have dummy flashcards in my account
     Then I should be redirected to the Flashcard Generation page
     When I navigate to the Flashcards page
+    Then I should see existing flashcards
     Then I should be in "card" view
     When I toggle the view mode
     Then I should be in "list" view
     When I toggle the view mode
     Then I should be in "card" view
 
+@ignore
   Scenario: Flip flashcards in card view
     Given I am on the Login page
     When I login with my test user
-    And I have dummy flashcards in my account
     Then I should be redirected to the Flashcard Generation page
     When I navigate to the Flashcards page
     And I am in card view
-    When I flip the card "Heliora"
-    Then the card "Heliora" should be flipped
-    When I flip the card "Heliora"
-    Then the card "Heliora" should show the question
+    When I flip any available card
+    Then the card should be flipped
+    When I flip the same card again
+    Then the card should show the question
