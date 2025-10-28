@@ -124,7 +124,8 @@ jobs:
       run: |
         cd Fiszki.FunctionalTests
         dotnet build
-        dotnet exec microsoft.playwright.dll install chromium
+        # Install Playwright browsers using the proper method for GitHub Actions
+        pwsh ./bin/Debug/net8.0/playwright.ps1 install chromium --with-deps
       
     - name: 🚀 Start application in test mode (background)
       run: |
