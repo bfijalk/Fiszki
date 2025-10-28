@@ -1,6 +1,8 @@
 using Microsoft.Playwright;
 using TechTalk.SpecFlow;
 using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using Fiszki.FunctionalTests.Constants;
 
 namespace Fiszki.FunctionalTests.Hooks;
 
@@ -11,12 +13,24 @@ public class PlaywrightHooks
     private static IBrowser? _browser;
     private static readonly HttpClient _http = new();
     private static string? _baseUrl;
+    private static IConfiguration? _configuration;
 
     [BeforeTestRun]
     public static async Task BeforeTestRun()
     {
-        // Determine base URL (external app expected to be already running)
-        _baseUrl = (Environment.GetEnvironmentVariable("FISZKI_BASE_URL") ?? "http://localhost:5290").TrimEnd('/');
+        // Load configuration from appsettings.json
+        _configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.Development.json", optional: true)
+            .Build();
+
+        // Determine base URL with priority: Environment Variable > Configuration > Default
+        _baseUrl = Environment.GetEnvironmentVariable("FISZKI_BASE_URL") 
+            ?? _configuration["Playwright:BaseUrl"] 
+            ?? "http://localhost:5290";
+        _baseUrl = _baseUrl.TrimEnd('/');
+        
         Console.WriteLine($"[App] Using existing application at {_baseUrl}");
 
         // Optional: wait briefly for health (do not fail entire run early; just warn)
@@ -31,11 +45,35 @@ public class PlaywrightHooks
         }
 
         _playwright = await Playwright.CreateAsync();
+        
+        // Get browser configuration with priority: Environment Variables > Configuration > Defaults
         var headlessEnv = Environment.GetEnvironmentVariable("PW_HEADLESS");
-        bool headless = headlessEnv != null && headlessEnv.Equals("true", StringComparison.OrdinalIgnoreCase);
+        bool headless;
+        if (headlessEnv != null)
+        {
+            // Environment variable takes precedence
+            headless = !headlessEnv.Equals("false", StringComparison.OrdinalIgnoreCase);
+        }
+        else
+        {
+            // Fall back to configuration, default to true (headless)
+            bool.TryParse(_configuration["Playwright:Headless"], out headless);
+            if (_configuration["Playwright:Headless"] == null) headless = true; // Default to headless
+        }
+
         var slowMoEnv = Environment.GetEnvironmentVariable("PW_SLOWMO");
-        int slowMo = 0;
-        if (int.TryParse(slowMoEnv, out var parsed)) slowMo = parsed;
+        int slowMo;
+        if (int.TryParse(slowMoEnv, out var parsedSlowMo))
+        {
+            slowMo = parsedSlowMo;
+        }
+        else
+        {
+            if (!int.TryParse(_configuration["Playwright:SlowMotion"], out slowMo))
+            {
+                slowMo = 0; // Default value
+            }
+        }
 
         Console.WriteLine($"[Playwright] Launching Chromium. Headless={headless}, SlowMo={slowMo}ms");
         _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
@@ -77,14 +115,31 @@ public class PlaywrightHooks
     {
         if (_browser == null) throw new InvalidOperationException("Browser not initialized in BeforeTestRun.");
         if (_baseUrl == null) throw new InvalidOperationException("Base URL not established.");
+        
+        // Get viewport configuration from settings
+        int viewportWidth = 1280; // Default
+        int viewportHeight = 800; // Default
+        int defaultTimeout = 7000; // Default
+        
+        if (_configuration != null)
+        {
+            if (int.TryParse(_configuration["Playwright:ViewportWidth"], out var width)) viewportWidth = width;
+            if (int.TryParse(_configuration["Playwright:ViewportHeight"], out var height)) viewportHeight = height;
+            if (int.TryParse(_configuration["Playwright:DefaultTimeout"], out var timeout)) defaultTimeout = timeout;
+        }
+        
         var context = await _browser.NewContextAsync(new BrowserNewContextOptions
         {
-            ViewportSize = new ViewportSize { Width = 1280, Height = 800 }
+            ViewportSize = new ViewportSize { Width = viewportWidth, Height = viewportHeight }
         });
+        
+        // Set the timeout from configuration
+        context.SetDefaultTimeout(defaultTimeout);
+        
         var page = await context.NewPageAsync();
         scenarioContext[Support.TestContextKeys.Page] = page;
         scenarioContext[Support.TestContextKeys.BaseUrl] = _baseUrl;
-        Console.WriteLine($"[Scenario] Using BaseUrl={_baseUrl}");
+        Console.WriteLine($"[Scenario] Using BaseUrl={_baseUrl}, Viewport={viewportWidth}x{viewportHeight}, Timeout={defaultTimeout}ms");
     }
 
     [AfterScenario]

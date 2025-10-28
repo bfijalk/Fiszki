@@ -256,10 +256,35 @@ public class FlashcardsPage : BasePage, IFlashcardsPage
 
     public async Task ClickAddManualCardAsync()
     {
-        // Use the exact button text from the UI: "Add Manual Card"
-        var addButton = Page.GetByRole(AriaRole.Button, new() { Name = "Add Manual Card" });
-        await addButton.ClickAsync();
-        await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
+        // Look for the "Create Manually" button as shown in the successful Playwright test
+        var addButtonSelectors = new[]
+        {
+            () => Page.GetByRole(AriaRole.Button, new() { Name = " Create Manually" }),
+            () => Page.GetByRole(AriaRole.Button, new() { Name = "Create Manually" }),
+            () => Page.GetByRole(AriaRole.Button, new() { Name = "Add Manual Card" }),
+            () => Page.Locator("button").Filter(new() { HasText = "Create Manually" }),
+            () => Page.Locator("button").Filter(new() { HasText = "Add Manual Card" })
+        };
+
+        foreach (var selectorFunc in addButtonSelectors)
+        {
+            try
+            {
+                var element = selectorFunc();
+                if (await element.CountAsync() > 0 && await element.IsVisibleAsync())
+                {
+                    await element.ClickAsync();
+                    await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
+                    return;
+                }
+            }
+            catch
+            {
+                // Continue to next selector
+            }
+        }
+
+        throw new InvalidOperationException("Could not find Create Manually or Add Manual Card button with any of the attempted selectors");
     }
 
     public async Task FlipCardAsync(string cardText)
@@ -319,25 +344,32 @@ public class FlashcardsPage : BasePage, IFlashcardsPage
 
     public async Task EnterQuestionAsync(string question)
     {
-        var questionField = Page.Locator("#frontContent");
+        // Use the exact selector from the successful Playwright test
+        var questionField = Page.GetByRole(AriaRole.Textbox, new() { Name = "Question (Front)*" });
+        await questionField.ClickAsync();
         await questionField.FillAsync(question);
     }
 
     public async Task EnterAnswerAsync(string answer)
     {
-        var answerField = Page.Locator("#backContent");
+        // Use the exact selector from the successful Playwright test
+        var answerField = Page.GetByRole(AriaRole.Textbox, new() { Name = "Answer (Back)*" });
+        await answerField.ClickAsync();
         await answerField.FillAsync(answer);
     }
 
     public async Task EnterTagsAsync(string tags)
     {
-        var tagsField = Page.Locator("#tags");
+        // Use the exact selector from the successful Playwright test
+        var tagsField = Page.GetByRole(AriaRole.Textbox, new() { Name = "Tags (optional)" });
+        await tagsField.ClickAsync();
         await tagsField.FillAsync(tags);
     }
 
     public async Task ClickCreateCardAsync()
     {
-        var createButton = Page.Locator(".modal .btn-primary");
+        // Use the exact selector from the successful Playwright test
+        var createButton = Page.GetByRole(AriaRole.Button, new() { Name = " Create Card" });
         await createButton.ClickAsync();
         await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
     }

@@ -1,4 +1,5 @@
 using Fiszki.FunctionalTests.Abstractions;
+using Fiszki.FunctionalTests.Constants;
 using Fiszki.FunctionalTests.PageObjects;
 using Fiszki.FunctionalTests.Steps.Base;
 using Fiszki.FunctionalTests.Support;
@@ -37,10 +38,23 @@ public class DynamicLoginSteps : BaseSteps
         // Navigate to login page if not already there
         await LoginPage.NavigateAsync();
         
-        // Enter credentials and login
+        // Wait a bit for the page to fully load
+        await Task.Delay(TestConstants.Timeouts.DefaultWaitMs);
+        
+        // Enter credentials and login with extended timeouts
         await LoginPage.EnterEmailAsync(testUserEmail);
+        await Task.Delay(TestConstants.Timeouts.FormValidationWaitMs); // Allow for form validation
+        
         await LoginPage.EnterPasswordAsync(testUserPassword);
+        await Task.Delay(TestConstants.Timeouts.FormValidationWaitMs); // Allow for form validation
+        
+        // Click login and wait longer for the login process to complete
         await LoginPage.ClickLoginAsync();
+        
+        // Wait for login processing - this is crucial for slow login responses
+        await Task.Delay(TestConstants.Timeouts.LoginTimeoutMs);
+        
+        Console.WriteLine($"[Dynamic Login] Login process completed for user: {testUserEmail}");
     }
 
     /// <summary>
