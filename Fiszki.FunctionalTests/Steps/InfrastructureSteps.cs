@@ -51,7 +51,7 @@ public class InfrastructureSteps
             {
                 lastEx = ex;
             }
-            await Task.Delay(500); // brief backoff before retry
+            await Task.Delay(1000); // brief backoff before retry
         }
         throw new InvalidOperationException($"Failed to confirm application running at '{BaseUrl}' after {attempts} attempts. Last error: {lastEx?.Message}");
     }
