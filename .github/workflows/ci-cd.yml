@@ -129,6 +129,16 @@ jobs:
         # Install Playwright browsers using the proper method for GitHub Actions
         pwsh ./bin/Debug/net8.0/playwright.ps1 install chromium --with-deps
       
+    - name: 🔍 Check environment variables
+      run: |
+        echo "Checking environment variables visibility..."
+        echo "CheckSecrets value: $CHECKSECRET"
+        echo "OpenRouter API Key is set: $(if [ -n "$OPENROUTER__APIKEY" ]; then echo "YES"; else echo "NO"; fi)"
+        echo "Environment variables check completed."
+      env:
+        CHECKSECRET: ${{ secrets.CHECKSECRET }}
+        OPENROUTER__APIKEY: ${{ secrets.OPENROUTER__APIKEY }}
+      
     - name: 🚀 Start application in test mode (background)
       run: |
         echo "Starting application in test mode..."
