@@ -75,10 +75,48 @@ public class FlashcardSteps : BaseSteps
         {
             await FlashcardsPage.NavigateAsync();
         }
-        catch (TimeoutException)
+        catch (TimeoutException ex)
         {
             var pageInstance = ((FlashcardsPage)FlashcardsPage).PageInstance;
+            
+            // Add debugging information
+            Console.WriteLine($"[Debug] Navigation to flashcards page failed. Current URL: {pageInstance.Url}");
+            Console.WriteLine($"[Debug] Page title: {await pageInstance.TitleAsync()}");
+            
+            // Check if we're redirected to login due to authentication issues
+            var currentUrl = pageInstance.Url;
+            if (currentUrl.Contains("/login"))
+            {
+                Console.WriteLine("[Debug] User was redirected to login page - authentication state lost!");
+                throw new InvalidOperationException("Authentication state was lost after login. User was redirected back to login page when accessing flashcards.");
+            }
+            
+            // Try to get page content for debugging
+            try
+            {
+                var pageContent = await pageInstance.ContentAsync();
+                Console.WriteLine($"[Debug] Page content preview: {pageContent.Substring(0, Math.Min(500, pageContent.Length))}...");
+            }
+            catch
+            {
+                Console.WriteLine("[Debug] Could not retrieve page content");
+            }
+            
+            // Try direct navigation to flashcards page
+            Console.WriteLine("[Debug] Attempting direct navigation to /flashcards");
             await pageInstance.GotoAsync($"{BaseUrl}/flashcards");
+            
+            // Wait a bit for the page to load
+            await Task.Delay(TestConstants.Timeouts.DefaultWaitMs);
+            
+            // Check URL again after direct navigation
+            var newUrl = pageInstance.Url;
+            Console.WriteLine($"[Debug] After direct navigation, current URL: {newUrl}");
+            
+            if (newUrl.Contains("/login"))
+            {
+                throw new InvalidOperationException("Direct navigation to flashcards also redirected to login - authentication is not working properly in test environment.");
+            }
             
             var pageHeading = pageInstance.GetByRole(AriaRole.Heading, new() { Name = "Your Flashcards" });
             await pageHeading.WaitForAsync(new() 

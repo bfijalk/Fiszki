@@ -79,21 +79,39 @@
         _isSubmitting = true;
         try
         {
+            Console.WriteLine($"[Login] Attempting login for user: {_email}");
             var command = new LoginCommand(_email, _password);
             var user = await UserService.LoginAsync(command);
+            Console.WriteLine($"[Login] Login successful for user: {user.Email}");
+            
             if (AuthStateProvider is Fiszki.Services.Services.CustomAuthStateProvider custom)
             {
                 custom.MarkUserAsAuthenticated(user);
+                Console.WriteLine("[Login] Authentication state updated");
+                
+                // Wait a bit to ensure authentication state is propagated
+                await Task.Delay(500);
+                
+                // Verify authentication state was set correctly
+                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                Console.WriteLine($"[Login] Verification - User authenticated: {authState.User.Identity?.IsAuthenticated}");
             }
+            else
+            {
+                Console.WriteLine("[Login] Warning: AuthStateProvider is not CustomAuthStateProvider");
+            }
+            
+            Console.WriteLine("[Login] Navigating to /generate");
             NavigationManager.NavigateTo("/generate");
         }
-        catch (UnauthorizedDomainException)
+        catch (UnauthorizedDomainException ex)
         {
+            Console.WriteLine($"[Login] Unauthorized: {ex.Message}");
             _error = "Invalid credentials";
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Console.WriteLine($"[Login] Unexpected error: {ex}");
             _error = "Unexpected error. Please try again.";
         }
         finally

@@ -54,7 +54,25 @@ public class DynamicLoginSteps : BaseSteps
         // Wait for login processing - this is crucial for slow login responses
         await Task.Delay(TestConstants.Timeouts.LoginTimeoutMs);
         
-        Console.WriteLine($"[Dynamic Login] Login process completed for user: {testUserEmail}");
+        // Additional wait for authentication state to propagate in test environment
+        Console.WriteLine("[Dynamic Login] Waiting additional time for authentication state propagation...");
+        await Task.Delay(2000);
+        
+        // Verify we're not still on the login page after successful login
+        var currentUrl = LoginPage.PageInstance.Url;
+        if (currentUrl.Contains("/login"))
+        {
+            Console.WriteLine($"[Dynamic Login] Warning: Still on login page after login attempt. URL: {currentUrl}");
+            // Wait a bit more and check again
+            await Task.Delay(3000);
+            currentUrl = LoginPage.PageInstance.Url;
+            if (currentUrl.Contains("/login"))
+            {
+                throw new InvalidOperationException($"Login failed - still on login page after extended wait. Current URL: {currentUrl}");
+            }
+        }
+        
+        Console.WriteLine($"[Dynamic Login] Login process completed for user: {testUserEmail}. Final URL: {currentUrl}");
     }
 
     /// <summary>
