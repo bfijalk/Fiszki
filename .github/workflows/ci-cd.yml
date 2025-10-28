@@ -99,6 +99,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, unit-tests]
     if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    environment:
+      name: Functional tests environment
     
     steps:
     - name: 📥 Checkout code
@@ -135,7 +137,7 @@ jobs:
         export TestMode=true
         export OpenRouter__ApiKey=$OPENROUTER__APIKEY
         export CheckSecrets=$CHECKSECRET
-        echo $CeckSecrets
+        echo $CheckSecrets
         nohup dotnet run --project Fiszki.csproj --environment Test --urls "http://localhost:5000" > app.log 2>&1 &
         APP_PID=$!
         echo $APP_PID > app.pid
