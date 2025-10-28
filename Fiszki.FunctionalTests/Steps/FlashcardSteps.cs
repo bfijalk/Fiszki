@@ -199,6 +199,82 @@ public class FlashcardSteps : BaseSteps
         await FlashcardsPage.FlipCardAsync(cardText);
     }
 
+    [When("I flip any available card")]
+    public async Task WhenIFlipAnyAvailableCard()
+    {
+        // Store the card we're flipping in scenario context for later reference
+        var pageInstance = ((FlashcardsPage)FlashcardsPage).PageInstance;
+        var firstCard = pageInstance.Locator(".card.h-100.shadow").First;
+        
+        if (await firstCard.CountAsync() == 0)
+        {
+            throw new InvalidOperationException("No flashcards found to flip");
+        }
+        
+        // Get the question content from the first card to use as identifier
+        var questionElement = firstCard.Locator(".flashcard-front");
+        var cardIdentifier = "";
+        
+        if (await questionElement.CountAsync() > 0)
+        {
+            var questionText = await questionElement.TextContentAsync();
+            // Extract just the question part, removing "Question:" label
+            var lines = questionText?.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            cardIdentifier = lines?.LastOrDefault()?.Trim() ?? "";
+        }
+        
+        // Fallback: if we still don't have a good identifier, use a more specific approach
+        if (string.IsNullOrEmpty(cardIdentifier))
+        {
+            // Get the entire card content and extract a meaningful part
+            var cardContent = await firstCard.TextContentAsync();
+            var contentLines = cardContent?.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            // Look for a line that contains actual question content (not labels)
+            cardIdentifier = contentLines?.FirstOrDefault(line => 
+                !string.IsNullOrWhiteSpace(line) && 
+                !line.Trim().Equals("Question:", StringComparison.OrdinalIgnoreCase) &&
+                !line.Trim().Equals("Answer:", StringComparison.OrdinalIgnoreCase) &&
+                !line.Contains("Show Answer") &&
+                !line.Contains("Show Question") &&
+                line.Length > 5)?.Trim() ?? "first-card";
+        }
+        
+        Console.WriteLine($"[FlipCard] Selected card with identifier: '{cardIdentifier}'");
+        _scenarioContext["SelectedCardIdentifier"] = cardIdentifier;
+        
+        await FlashcardsPage.FlipCardAsync(cardIdentifier);
+    }
+
+    [When("I flip the same card again")]
+    public async Task WhenIFlipTheSameCardAgain()
+    {
+        var cardIdentifier = _scenarioContext["SelectedCardIdentifier"]?.ToString() 
+            ?? throw new InvalidOperationException("No card identifier found in scenario context");
+            
+        Console.WriteLine($"[FlipCard] Flipping the same card again: '{cardIdentifier}'");
+        await FlashcardsPage.FlipCardAsync(cardIdentifier);
+    }
+
+    [Then("the card should be flipped")]
+    public async Task ThenTheCardShouldBeFlipped()
+    {
+        var cardIdentifier = _scenarioContext["SelectedCardIdentifier"]?.ToString() 
+            ?? throw new InvalidOperationException("No card identifier found in scenario context");
+            
+        var isFlipped = await FlashcardsPage.IsCardFlippedAsync(cardIdentifier);
+        isFlipped.Should().BeTrue($"Card '{cardIdentifier}' should be flipped");
+    }
+
+    [Then("the card should show the question")]
+    public async Task ThenTheCardShouldShowTheQuestion()
+    {
+        var cardIdentifier = _scenarioContext["SelectedCardIdentifier"]?.ToString() 
+            ?? throw new InvalidOperationException("No card identifier found in scenario context");
+            
+        var isFlipped = await FlashcardsPage.IsCardFlippedAsync(cardIdentifier);
+        isFlipped.Should().BeFalse($"Card '{cardIdentifier}' should show the question (not be flipped)");
+    }
+
     [Then("the card {string} should be flipped")]
     public async Task ThenCardShouldBeFlipped(string cardText)
     {
@@ -626,5 +702,99 @@ public class FlashcardSteps : BaseSteps
         
         var isVisible = await saveButton.IsVisibleAsync();
         isVisible.Should().BeTrue("Save Selected button should be visible");
+    }
+
+    // New step definitions for seeded test data
+    [Then("I should see existing flashcards")]
+    public async Task ThenIShouldSeeExistingFlashcards()
+    {
+        // Wait for any loading to complete
+        var isLoading = await FlashcardsPage.IsLoadingAsync();
+        if (isLoading)
+        {
+            await Task.Delay(2000); // Wait for loading to complete
+        }
+        
+        var hasFlashcards = await FlashcardsPage.HasFlashcardsAsync();
+        hasFlashcards.Should().BeTrue("Expected to see existing flashcards from seeded test data");
+        Console.WriteLine("[Flashcard Steps] Verified that existing flashcards are visible");
+    }
+
+    [Then("I should see flashcards like {string}, {string}, {string}")]
+    public async Task ThenIShouldSeeFlashcardsLike(string card1, string card2, string card3)
+    {
+        // Wait for any loading to complete
+        var isLoading = await FlashcardsPage.IsLoadingAsync();
+        if (isLoading)
+        {
+            await Task.Delay(2000); // Wait for loading to complete
+        }
+        
+        var expectedCards = new[] { card1, card2, card3 };
+        var foundCount = 0;
+        
+        foreach (var expectedCard in expectedCards)
+        {
+            try
+            {
+                var found = await FlashcardsPage.IsFlashcardVisibleAsync(expectedCard);
+                if (found)
+                {
+                    foundCount++;
+                    Console.WriteLine($"[Flashcard Steps] Found expected flashcard: {expectedCard}");
+                }
+                else
+                {
+                    Console.WriteLine($"[Flashcard Steps] Expected flashcard not found: {expectedCard}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Flashcard Steps] Error checking for flashcard '{expectedCard}': {ex.Message}");
+            }
+        }
+        
+        // At least one of the expected cards should be present
+        foundCount.Should().BeGreaterThan(0, $"Expected to see at least one of the flashcards: {string.Join(", ", expectedCards)}");
+        Console.WriteLine($"[Flashcard Steps] Found {foundCount} out of {expectedCards.Length} expected flashcards");
+    }
+
+    [Then("I should see flashcards like {string}, {string}")]
+    public async Task ThenIShouldSeeFlashcardsLike(string card1, string card2)
+    {
+        // Wait for any loading to complete
+        var isLoading = await FlashcardsPage.IsLoadingAsync();
+        if (isLoading)
+        {
+            await Task.Delay(2000); // Wait for loading to complete
+        }
+        
+        var expectedCards = new[] { card1, card2 };
+        var foundCount = 0;
+        
+        foreach (var expectedCard in expectedCards)
+        {
+            try
+            {
+                var found = await FlashcardsPage.IsFlashcardVisibleAsync(expectedCard);
+                if (found)
+                {
+                    foundCount++;
+                    Console.WriteLine($"[Flashcard Steps] Found expected flashcard: {expectedCard}");
+                }
+                else
+                {
+                    Console.WriteLine($"[Flashcard Steps] Expected flashcard not found: {expectedCard}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Flashcard Steps] Error checking for flashcard '{expectedCard}': {ex.Message}");
+            }
+        }
+        
+        // At least one of the expected cards should be present
+        foundCount.Should().BeGreaterThan(0, $"Expected to see at least one of the flashcards: {string.Join(", ", expectedCards)}");
+        Console.WriteLine($"[Flashcard Steps] Found {foundCount} out of {expectedCards.Length} expected flashcards");
     }
 }

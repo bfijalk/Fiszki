@@ -10,4 +10,5 @@ public static class TestContextKeys
     public const string TestUserEmail = nameof(TestUserEmail);
     public const string TestUserPassword = nameof(TestUserPassword);
     public const string TestUserId = nameof(TestUserId);
+    public const string TestUserType = nameof(TestUserType);
 }

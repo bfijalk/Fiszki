@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MudBlazor" Version="8.13.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.8" />
   </ItemGroup>
 
 </Project>

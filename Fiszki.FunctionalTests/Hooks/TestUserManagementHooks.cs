@@ -9,61 +9,22 @@ namespace Fiszki.FunctionalTests.Hooks;
 public class TestUserManagementHooks
 {
     private readonly ScenarioContext _scenarioContext;
-    private TestUserManagementService? _testUserService;
     
     public TestUserManagementHooks(ScenarioContext scenarioContext)
     {
         _scenarioContext = scenarioContext;
     }
 
-    private TestUserManagementService TestUserService
+    // DISABLED: This hook is disabled in favor of SeededTestUserHooks for in-memory database testing
+    // [BeforeScenario]
+    public Task BeforeScenario()
     {
-        get
-        {
-            if (_testUserService == null)
-            {
-                var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false)
-                    .AddJsonFile("appsettings.Development.json", optional: true)
-                    .Build();
-
-                var connectionString = configuration.GetConnectionString("FiszkiDatabase") 
-                    ?? throw new InvalidOperationException("FiszkiDatabase connection string not found");
-
-                _testUserService = new TestUserManagementService(connectionString);
-            }
-            return _testUserService;
-        }
-    }
-
-    [BeforeScenario]
-    public async Task BeforeScenario()
-    {
-        // Generate a unique test user email for this scenario
-        var scenarioTitle = _scenarioContext.ScenarioInfo.Title;
-        var testUserNumber = GetTestUserNumberFromScenario(scenarioTitle);
-        var testUserEmail = $"test{testUserNumber}@test.pl";
-        var testUserPassword = "test123";
-
-        Console.WriteLine($"[Test User Management] Setting up test user '{testUserEmail}' for scenario: {scenarioTitle}");
-
-        // Ensure the test user exists
-        var user = await TestUserService.EnsureTestUserExistsAsync(testUserEmail, testUserPassword);
-        
-        // Clear any existing flashcards for this user to ensure clean state
-        await TestUserService.ClearFlashcardsForUserAsync(testUserEmail);
-
-        // Store the test user credentials in scenario context for use in steps
-        _scenarioContext[TestContextKeys.TestUserEmail] = testUserEmail;
-        _scenarioContext[TestContextKeys.TestUserPassword] = testUserPassword;
-        _scenarioContext[TestContextKeys.TestUserId] = user.Id.ToString();
-
-        Console.WriteLine($"[Test User Management] Test user '{testUserEmail}' ready for scenario");
+        Console.WriteLine("[Test User Management] DISABLED: Using seeded test data instead of dynamic user creation");
+        return Task.CompletedTask;
     }
 
     [AfterScenario]
-    public async Task AfterScenario()
+    public Task AfterScenario()
     {
         if (_scenarioContext.ContainsKey(TestContextKeys.TestUserEmail))
         {
@@ -78,10 +39,10 @@ public class TestUserManagementHooks
             else
             {
                 // Scenario passed - clean up the flashcards
-                Console.WriteLine($"[Test User Management] Scenario passed. Cleaning up flashcards for user '{testUserEmail}'.");
-                await TestUserService.ClearFlashcardsForUserAsync(testUserEmail!);
+                Console.WriteLine($"[Test User Management] Scenario passed. No cleanup needed for seeded data user '{testUserEmail}'.");
             }
         }
+        return Task.CompletedTask;
     }
 
     /// <summary>
