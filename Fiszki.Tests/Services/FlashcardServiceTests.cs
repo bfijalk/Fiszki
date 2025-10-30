@@ -152,4 +152,71 @@ public class FlashcardServiceTests : IDisposable
         var act = () => _svc.DeleteAsync(userId, cardId);
         await act.Should().NotThrowAsync();
     }
+
+    [Theory]
+    [AutoData]
+    public async Task DeleteAsync_ShouldNotDeleteOtherUsersCard(Guid ownerId, Guid otherUserId, string front, string back)
+    {
+        // Arrange: Create a flashcard owned by one user
+        var card = new Flashcard
+        {
+            Id = Guid.NewGuid(), 
+            UserId = ownerId, 
+            FrontContent = front, 
+            BackContent = back,
+            CreationSource = CreationSource.Manual, 
+            CreatedAt = DateTime.UtcNow, 
+            UpdatedAt = DateTime.UtcNow
+        };
+        _db.Flashcards.Add(card);
+        await _db.SaveChangesAsync();
+
+        // Act: Try to delete the card using a different user ID
+        await _svc.DeleteAsync(otherUserId, card.Id);
+
+        // Assert: The card should still exist in the database (not deleted)
+        var existingCard = await _db.Flashcards.FindAsync(card.Id);
+        existingCard.Should().NotBeNull("other users should not be able to delete cards they don't own");
+        existingCard!.UserId.Should().Be(ownerId, "the card should still belong to the original owner");
+    }
+
+    [Theory]
+    [AutoData]
+    public async Task DeleteAsync_ShouldOnlyAffectSpecifiedCard(Guid userId, string front1, string back1, string front2, string back2)
+    {
+        // Arrange: Create multiple flashcards for the same user
+        var card1 = new Flashcard
+        {
+            Id = Guid.NewGuid(), 
+            UserId = userId, 
+            FrontContent = front1, 
+            BackContent = back1,
+            CreationSource = CreationSource.Manual, 
+            CreatedAt = DateTime.UtcNow, 
+            UpdatedAt = DateTime.UtcNow
+        };
+        var card2 = new Flashcard
+        {
+            Id = Guid.NewGuid(), 
+            UserId = userId, 
+            FrontContent = front2, 
+            BackContent = back2,
+            CreationSource = CreationSource.Ai, 
+            CreatedAt = DateTime.UtcNow, 
+            UpdatedAt = DateTime.UtcNow
+        };
+        _db.Flashcards.AddRange(card1, card2);
+        await _db.SaveChangesAsync();
+
+        // Act: Delete only the first card
+        await _svc.DeleteAsync(userId, card1.Id);
+
+        // Assert: Only the first card should be deleted, the second should remain
+        (await _db.Flashcards.FindAsync(card1.Id)).Should().BeNull("the specified card should be deleted");
+        (await _db.Flashcards.FindAsync(card2.Id)).Should().NotBeNull("other cards should not be affected");
+        
+        var remainingCard = await _db.Flashcards.FindAsync(card2.Id);
+        remainingCard!.FrontContent.Should().Be(front2);
+        remainingCard.BackContent.Should().Be(back2);
+    }
 }
