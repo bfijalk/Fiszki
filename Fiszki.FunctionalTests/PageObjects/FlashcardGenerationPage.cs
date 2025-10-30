@@ -112,8 +112,32 @@ public class FlashcardGenerationPage : BasePage, IFlashcardGenerationPage
 
         await generateButton.ClickAsync();
         
-        // Wait for generation to complete - longer timeout for AI processing
-        await Page.WaitForTimeoutAsync(TestConstants.Timeouts.FlashcardGenerationWaitMs);
+        // Instead of a fixed 30-second wait, wait for generation to actually complete
+        // Look for indicators that generation has finished
+        var generationCompleteSelectors = new[]
+        {
+            "text=/Generated Flashcards \\([0-9]+ of [0-9]+ selected\\)/", // Header showing results
+            "button:has-text('Accept All')", // Accept All button appears
+            "button:has-text('Save Selected')", // Save button appears
+            ".mud-paper:has-text('Example:')" // Actual flashcard content appears
+        };
+
+        // Wait for any of these indicators with a reasonable timeout
+        var waitTasks = generationCompleteSelectors.Select(selector => 
+            Page.Locator(selector).WaitForAsync(new() { Timeout = TestConstants.Timeouts.FlashcardGenerationWaitMs }));
+        
+        try
+        {
+            // Wait for the first indicator to appear (race condition - whichever comes first)
+            await Task.WhenAny(waitTasks);
+            Console.WriteLine("[FlashcardGeneration] Generation completed - indicators found");
+        }
+        catch (TimeoutException)
+        {
+            Console.WriteLine("[FlashcardGeneration] Warning: Generation indicators not found within timeout, proceeding anyway");
+            // Fallback: wait a shorter time to ensure generation has a chance to complete
+            await Page.WaitForTimeoutAsync(5000); // 5 seconds fallback
+        }
     }
 
     public async Task ClickAcceptAllAsync()
