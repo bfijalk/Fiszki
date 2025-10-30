@@ -103,10 +103,43 @@ public class LoginSteps : BaseSteps
         throw new InvalidOperationException($"Login redirect failed. Expected to be redirected from login page, but current URL is: {currentUrl}");
     }
 
-    // Removed duplicate step definition - using DynamicLoginSteps.WhenILoginWithMyTestUser instead
+    [Then("I should be redirected to the Flashcards page")]
+    [When("I should be redirected to the Flashcards page")]
+    public async Task ThenIShouldBeRedirectedToFlashcardsPage()
+    {
+        var pageInstance = ((LoginPage)LoginPage).PageInstance;
+        
+        Console.WriteLine($"[Login Redirect] Starting redirect verification. Current URL: {pageInstance.Url}");
+        
+        // Wait for navigation to complete using Playwright's built-in mechanisms
+        try
+        {
+            // Wait for URL to change from login page with a reasonable timeout
+            await pageInstance.WaitForURLAsync(url => !url.Contains("/login"), new()
+            {
+                Timeout = TestConstants.Timeouts.RedirectWaitMs
+            });
+        }
+        catch (TimeoutException)
+        {
+            Console.WriteLine("[Login Redirect] Timeout waiting for redirect from login page");
+        }
+        
+        var currentUrl = pageInstance.Url;
+        Console.WriteLine($"[Login Redirect] Current URL after redirect: {currentUrl}");
+        
+        // Check if we're on the flashcards page
+        if (currentUrl.Contains("/flashcards"))
+        {
+            Console.WriteLine($"[Login Redirect] Login successful - redirected to flashcards page: {currentUrl}");
+            return;
+        }
+        
+        throw new InvalidOperationException($"Login redirect failed. Expected to be redirected to flashcards page, but current URL is: {currentUrl}");
+    }
 
-    [When("I enter email \"(.*)\"")]
     [Given("I enter email \"(.*)\"")]
+    [When("I enter email {string}")]
     public async Task WhenIEnterEmail(string email)
     {
         var page = ((LoginPage)LoginPage).PageInstance;
@@ -124,6 +157,7 @@ public class LoginSteps : BaseSteps
 
     [When("I enter password \"(.*)\"")]
     [Given("I enter password \"(.*)\"")]
+    [When("I enter password {string}")]
     public async Task WhenIEnterPassword(string password)
     {
         var page = ((LoginPage)LoginPage).PageInstance;

@@ -62,9 +62,25 @@ public class FlashcardSteps : BaseSteps
     // Navigation steps
     [Given("I am on the Flashcard Generation page")]
     [When("I am on the Flashcard Generation page")]
+    [When("I navigate to the Generate page")]
     public async Task GivenIAmOnFlashcardGenerationPage()
     {
-        await FlashcardGenerationPage.NavigateAsync();
+        try
+        {
+            await FlashcardGenerationPage.NavigateAsync();
+        }
+        catch (TimeoutException)
+        {
+            var pageInstance = ((FlashcardGenerationPage)FlashcardGenerationPage).PageInstance;
+            await pageInstance.GotoAsync($"{BaseUrl}/generate");
+            
+            var pageHeading = pageInstance.GetByRole(AriaRole.Heading).First;
+            await pageHeading.WaitForAsync(new() 
+            { 
+                State = WaitForSelectorState.Visible, 
+                Timeout = TestConstants.Timeouts.NavigationTimeoutMs 
+            });
+        }
     }
 
     [Given("I am on the Flashcards page")]
@@ -424,13 +440,14 @@ public class FlashcardSteps : BaseSteps
     public async Task GivenIHaveNoFlashcards()
     {
         // This is handled by the database cleanup
+        await Task.CompletedTask;
     }
 
     [Given("I have some existing flashcards")]
-    public Task GivenIHaveSomeExistingFlashcards()
+    public async Task GivenIHaveSomeExistingFlashcards()
     {
         // This step indicates that flashcards should exist
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     [Then("I should see the empty state message")]
@@ -639,18 +656,15 @@ public class FlashcardSteps : BaseSteps
         // Check for at least some expected content from the sample text
         var expectedTerms = new[] { "Helena Markos", "Heliora", "ceramika", "Selina", "starożytnego" };
         var foundTerms = 0;
-        
+
         foreach (var term in expectedTerms)
         {
             var termElement = pageInstance.GetByText(term, new() { Exact = false });
             var count = await termElement.CountAsync();
             if (count > 0)
-            {
                 foundTerms++;
-                Console.WriteLine($"Found expected term: {term}");
-            }
         }
-        
+
         foundTerms.Should().BeGreaterThan(0, "Generated flashcards should contain some expected content from the source text");
         Console.WriteLine($"Found {foundTerms} out of {expectedTerms.Length} expected terms in generated flashcards");
     }
@@ -659,28 +673,43 @@ public class FlashcardSteps : BaseSteps
     public async Task ThenAllFlashcardsShouldBeSelected()
     {
         var pageInstance = ((FlashcardGenerationPage)FlashcardGenerationPage).PageInstance;
-        
+
         // Wait for the Accept All action to complete
         await pageInstance.WaitForTimeoutAsync(1000);
+
+        // The system uses rejection-based selection, so we need to verify:
+        // 1. Header shows all cards are selected (X of X selected)
+        // 2. No cards are visually marked as rejected
+        // 3. Save Selected button shows the correct count
+
+        // Check the header text for selection count
+        var headerLocator = pageInstance.Locator("text=/Generated Flashcards \\([0-9]+ of [0-9]+ selected\\)/");
+        await headerLocator.WaitForAsync(new() { Timeout = 5000 });
         
-        // Look for selected state indicators - checkboxes should be checked
-        var checkboxes = pageInstance.Locator("input[type='checkbox']");
-        var checkboxCount = await checkboxes.CountAsync();
+        var headerText = await headerLocator.TextContentAsync();
+        headerText.Should().NotBeNull("Selection count should be visible in header");
         
-        if (checkboxCount > 0)
-        {
-            var checkedBoxes = pageInstance.Locator("input[type='checkbox']:checked");
-            var checkedCount = await checkedBoxes.CountAsync();
-            checkedCount.Should().BeGreaterThan(0, "At least some flashcards should be selected after Accept All");
-            Console.WriteLine($"Found {checkedCount} checked out of {checkboxCount} total checkboxes");
-        }
-        else
-        {
-            // Alternative: check if the count in header shows selection
-            var headerText = await pageInstance.Locator("text=/Generated Flashcards \\([0-9]+ of [0-9]+ selected\\)/").TextContentAsync();
-            headerText.Should().NotBeNull("Selection count should be visible in header");
-            Console.WriteLine($"Header shows: {headerText}");
-        }
+        // Extract the numbers from "Generated Flashcards (X of Y selected)"
+        var match = System.Text.RegularExpressions.Regex.Match(headerText!, @"Generated Flashcards \((\d+) of (\d+) selected\)");
+        match.Success.Should().BeTrue("Header should show selection count in expected format");
+        
+        var selectedCount = int.Parse(match.Groups[1].Value);
+        var totalCount = int.Parse(match.Groups[2].Value);
+        
+        selectedCount.Should().Be(totalCount, "All flashcards should be selected after Accept All");
+        selectedCount.Should().BeGreaterThan(0, "There should be at least one flashcard to select");
+        
+        // Verify Save Selected button shows the correct count
+        var saveButtonLocator = pageInstance.Locator("button:has-text('Save Selected')");
+        var saveButtonText = await saveButtonLocator.TextContentAsync();
+        saveButtonText.Should().Contain($"({selectedCount})", "Save Selected button should show the count of selected cards");
+        
+        // Verify no cards are visually marked as rejected (rejected cards have error styling)
+        var rejectedCards = pageInstance.Locator(".mud-paper .mud-text-error");
+        var rejectedCount = await rejectedCards.CountAsync();
+        rejectedCount.Should().Be(0, "No cards should be marked as rejected when all are selected");
+        
+        Console.WriteLine($"Verified: {selectedCount} of {totalCount} flashcards are selected");
     }
 
     [Then("the Save Selected button should be enabled")]
