@@ -39,112 +39,68 @@ public class LoginSteps : BaseSteps
         
         Console.WriteLine($"[Login Redirect] Starting redirect verification. Current URL: {pageInstance.Url}");
         
-        // Wait longer for the login to complete and any redirect to happen
-        await pageInstance.WaitForLoadStateAsync(LoadState.NetworkIdle, new()
+        // Wait for navigation to complete using Playwright's built-in mechanisms
+        try
         {
-            Timeout = TestConstants.Timeouts.NavigationTimeoutMs
-        });
-        
-        // Give extra time for any slow redirects or authentication processing
-        await Task.Delay(TestConstants.Timeouts.LoginTimeoutMs);
-        
-        // Re-check the URL after waiting
-        var currentUrl = pageInstance.Url;
-        Console.WriteLine($"[Login Redirect] URL after wait: {currentUrl}");
-        
-        // Check if we're on the generate page by URL pattern
-        if (currentUrl.Contains("/generate"))
-        {
-            Console.WriteLine("[Login Redirect] On generate page, looking for content...");
-            // We're on the generate page, try to find the heading with more patience
-            var generateHeadingSelectors = new[]
+            // Wait for URL to change from login page with a reasonable timeout
+            await pageInstance.WaitForURLAsync(url => !url.Contains("/login"), new()
             {
-                () => pageInstance.GetByRole(AriaRole.Heading, new() { Name = "Generate Flashcards", Exact = true }),
-                () => pageInstance.GetByRole(AriaRole.Heading, new() { Name = "Generate Flashcards" }),
-                () => pageInstance.Locator("h1, h2, h3, h4, h5, h6").Filter(new() { HasText = "Generate Flashcards" }),
-                () => pageInstance.GetByText("Generate Flashcards").First,
-                () => pageInstance.Locator("h1, h2, h3, h4, h5, h6").Filter(new() { HasText = "Generate" }),
-                () => pageInstance.GetByText("Generate").First
-            };
-
-            foreach (var selectorFunc in generateHeadingSelectors)
+                Timeout = TestConstants.Timeouts.RedirectWaitMs
+            });
+        }
+        catch (TimeoutException)
+        {
+            Console.WriteLine("[Login Redirect] Timeout waiting for redirect from login page");
+        }
+        
+        var currentUrl = pageInstance.Url;
+        Console.WriteLine($"[Login Redirect] Current URL after redirect: {currentUrl}");
+        
+        // Check if we're on any valid post-login page
+        if (currentUrl.Contains("/flashcards") || currentUrl.Contains("/generate") || 
+            currentUrl.Contains("/home") || currentUrl.Contains("/dashboard"))
+        {
+            Console.WriteLine($"[Login Redirect] Login successful - redirected to: {currentUrl}");
+            
+            // If we're on the generate page, try to verify content is loaded
+            if (currentUrl.Contains("/generate"))
             {
                 try
                 {
-                    var element = selectorFunc();
-                    if (await element.CountAsync() > 0)
-                    {
-                        await element.WaitForAsync(new()
-                        {
-                            State = WaitForSelectorState.Visible,
-                            Timeout = TestConstants.Timeouts.NavigationTimeoutMs
-                        });
-                        Console.WriteLine("[Login Redirect] Found generate page heading - success!");
-                        return; // Success!
-                    }
+                    // Wait for any heading that indicates the page is loaded
+                    var heading = pageInstance.Locator("h1, h2, h3, h4, h5, h6").First;
+                    await heading.WaitForAsync(new() { Timeout = TestConstants.Timeouts.ContentLoadWaitMs });
+                    Console.WriteLine("[Login Redirect] Generate page content loaded successfully");
                 }
-                catch (Exception ex)
+                catch (TimeoutException)
                 {
-                    Console.WriteLine($"[Login Redirect] Selector attempt failed: {ex.Message}");
-                    // Continue to next selector
+                    Console.WriteLine("[Login Redirect] Generate page loaded but content may still be loading");
+                    // This is acceptable - page redirected correctly
                 }
             }
-        }
-        
-        // If we're still on the login page, wait a bit more and try again
-        if (currentUrl.Contains("/login"))
-        {
-            Console.WriteLine("[Login Redirect] Still on login page, waiting longer...");
-            await Task.Delay(TestConstants.Timeouts.LoginTimeoutMs * 2); // Wait even longer
-            
-            // Check URL again
-            currentUrl = pageInstance.Url;
-            Console.WriteLine($"[Login Redirect] URL after extended wait: {currentUrl}");
-        }
-        
-        // If we reach here, either we're not on the generate page or couldn't find the expected content
-        // Let's be more flexible - check if we're redirected to any expected page after login
-        if (currentUrl.Contains("/flashcards") || currentUrl.Contains("/generate") || currentUrl.Contains("/home") || currentUrl.Contains("/dashboard"))
-        {
-            // We're on a valid post-login page, that's acceptable
-            Console.WriteLine($"[Login Redirect] Login successful - redirected to valid page: {currentUrl}");
             return;
         }
         
-        // If we're still on login page, that indicates login failed
+        // If we're still on login page, check for error messages
         if (currentUrl.Contains("/login"))
         {
-            Console.WriteLine($"[Login Redirect] Login appears to have failed - still on login page: {currentUrl}");
-            
-            // Try to get any error messages from the page to help with debugging
+            Console.WriteLine("[Login Redirect] Still on login page - checking for errors");
             try
             {
-                var errorSelectors = new[]
+                var errorElement = pageInstance.Locator(".alert-danger, .error, .text-danger").First;
+                if (await errorElement.CountAsync() > 0)
                 {
-                    () => pageInstance.Locator(".alert-danger"),
-                    () => pageInstance.Locator(".error"),
-                    () => pageInstance.Locator(".text-danger"),
-                    () => pageInstance.GetByText("Invalid"),
-                    () => pageInstance.GetByText("Error")
-                };
-                
-                foreach (var errorSelector in errorSelectors)
-                {
-                    var errorElement = errorSelector();
-                    if (await errorElement.CountAsync() > 0)
-                    {
-                        var errorText = await errorElement.First.TextContentAsync();
-                        Console.WriteLine($"[Login Redirect] Found error message: {errorText}");
-                    }
+                    var errorText = await errorElement.TextContentAsync();
+                    Console.WriteLine($"[Login Redirect] Found error: {errorText}");
                 }
             }
             catch
             {
-                // Ignore errors when looking for error messages
+                // No error messages found
             }
         }
         
-        throw new InvalidOperationException($"After login, expected to be redirected to a valid page, but current URL is: {currentUrl}. Login may have failed or taken longer than expected.");
+        throw new InvalidOperationException($"Login redirect failed. Expected to be redirected from login page, but current URL is: {currentUrl}");
     }
 
     // Removed duplicate step definition - using DynamicLoginSteps.WhenILoginWithMyTestUser instead
@@ -155,16 +111,14 @@ public class LoginSteps : BaseSteps
     {
         var page = ((LoginPage)LoginPage).PageInstance;
         
-        // Wait longer for the email field to be available with extended timeout
+        // Wait for the email field to be available
         var emailField = page.GetByRole(AriaRole.Textbox, new() { Name = "Email*" });
         await emailField.WaitForAsync(new() 
         { 
             State = WaitForSelectorState.Visible, 
-            Timeout = TestConstants.Timeouts.NavigationTimeoutMs 
+            Timeout = TestConstants.Timeouts.ElementWaitMs
         });
         
-        await emailField.ClickAsync();
-        await Task.Delay(TestConstants.Timeouts.FormValidationWaitMs); // Allow time for focus
         await emailField.FillAsync(email);
     }
 
@@ -174,15 +128,14 @@ public class LoginSteps : BaseSteps
     {
         var page = ((LoginPage)LoginPage).PageInstance;
         
-        // Wait longer for the password field to be available
+        // Wait for the password field to be available
         var passwordField = page.GetByRole(AriaRole.Textbox, new() { Name = "Password*" });
         await passwordField.WaitForAsync(new() 
         { 
             State = WaitForSelectorState.Visible, 
-            Timeout = TestConstants.Timeouts.NavigationTimeoutMs 
+            Timeout = TestConstants.Timeouts.ElementWaitMs
         });
         
-        await Task.Delay(TestConstants.Timeouts.FormValidationWaitMs); // Allow time after email input
         await passwordField.FillAsync(password);
     }
 
@@ -197,14 +150,20 @@ public class LoginSteps : BaseSteps
         await loginButton.WaitForAsync(new() 
         { 
             State = WaitForSelectorState.Visible, 
-            Timeout = TestConstants.Timeouts.NavigationTimeoutMs 
+            Timeout = TestConstants.Timeouts.ElementWaitMs
         });
         
-        await Task.Delay(TestConstants.Timeouts.FormValidationWaitMs); // Allow time for form validation
         await loginButton.ClickAsync();
         
-        // Wait longer for login processing to complete
-        await page.WaitForTimeoutAsync(TestConstants.Timeouts.LoginTimeoutMs);
+        // Wait for navigation to start instead of a fixed delay
+        try
+        {
+            await page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = TestConstants.Timeouts.NetworkIdleWaitMs });
+        }
+        catch (TimeoutException)
+        {
+            // Navigation might still be in progress, that's ok
+        }
     }
 
     [Then("the Login button should be disabled")]
@@ -217,8 +176,17 @@ public class LoginSteps : BaseSteps
     [Then("the Login button should be enabled")]
     public async Task ThenLoginButtonShouldBeEnabled()
     {
-        // Wait briefly for reactive state update
-        await Task.Delay(TestConstants.Timeouts.FormValidationWaitMs);
+        // Use Playwright's built-in waiting instead of hardcoded delay
+        var page = ((LoginPage)LoginPage).PageInstance;
+        var loginButton = page.GetByRole(AriaRole.Button, new() { Name = "Login" });
+        
+        // Wait for button to be enabled
+        await loginButton.WaitForAsync(new() 
+        { 
+            State = WaitForSelectorState.Visible, 
+            Timeout = TestConstants.Timeouts.ButtonStateWaitMs
+        });
+        
         var isDisabled = await LoginPage.IsLoginButtonDisabledAsync();
         isDisabled.Should().BeFalse();
     }

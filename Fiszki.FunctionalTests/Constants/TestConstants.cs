@@ -11,6 +11,13 @@ public static class TestConstants
         public const int FlashcardGenerationWaitMs = 30000; // Increased from 15000 to 30000 for CI environment
         public const int PlaywrightDefaultTimeoutMs = 30000; // Increased from 15000 to 30000 for CI environment
         public const int LoginTimeoutMs = 30000; // Increased from 10000 to 30000 for CI environment
+        
+        // Optimized timeouts for improved test performance
+        public const int ElementWaitMs = 10000; // Wait for elements to be visible/available
+        public const int RedirectWaitMs = 10000; // Wait for page redirects after login
+        public const int ContentLoadWaitMs = 5000; // Wait for page content to load
+        public const int NetworkIdleWaitMs = 5000; // Wait for network activity to settle
+        public const int ButtonStateWaitMs = 5000; // Wait for button state changes
     }
 
     public static class Messages
