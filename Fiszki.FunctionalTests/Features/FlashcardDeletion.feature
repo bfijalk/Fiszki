@@ -8,7 +8,6 @@ Feature: Flashcard Deletion
 
   @deletion
   Scenario: Delete a flashcard with confirmation
-    Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
     When I have dummy flashcards in my account

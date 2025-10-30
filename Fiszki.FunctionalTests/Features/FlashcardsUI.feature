@@ -18,7 +18,6 @@ Feature: Flashcards UI Interactions
 
   @empty3
   Scenario: Create a manual flashcard from empty state
-    Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
     When I navigate to the Flashcards page
@@ -33,7 +32,6 @@ Feature: Flashcards UI Interactions
 
   @empty2
   Scenario: Create manual flashcard with validation error
-    Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
     When I navigate to the Flashcards page
@@ -45,7 +43,6 @@ Feature: Flashcards UI Interactions
     Then the create card modal should be closed
 
   Scenario: View existing flashcards and statistics
-    Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
     When I navigate to the Flashcards page
@@ -55,7 +52,6 @@ Feature: Flashcards UI Interactions
 
   @demo
   Scenario: View flashcard statistics and filters with more flashcards
-    Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
     When I navigate to the Flashcards page
@@ -64,7 +60,6 @@ Feature: Flashcards UI Interactions
     And I should see flashcards like "Book", "Water"
 
   Scenario: Toggle between card and list view
-    Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
     When I navigate to the Flashcards page
@@ -77,7 +72,6 @@ Feature: Flashcards UI Interactions
 
 @ignore
   Scenario: Flip flashcards in card view
-    Given I am on the Login page
     When I login with my test user
     Then I should be redirected to the Flashcard Generation page
     When I navigate to the Flashcards page

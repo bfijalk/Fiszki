@@ -7,9 +7,8 @@ Feature: Flashcard Generation Validation
     Given the application is running
 
   Scenario: Generate flashcards and validate they appear on generation page
-    Given I am on the Login page
     When I login with my test user
-    Then I should be redirected to the Flashcard Generation page
+    When I click "Generate" button on navbar
     When I enter the sample source text
     And I set maximum cards to 5
     And I click Generate Flashcards

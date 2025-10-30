@@ -7,7 +7,6 @@ Feature: Manual Flashcard Creation
     Given the application is running
 
   Scenario: Create a manual flashcard successfully
-    Given I am on the Login page
     When I login with my test user
     And I navigate to the Flashcards page
     When I click Add Manual Card
@@ -20,7 +19,6 @@ Feature: Manual Flashcard Creation
     And I should see the flashcard "Dodaj pytanie na przod formatki"
 
   Scenario: Attempt to create flashcard with missing required fields
-    Given I am on the Login page
     When I login with my test user
     And I navigate to the Flashcards page
     When I click Add Manual Card
@@ -31,7 +29,6 @@ Feature: Manual Flashcard Creation
     Then I should see a validation error
 
   Scenario: Cancel manual flashcard creation
-    Given I am on the Login page
     When I login with my test user
     And I navigate to the Flashcards page
     When I click Add Manual Card
