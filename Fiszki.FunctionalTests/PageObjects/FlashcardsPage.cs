@@ -567,4 +567,32 @@ public class FlashcardsPage : BasePage, IFlashcardsPage
         await flashcard.ClickAsync();
         await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
     }
+
+    public async Task ClickDeleteButtonForFirstFlashcardAsync()
+    {
+        // Look for the first delete button (trash icon) in either card view or list view
+        var deleteButton = Page.Locator("button[title='Delete'] .bi-trash, button .bi-trash").First;
+        await deleteButton.ClickAsync();
+        await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
+    }
+
+    public async Task<bool> IsDeleteConfirmationModalVisibleAsync()
+    {
+        var modal = Page.Locator(".modal").Filter(new() { HasText = "Confirm Deletion" });
+        return await modal.IsVisibleAsync();
+    }
+
+    public async Task ClickConfirmDeleteAsync()
+    {
+        var confirmButton = Page.Locator(".modal .btn-danger").Filter(new() { HasText = "Delete" });
+        await confirmButton.ClickAsync();
+        await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
+    }
+
+    public async Task ClickCancelDeleteAsync()
+    {
+        var cancelButton = Page.Locator(".modal .btn-secondary").Filter(new() { HasText = "Cancel" });
+        await cancelButton.ClickAsync();
+        await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
+    }
 }

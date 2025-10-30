@@ -401,19 +401,31 @@
 
     private void ApplyFilter()
     {
-        if (_selectedFilter == "Ai")
+        _flashcards = _selectedFilter switch
         {
-            _flashcards = _allFlashcards.Where(f => f.CreationSource == "Ai").ToList();
-        }
-        else if (_selectedFilter == "Manual")
+            "Ai" => _allFlashcards.Where(f => f.CreationSource == "Ai").ToList(),
+            "Manual" => _allFlashcards.Where(f => f.CreationSource == "Manual").ToList(),
+            _ => _allFlashcards.ToList()
+        };
+    }
+
+    private void ToggleFilter(string filter)
+    {
+        if (filter == "Total")
         {
-            _flashcards = _allFlashcards.Where(f => f.CreationSource == "Manual").ToList();
+            _selectedFilter = null;
         }
         else
         {
-            // No filter selected, show all cards
-            _flashcards = _allFlashcards.ToList();
+            _selectedFilter = _selectedFilter == filter ? null : filter;
         }
+        ApplyFilter();
+    }
+
+    private void ClearFilter()
+    {
+        _selectedFilter = null;
+        ApplyFilter();
     }
 
     private void FlipCard(Guid cardId)
@@ -426,73 +438,98 @@
         {
             _flippedCards.Add(cardId);
         }
-        StateHasChanged();
     }
 
     private void ToggleViewMode()
     {
         _isCardView = !_isCardView;
-        _flippedCards.Clear(); // Reset flipped state when changing views
-        StateHasChanged();
+        _flippedCards.Clear(); // Reset flipped cards when changing view mode
     }
 
-    private void CreateManualCard()
+    private void NavigateToGenerate()
     {
-        _showCreateModal = true;
-        StateHasChanged();
-    }
-
-    private void EditCard(FlashcardDto card)
-    {
-        // TODO: Navigate to edit page or open edit modal
+        Navigation.NavigateTo("/generate");
     }
 
     private void ShowDeleteConfirmation(FlashcardDto card)
     {
         _cardToDelete = card;
-        StateHasChanged();
     }
 
     private void CancelDelete()
     {
         _cardToDelete = null;
-        StateHasChanged();
     }
 
-    private void ConfirmDelete()
+    private async Task ConfirmDelete()
     {
-        if (_cardToDelete != null)
+        if (_cardToDelete == null) return;
+
+        try
         {
-            try
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
-                // TODO: Implement actual delete service call
-                // await FlashcardService.DeleteAsync(_cardToDelete.Id);
-                _allFlashcards.Remove(_cardToDelete);
-                ApplyFilter();
-                _flippedCards.Remove(_cardToDelete.Id);
-                _cardToDelete = null;
-                StateHasChanged();
+                _error = "Unable to determine current user.";
+                return;
             }
-            catch (Exception ex)
-            {
-                _error = ex.Message;
-                _cardToDelete = null;
-                StateHasChanged();
-            }
+
+            await FlashcardService.DeleteAsync(userId, _cardToDelete.Id);
+            
+            // Remove the card from both collections
+            _allFlashcards.RemoveAll(f => f.Id == _cardToDelete.Id);
+            _flashcards.RemoveAll(f => f.Id == _cardToDelete.Id);
+            
+            // Remove from flipped cards if it was flipped
+            _flippedCards.Remove(_cardToDelete.Id);
+            
+            // Close the modal
+            _cardToDelete = null;
+            
+            StateHasChanged();
         }
+        catch (Exception ex)
+        {
+            _error = $"Failed to delete flashcard: {ex.Message}";
+        }
+    }
+
+    private void EditCard(FlashcardDto card)
+    {
+        // TODO: Implement edit functionality
+        // This could navigate to an edit page or open an edit modal
+        _ = card; // Suppress unused parameter warning
+    }
+
+    private void CreateManualCard()
+    {
+        _showCreateModal = true;
+        _newCardFront = string.Empty;
+        _newCardBack = string.Empty;
+        _newCardTags = string.Empty;
+        _createError = null;
+    }
+
+    private void CancelCreate()
+    {
+        _showCreateModal = false;
+        _newCardFront = string.Empty;
+        _newCardBack = string.Empty;
+        _newCardTags = string.Empty;
+        _createError = null;
     }
 
     private async Task CreateCard()
     {
         if (string.IsNullOrWhiteSpace(_newCardFront) || string.IsNullOrWhiteSpace(_newCardBack))
         {
-            _createError = "Question and Answer are required.";
+            _createError = "Both question and answer are required.";
             return;
         }
 
-        _createError = null;
         _isCreating = true;
-        StateHasChanged();
+        _createError = null;
 
         try
         {
@@ -504,23 +541,32 @@
                 return;
             }
 
-            // Parse tags if provided
             var tags = string.IsNullOrWhiteSpace(_newCardTags) 
-                ? null 
+                ? new List<string>() 
                 : _newCardTags.Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(t => t.Trim())
-                    .Where(t => !string.IsNullOrEmpty(t))
-                    .ToArray();
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .ToList();
 
-            var command = new CreateFlashcardCommand(_newCardFront.Trim(), _newCardBack.Trim(), tags);
+            var command = new CreateFlashcardCommand(
+                _newCardFront.Trim(),
+                _newCardBack.Trim(),
+                tags
+            );
+
             var newCard = await FlashcardService.CreateAsync(userId, command);
-
+            
+            // Add the new card to both collections
             _allFlashcards.Add(newCard);
-            ApplyFilter();
+            ApplyFilter(); // This will update _flashcards based on current filter
+            
+            // Close the modal and reset form
+            _showCreateModal = false;
             _newCardFront = string.Empty;
             _newCardBack = string.Empty;
             _newCardTags = string.Empty;
-            _showCreateModal = false;
+            
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -529,59 +575,6 @@
         finally
         {
             _isCreating = false;
-            StateHasChanged();
         }
-    }
-
-    private void CancelCreate()
-    {
-        _showCreateModal = false;
-        _newCardFront = string.Empty;
-        _newCardBack = string.Empty;
-        _newCardTags = string.Empty;
-        StateHasChanged();
-    }
-
-    private void ToggleFilter(string filter)
-    {
-        if (filter == "Total")
-        {
-            // Clicking Total should clear any filter (show all cards)
-            if (_selectedFilter == null)
-            {
-                // If already showing all, do nothing (or could toggle to some other state)
-                return;
-            }
-            else
-            {
-                _selectedFilter = null;
-            }
-        }
-        else
-        {
-            if (_selectedFilter == filter)
-            {
-                // If the same filter is clicked again, clear the filter
-                _selectedFilter = null;
-            }
-            else
-            {
-                _selectedFilter = filter;
-            }
-        }
-        ApplyFilter();
-        StateHasChanged();
-    }
-
-    private void ClearFilter()
-    {
-        _selectedFilter = null;
-        ApplyFilter();
-        StateHasChanged();
-    }
-
-    private void NavigateToGenerate()
-    {
-        Navigation.NavigateTo("/generate");
     }
 }
