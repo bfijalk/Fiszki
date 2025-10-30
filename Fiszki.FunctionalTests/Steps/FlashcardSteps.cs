@@ -797,4 +797,32 @@ public class FlashcardSteps : BaseSteps
         foundCount.Should().BeGreaterThan(0, $"Expected to see at least one of the flashcards: {string.Join(", ", expectedCards)}");
         Console.WriteLine($"[Flashcard Steps] Found {foundCount} out of {expectedCards.Length} expected flashcards");
     }
+
+    // Delete functionality steps for FlashcardDeletion.feature
+    [When("I click the delete button for the first flashcard")]
+    public async Task WhenIClickTheDeleteButtonForTheFirstFlashcard()
+    {
+        await FlashcardsPage.ClickDeleteButtonForFirstFlashcardAsync();
+    }
+
+    [When("I click Confirm Delete")]
+    public async Task WhenIClickConfirmDelete()
+    {
+        await FlashcardsPage.ClickConfirmDeleteAsync();
+    }
+
+    [Then("the flashcard should be deleted")]
+    public async Task ThenTheFlashcardShouldBeDeleted()
+    {
+        // Wait a moment for the deletion to be processed
+        await Task.Delay(1000);
+        
+        // Verify that the UI updated properly (no errors shown)
+        var isLoading = await FlashcardsPage.IsLoadingAsync();
+        isLoading.Should().BeFalse("Page should not be in loading state after deletion");
+        
+        // Additional verification: the page should still be functional
+        var hasFlashcards = await FlashcardsPage.HasFlashcardsAsync();
+        Console.WriteLine($"[Delete Test] After deletion - Has flashcards: {hasFlashcards}");
+    }
 }

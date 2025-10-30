@@ -57,6 +57,12 @@ public interface IFlashcardsPage : INavigable
     Task ConfirmDeleteAsync();
     Task CancelDeleteAsync();
     
+    // Delete functionality for FlashcardDeletion.feature
+    Task ClickDeleteButtonForFirstFlashcardAsync();
+    Task<bool> IsDeleteConfirmationModalVisibleAsync();
+    Task ClickConfirmDeleteAsync();
+    Task ClickCancelDeleteAsync();
+    
     // Manual card creation methods
     Task EnterQuestionAsync(string question);
     Task EnterAnswerAsync(string answer);
