@@ -17,39 +17,39 @@
 <div class="container" style="max-width:480px;">
     @if (!string.IsNullOrEmpty(_error))
     {
-        <div class="alert alert-danger py-2 my-3" data-testid="register-error-alert">@_error</div>
+        <div class="alert alert-danger py-2 my-3" id="register-error-alert" data-testid="register-error-alert">@_error</div>
     }
     @if (!string.IsNullOrEmpty(_success))
     {
-        <div class="alert alert-success py-2 my-3" data-testid="register-success-alert">@_success</div>
+        <div class="alert alert-success py-2 my-3" id="register-success-alert" data-testid="register-success-alert">@_success</div>
     }
 
     <div class="card shadow-sm mt-3">
         <div class="card-body">
             <div class="mb-3">
                 <label for="emailInput" class="form-label">Email</label>
-                <input id="emailInput" class="form-control" type="email" value="@email" @oninput="OnEmailInput" autocomplete="email" data-testid="email-input" />
+                <input id="email-input" class="form-control" type="email" value="@email" @oninput="OnEmailInput" autocomplete="email" data-testid="email-input" />
             </div>
             <div class="mb-3">
                 <label for="passwordInput" class="form-label">Password</label>
-                <input id="passwordInput" class="form-control" type="password" value="@password" @oninput="OnPasswordInput" autocomplete="new-password" data-testid="password-input" />
+                <input id="password-input" class="form-control" type="password" value="@password" @oninput="OnPasswordInput" autocomplete="new-password" data-testid="password-input" />
             </div>
             <div class="mb-4">
                 <label for="passwordConfirmInput" class="form-label">Confirm Password</label>
-                <input id="passwordConfirmInput" class="form-control" type="password" value="@passwordConfirm" @oninput="OnPasswordConfirmInput" autocomplete="new-password" data-testid="password-confirm-input" />
+                <input id="password-confirm-input" class="form-control" type="password" value="@passwordConfirm" @oninput="OnPasswordConfirmInput" autocomplete="new-password" data-testid="password-confirm-input" />
                 @if (ShowPasswordMismatch)
                 {
-                    <div class="form-text text-danger" data-testid="password-mismatch-message">Passwords don't match.</div>
+                    <div class="form-text text-danger" id="password-mismatch-message" data-testid="password-mismatch-message">Passwords don't match.</div>
                 }
             </div>
 
-            <button type="button" class="btn btn-primary w-100" @onclick="HandleRegister" disabled="@_isSubmitting" data-testid="register-button">
+            <button type="button" class="btn btn-primary w-100" @onclick="HandleRegister" disabled="@_isSubmitting" id="register-button" data-testid="register-button">
                 @if (_isSubmitting)
                 {<span>Registering...</span>}
                 else
                 {<span>Register</span>}
             </button>
-            <button type="button" class="btn btn-link w-100 mt-3" @onclick="NavigateLogin" data-testid="back-to-login-button">Back to Login</button>
+            <button type="button" class="btn btn-link w-100 mt-3" @onclick="NavigateLogin" id="back-to-login-button" data-testid="back-to-login-button">Back to Login</button>
         </div>
     </div>
 </div>

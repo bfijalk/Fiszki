@@ -18,13 +18,15 @@
                 Transform any text into effective flashcards instantly. Our AI analyzes your content and creates 
                 personalized study materials, making learning 10x faster and more efficient.
             </MudText>
-            <MudButton Variant="Variant.Filled" 
-                      Color="Color.Primary" 
-                      Size="Size.Large" 
-                      StartIcon="@Icons.Material.Filled.Login"
-                      OnClick="NavigateToLogin"
-                      Class="px-8 py-3"
-                      data-testid="get-started-signin-button">
+            <MudButton 
+                Variant="Variant.Filled" 
+                Color="Color.Primary" 
+                Size="Size.Large" 
+                StartIcon="@Icons.Material.Filled.Login"
+                OnClick="NavigateToLogin"
+                Class="px-8 py-3"
+                id="get-started-signin-button"
+                data-testid="get-started-signin-button">
                 Get Started - Sign In
             </MudButton>
         </MudItem>
@@ -152,6 +154,7 @@
                           StartIcon="@Icons.Material.Filled.Login"
                           OnClick="NavigateToLogin"
                           Class="px-8 py-3"
+                          id="start-learning-button"
                           data-testid="start-learning-button">
                     Start Learning Today
                 </MudButton>
