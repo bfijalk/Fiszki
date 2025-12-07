@@ -54,7 +54,6 @@
                                             Icon="@Icons.Material.Filled.Edit" 
                                             OnClick="@(() => OnEditProposal(proposal))"
                                             Disabled="@Disabled"
-                                            id="edit-proposal-button-@proposal.Id"
                                             data-testid="edit-proposal-button" />
                                     }
                                     <MudIconButton 
@@ -62,7 +61,6 @@
                                         Color="@(proposal.Rejected ? Color.Primary : Color.Error)"
                                         OnClick="@(() => OnToggleReject(proposal))"
                                         Disabled="@Disabled"
-                                        id="@(proposal.Rejected ? $"undo-reject-button-{proposal.Id}" : $"reject-proposal-button-{proposal.Id}")"
                                         data-testid="@(proposal.Rejected ? "undo-reject-button" : "reject-proposal-button")" />
                                 </div>
                             </div>

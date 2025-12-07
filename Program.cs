@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization; // added
-using Fiszki.Services.Services; // custom provider
 
 var builder = WebApplication.CreateBuilder(args);
 
