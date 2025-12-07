@@ -1,29 +1,32 @@
 @using MudBlazor
 
-<MudPaper Class="pa-4">
+<MudPaper Class="pa-4" data-testid="proposals-section">
     <div class="d-flex flex-column gap-4">
         <div class="d-flex justify-space-between align-center">
-            <MudText Typo="Typo.h6">Generated Flashcards (@SelectionStats.SelectedCount of @SelectionStats.Total selected)</MudText>
+            <MudText Typo="Typo.h6" data-testid="proposals-header">Generated Flashcards (@SelectionStats.SelectedCount of @SelectionStats.Total selected)</MudText>
             <div class="d-flex gap-2">
                 <MudButton 
                     Variant="Variant.Outlined"
                     Color="Color.Primary"
                     OnClick="@(() => OnBulkAccept.InvokeAsync())"
-                    Disabled="@(SelectionStats.EditableCount == 0 || Disabled)">
+                    Disabled="@(SelectionStats.EditableCount == 0 || Disabled)"
+                    data-testid="accept-all-button">
                     Accept All
                 </MudButton>
                 <MudButton 
                     Variant="Variant.Outlined"
                     Color="Color.Error"
                     OnClick="@(() => OnBulkReject.InvokeAsync())"
-                    Disabled="@(SelectionStats.EditableCount == 0 || Disabled)">
+                    Disabled="@(SelectionStats.EditableCount == 0 || Disabled)"
+                    data-testid="reject-all-button">
                     Reject All
                 </MudButton>
                 <MudButton 
                     Variant="Variant.Filled"
                     Color="Color.Primary"
                     OnClick="@(() => OnSaveSelected.InvokeAsync())"
-                    Disabled="@(SelectionStats.SelectedCount == 0 || Disabled)">
+                    Disabled="@(SelectionStats.SelectedCount == 0 || Disabled)"
+                    data-testid="save-selected-button">
                     Save Selected (@SelectionStats.SelectedCount)
                 </MudButton>
             </div>
@@ -34,34 +37,36 @@
         <div class="d-flex flex-column gap-2">
             @foreach (var proposal in Proposals)
             {
-                <MudPaper Elevation="2" Class="pa-3">
+                <MudPaper Elevation="2" Class="pa-3" data-testid="proposal-item">
                     <div class="d-flex gap-4">
                      
                         
                         <div class="flex-grow-1">
                             <div class="d-flex justify-space-between align-center">
-                                <MudText Typo="Typo.subtitle1">@proposal.Front</MudText>
+                                <MudText Typo="Typo.subtitle1" data-testid="proposal-front">@proposal.Front</MudText>
                                 <div class="d-flex gap-2">
                                     @if (!proposal.Rejected)
                                     {
                                         <MudIconButton 
                                             Icon="@Icons.Material.Filled.Edit" 
                                             OnClick="@(() => OnEditProposal(proposal))"
-                                            Disabled="@Disabled" />
+                                            Disabled="@Disabled"
+                                            data-testid="edit-proposal-button" />
                                     }
                                     <MudIconButton 
                                         Icon="@(proposal.Rejected ? Icons.Material.Filled.Undo : Icons.Material.Filled.Close)"
                                         Color="@(proposal.Rejected ? Color.Primary : Color.Error)"
                                         OnClick="@(() => OnToggleReject(proposal))"
-                                        Disabled="@Disabled" />
+                                        Disabled="@Disabled"
+                                        data-testid="@(proposal.Rejected ? "undo-reject-button" : "reject-proposal-button")" />
                                 </div>
                             </div>
-                            <MudText Typo="Typo.body1" Color="@(proposal.Rejected ? Color.Error : Color.Default)">
+                            <MudText Typo="Typo.body1" Color="@(proposal.Rejected ? Color.Error : Color.Default)" data-testid="proposal-back">
                                 @proposal.Back
                             </MudText>
                             @if (!string.IsNullOrEmpty(proposal.Example))
                             {
-                                <MudText Typo="Typo.body2" Color="Color.Primary" Class="mt-1">
+                                <MudText Typo="Typo.body2" Color="Color.Primary" Class="mt-1" data-testid="proposal-example">
                                     Example: @proposal.Example
                                 </MudText>
                             }

@@ -32,7 +32,7 @@
     {
         <div class="row">
             <div class="col-12 text-center">
-                <div class="spinner-border text-primary" role="status">
+                <div class="spinner-border text-primary" role="status" data-testid="flashcards-loading-spinner">
                     <span class="visually-hidden">Loading...</span>
                 </div>
                 <p class="mt-2">Loading your flashcards...</p>
@@ -43,7 +43,7 @@
     {
         <div class="row">
             <div class="col-12">
-                <div class="alert alert-danger">
+                <div class="alert alert-danger" data-testid="flashcards-error-alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
                     @_error
                 </div>
@@ -54,15 +54,15 @@
     {
         <div class="row">
             <div class="col-12 text-center">
-                <div class="p-4">
+                <div class="p-4" data-testid="flashcards-empty-state">
                     <i class="bi bi-collection display-1 text-muted mb-3"></i>
                     <h5 class="text-muted mb-3">No flashcards yet</h5>
                     <p class="text-muted mb-4">Start creating your first flashcards to build your learning collection!</p>
-                    <button class="btn btn-primary me-2" @onclick="NavigateToGenerate">
+                    <button class="btn btn-primary me-2" @onclick="NavigateToGenerate" data-testid="generate-with-ai-button">
                         <i class="bi bi-stars me-2"></i>
                         Generate with AI
                     </button>
-                    <button class="btn btn-outline-primary" @onclick="CreateManualCard">
+                    <button class="btn btn-outline-primary" @onclick="CreateManualCard" data-testid="create-manually-button">
                         <i class="bi bi-plus-circle me-2"></i>
                         Create Manually
                     </button>
@@ -76,7 +76,7 @@
         <div class="row mb-4">
             <div class="col-12 col-md-4 mb-3">
                 <div class="card bg-primary text-white filter-card @(_selectedFilter == null ? "selected" : "")" 
-                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Total")' @ondblclick="ClearFilter">
+                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Total")' @ondblclick="ClearFilter" data-testid="total-cards-stat">
                     <div class="card-body text-center">
                         <h5 class="card-title d-flex align-items-center justify-content-center">
                             Total Cards
@@ -85,13 +85,13 @@
                                 <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
                             }
                         </h5>
-                        <h2>@_allFlashcards.Count</h2>
+                        <h2 data-testid="total-count">@_allFlashcards.Count</h2>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-4 mb-3">
                 <div class="card bg-success text-white filter-card @(_selectedFilter == "Ai" ? "selected" : "")" 
-                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Ai")' @ondblclick="ClearFilter">
+                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Ai")' @ondblclick="ClearFilter" data-testid="ai-cards-stat">
                     <div class="card-body text-center">
                         <h5 class="card-title d-flex align-items-center justify-content-center">
                             AI Generated
@@ -100,13 +100,13 @@
                                 <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
                             }
                         </h5>
-                        <h2>@_allFlashcards.Count(f => f.CreationSource == "Ai")</h2>
+                        <h2 data-testid="ai-count">@_allFlashcards.Count(f => f.CreationSource == "Ai")</h2>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-4 mb-3">
                 <div class="card bg-info text-white filter-card @(_selectedFilter == "Manual" ? "selected" : "")" 
-                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Manual")' @ondblclick="ClearFilter">
+                     style="cursor: pointer; transition: all 0.3s ease;" @onclick='() => ToggleFilter("Manual")' @ondblclick="ClearFilter" data-testid="manual-cards-stat">
                     <div class="card-body text-center">
                         <h5 class="card-title d-flex align-items-center justify-content-center">
                             Manual
@@ -115,7 +115,7 @@
                                 <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
                             }
                         </h5>
-                        <h2>@_allFlashcards.Count(f => f.CreationSource == "Manual")</h2>
+                        <h2 data-testid="manual-count">@_allFlashcards.Count(f => f.CreationSource == "Manual")</h2>
                     </div>
                 </div>
             </div>
@@ -124,15 +124,15 @@
         <!-- Action Buttons -->
         <div class="row mb-4">
             <div class="col-12">
-                <button class="btn btn-primary me-2" @onclick="NavigateToGenerate">
+                <button class="btn btn-primary me-2" @onclick="NavigateToGenerate" data-testid="generate-more-cards-button">
                     <i class="bi bi-stars me-2"></i>
                     Generate More Cards
                 </button>
-                <button class="btn btn-outline-primary me-2" @onclick="CreateManualCard">
+                <button class="btn btn-outline-primary me-2" @onclick="CreateManualCard" data-testid="add-manual-card-button">
                     <i class="bi bi-plus-circle me-2"></i>
                     Add Manual Card
                 </button>
-                <button class="btn btn-outline-secondary" @onclick="ToggleViewMode">
+                <button class="btn btn-outline-secondary" @onclick="ToggleViewMode" data-testid="toggle-view-mode-button">
                     <i class="bi bi-@(_isCardView ? "list-ul" : "grid-3x3") me-2"></i>
                     @(_isCardView ? "List View" : "Card View")
                 </button>
@@ -142,12 +142,12 @@
         @if (_cardToDelete != null)
         {
             <!-- Delete Confirmation Modal -->
-            <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);" data-testid="delete-confirmation-modal">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Confirm Deletion</h5>
-                            <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                            <button type="button" class="btn-close" @onclick="CancelDelete" data-testid="cancel-delete-button"></button>
                         </div>
                         <div class="modal-body">
                             <p>Are you sure you want to delete this flashcard?</p>
@@ -160,8 +160,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
-                            <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">
+                            <button type="button" class="btn btn-secondary" @onclick="CancelDelete" data-testid="cancel-delete-modal-button">Cancel</button>
+                            <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" data-testid="confirm-delete-button">
                                 <i class="bi bi-trash me-1"></i>
                                 Delete
                             </button>
@@ -174,10 +174,10 @@
         @if (_isCardView)
         {
             <!-- Card View -->
-            <div class="row">
+            <div class="row" data-testid="flashcards-card-view">
                 @foreach (var card in _flashcards)
                 {
-                    <div class="col-12 col-sm-6 col-lg-4 mb-4">
+                    <div class="col-12 col-sm-6 col-lg-4 mb-4" data-testid="flashcard-item">
                         <div class="card h-100 shadow">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <span class="d-flex align-items-center">
@@ -251,7 +251,7 @@
         else
         {
             <!-- List View -->
-            <div class="list-group">
+            <div class="list-group" data-testid="flashcards-list-view">
                 @foreach (var card in _flashcards)
                 {
                     <div class="list-group-item">
@@ -290,7 +290,7 @@
     @if (_showCreateModal)
     {
         <!-- Create Manual Card Modal -->
-        <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);" data-testid="create-manual-card-modal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -298,12 +298,12 @@
                             <i class="bi bi-plus-circle me-2"></i>
                             Create Manual Flashcard
                         </h5>
-                        <button type="button" class="btn-close" @onclick="CancelCreate"></button>
+                        <button type="button" class="btn-close" @onclick="CancelCreate" data-testid="close-create-modal-button"></button>
                     </div>
                     <div class="modal-body">
                         @if (_createError != null)
                         {
-                            <div class="alert alert-danger">
+                            <div class="alert alert-danger" data-testid="create-error-alert">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
                                 @_createError
                             </div>
@@ -312,25 +312,25 @@
                         <div class="mb-3">
                             <label for="frontContent" class="form-label">Question (Front)*</label>
                             <textarea class="form-control" id="frontContent" rows="3" 
-                                      @bind="_newCardFront" placeholder="Enter the question or prompt..."></textarea>
+                                      @bind="_newCardFront" placeholder="Enter the question or prompt..." data-testid="question-front-input"></textarea>
                         </div>
                         
                         <div class="mb-3">
                             <label for="backContent" class="form-label">Answer (Back)*</label>
                             <textarea class="form-control" id="backContent" rows="3" 
-                                      @bind="_newCardBack" placeholder="Enter the answer or explanation..."></textarea>
+                                      @bind="_newCardBack" placeholder="Enter the answer or explanation..." data-testid="answer-back-input"></textarea>
                         </div>
                         
                         <div class="mb-3">
                             <label for="tags" class="form-label">Tags (optional)</label>
                             <input type="text" class="form-control" id="tags" 
-                                   @bind="_newCardTags" placeholder="tag1, tag2, tag3...">
+                                   @bind="_newCardTags" placeholder="tag1, tag2, tag3..." data-testid="tags-input">
                             <div class="form-text">Separate multiple tags with commas</div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @onclick="CancelCreate">Cancel</button>
-                        <button type="button" class="btn btn-primary" @onclick="CreateCard" disabled="@_isCreating">
+                        <button type="button" class="btn btn-secondary" @onclick="CancelCreate" data-testid="cancel-create-button">Cancel</button>
+                        <button type="button" class="btn btn-primary" @onclick="CreateCard" disabled="@_isCreating" data-testid="create-card-button">
                             @if (_isCreating)
                             {
                                 <span class="spinner-border spinner-border-sm me-2" role="status"></span>

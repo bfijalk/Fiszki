@@ -15,7 +15,7 @@
         
         @if (!string.IsNullOrEmpty(_error))
         {
-            <MudAlert Severity="Severity.Error" Class="mb-4">@_error</MudAlert>
+            <MudAlert Severity="Severity.Error" Class="mb-4" data-testid="login-error-alert">@_error</MudAlert>
         }
         
         <MudForm @ref="_form">
@@ -26,7 +26,8 @@
                 RequiredError="Email is required"
                 Immediate="true"
                 InputType="InputType.Email"
-                Class="mb-4" />
+                Class="mb-4"
+                data-testid="email-input" />
                 
             <MudTextField 
                 @bind-Value="_password"
@@ -35,14 +36,16 @@
                 RequiredError="Password is required"
                 Immediate="true"
                 InputType="InputType.Password"
-                Class="mb-6" />
+                Class="mb-6"
+                data-testid="password-input" />
                 
             <MudButton 
                 Variant="Variant.Filled" 
                 Color="Color.Primary" 
                 FullWidth="true"
                 Disabled="@(_isSubmitting || !IsFormValid())"
-                OnClick="HandleLogin">
+                OnClick="HandleLogin"
+                data-testid="login-button">
                 @(_isSubmitting ? "Signing in..." : "Login")
             </MudButton>
             <!-- Registration navigation button -->
@@ -51,7 +54,8 @@
                 Color="Color.Secondary" 
                 FullWidth="true"
                 Class="mt-4"
-                Href="/register">
+                Href="/register"
+                data-testid="create-account-button">
                 Create Account
             </MudButton>
         </MudForm>
