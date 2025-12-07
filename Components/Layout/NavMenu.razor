@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Fiszki</a>
+        <a class="navbar-brand" href="" data-testid="navbar-brand">Fiszki</a>
     </div>
 </div>
 
@@ -9,31 +9,31 @@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="" Match="NavLinkMatch.All" data-testid="nav-home">
                 <span class="bi bi-house-door-fill fs-5" aria-hidden="true"></span>
                 <span>Home</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="how-to-start">
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="how-to-start" data-testid="nav-how-to-start">
                 <span class="bi bi-play-circle-fill fs-5" aria-hidden="true"></span>
                 <span>How to Start</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="examples">
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="examples" data-testid="nav-examples">
                 <span class="bi bi-card-text fs-5" aria-hidden="true"></span>
                 <span>Examples</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="about-technicalities">
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="about-technicalities" data-testid="nav-about-technicalities">
                 <span class="bi bi-gear-fill fs-5" aria-hidden="true"></span>
                 <span>About Technicalities</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="about">
+            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="about" data-testid="nav-about">
                 <span class="bi bi-person-circle fs-5" aria-hidden="true"></span>
                 <span>About Me</span>
             </NavLink>
@@ -41,19 +41,19 @@
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="flashcards">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="flashcards" data-testid="nav-flashcards">
                         <span class="bi bi-collection fs-5" aria-hidden="true"></span>
                         <span>Flashcards</span>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="generate">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="generate" data-testid="nav-generate">
                         <span class="bi bi-lightning-fill fs-5" aria-hidden="true"></span>
                         <span>Generate</span>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <button class="nav-link btn btn-link d-flex align-items-center gap-2 py-2" @onclick="Logout">
+                    <button class="nav-link btn btn-link d-flex align-items-center gap-2 py-2" @onclick="Logout" data-testid="nav-logout">
                         <span class="bi bi-box-arrow-right fs-5" aria-hidden="true"></span>
                         <span>Logout</span>
                     </button>
@@ -61,7 +61,7 @@
             </Authorized>
             <NotAuthorized>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="login">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="login" data-testid="nav-login">
                         <span class="bi bi-box-arrow-in-right fs-5" aria-hidden="true"></span>
                         <span>Login</span>
                     </NavLink>
