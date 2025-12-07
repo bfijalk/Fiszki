@@ -496,24 +496,27 @@ public class FlashcardsPage : BasePage, IFlashcardsPage
 
     public async Task EnterQuestionAsync(string question)
     {
-        // Use the exact selector from the successful Playwright test
-        var questionField = Page.GetByRole(AriaRole.Textbox, new() { Name = "Question (Front)*" });
+        // Use the data-testid selector we added
+        var questionField = Page.GetByTestId("question-front-input");
+        await questionField.WaitForAsync(new() { State = WaitForSelectorState.Visible });
         await questionField.ClickAsync();
         await questionField.FillAsync(question);
     }
 
     public async Task EnterAnswerAsync(string answer)
     {
-        // Use the exact selector from the successful Playwright test
-        var answerField = Page.GetByRole(AriaRole.Textbox, new() { Name = "Answer (Back)*" });
+        // Use the data-testid selector we added
+        var answerField = Page.GetByTestId("answer-back-input");
+        await answerField.WaitForAsync(new() { State = WaitForSelectorState.Visible });
         await answerField.ClickAsync();
         await answerField.FillAsync(answer);
     }
 
     public async Task EnterTagsAsync(string tags)
     {
-        // Use the exact selector from the successful Playwright test
-        var tagsField = Page.GetByRole(AriaRole.Textbox, new() { Name = "Tags (optional)" });
+        // Use the data-testid selector we added
+        var tagsField = Page.GetByTestId("tags-input");
+        await tagsField.WaitForAsync(new() { State = WaitForSelectorState.Visible });
         await tagsField.ClickAsync();
         await tagsField.FillAsync(tags);
     }
