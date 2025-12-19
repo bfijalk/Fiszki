@@ -27,6 +27,7 @@
                 Immediate="true"
                 InputType="InputType.Email"
                 Class="mb-4"
+                id="email-input"
                 data-testid="email-input" />
                 
             <MudTextField 
@@ -37,6 +38,7 @@
                 Immediate="true"
                 InputType="InputType.Password"
                 Class="mb-6"
+                id="password-input"
                 data-testid="password-input" />
                 
             <MudButton 
@@ -45,6 +47,7 @@
                 FullWidth="true"
                 Disabled="@(_isSubmitting || !IsFormValid())"
                 OnClick="HandleLogin"
+                id="login-button"
                 data-testid="login-button">
                 @(_isSubmitting ? "Signing in..." : "Login")
             </MudButton>
@@ -55,6 +58,7 @@
                 FullWidth="true"
                 Class="mt-4"
                 Href="/register"
+                id="create-account-button"
                 data-testid="create-account-button">
                 Create Account
             </MudButton>

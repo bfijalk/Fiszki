@@ -1,11 +1,11 @@
 @using Fiszki.Components.Pages.Generate
 
 <!-- Plain HTML version of the source input form (MudBlazor removed) -->
-<div class="p-4 border rounded bg-white" data-testid="source-input-form">
+<div class="p-4 border rounded bg-white" id="source-input-form" data-testid="source-input-form">
     <div class="d-flex flex-column gap-4">
         <div>
             <label for="sourceText" class="form-label">Source Text</label>
-            <textarea id="sourceText"
+            <textarea id="source-text-input"
                       class="form-control"
                       rows="5"
                       maxlength="5000"
@@ -21,7 +21,7 @@
         <div class="d-flex gap-4">
             <div class="flex-grow-1">
                 <label for="language" class="form-label">Language</label>
-                <select id="language" class="form-select" value="@_model.Language" @onchange="HandleLanguageChange" disabled="@IsGenerating" data-testid="language-select">
+                <select id="language-select" class="form-select" value="@_model.Language" @onchange="HandleLanguageChange" disabled="@IsGenerating" data-testid="language-select">
                     <option value="en">English</option>
                     <option value="pl">Polish</option>
                     <option value="es">Spanish</option>
@@ -31,7 +31,7 @@
             </div>
             <div style="width: 180px;">
                 <label for="maxCards" class="form-label">Maximum Cards</label>
-                <input id="maxCards" type="number" min="1" max="50" class="form-control" value="@_model.MaxCards" @onchange="HandleMaxCardsChange" disabled="@IsGenerating" data-testid="max-cards-input" />
+                <input id="max-cards-input" type="number" min="1" max="50" class="form-control" value="@_model.MaxCards" @onchange="HandleMaxCardsChange" disabled="@IsGenerating" data-testid="max-cards-input" />
             </div>
         </div>
 
@@ -40,6 +40,7 @@
                     class="btn btn-primary"
                     @onclick="HandleSubmit"
                     disabled="@(IsGenerating || string.IsNullOrEmpty(_model.Text) || _model.Text.Length < 50)"
+                    id="generate-flashcards-button"
                     data-testid="generate-flashcards-button">
                 Generate Flashcards
             </button>

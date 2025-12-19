@@ -37,10 +37,11 @@ public static class TestConstants
     public static class Selectors
     {
         public const string Navigation = "nav";
-        public const string EmailInput = "#emailInput";
-        public const string PasswordInput = "#passwordInput";
-        public const string PasswordConfirmInput = "#passwordConfirmInput";
-        public const string PasswordMismatchMessage = ".form-text.text-danger";
+        // Updated to match new data-testid attributes (changed from #emailInput to #email-input)
+        public const string EmailInput = "#email-input";
+        public const string PasswordInput = "#password-input";
+        public const string PasswordConfirmInput = "#password-confirm-input";
+        public const string PasswordMismatchMessage = "[data-testid='password-mismatch-message']";
         public const string Alert = ".mud-alert, .alert-danger";
     }
 
