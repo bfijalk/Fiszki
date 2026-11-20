@@ -8,7 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_TFM: 'net10.0'
   SOLUTION_FILE: 'Fiszki.sln'
   ARTIFACT_NAME: 'fiszki-release-build'
   PUBLISH_DIR: './publish'
@@ -127,7 +128,7 @@ jobs:
         cd Fiszki.FunctionalTests
         dotnet build
         # Install Playwright browsers using the proper method for GitHub Actions
-        pwsh ./bin/Debug/net8.0/playwright.ps1 install chromium --with-deps
+        pwsh ./bin/Debug/${{ env.DOTNET_TFM }}/playwright.ps1 install chromium --with-deps
       
     - name: 🔍 Check environment variables
       run: |

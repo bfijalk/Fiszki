@@ -14,7 +14,7 @@ Niniejszy dokument określa strategię testowania dla aplikacji Fiszki - systemu
 - Testowanie interfejsu użytkownika Blazor Server
 
 ### 1.3 Zakres projektu
-Aplikacja Fiszki to system e-learningowy oparty na .NET 8 z Blazor Server, wykorzystujący:
+Aplikacja Fiszki to system e-learningowy oparty na .NET 10 z Blazor Server, wykorzystujący:
 - Generowanie fiszek przez AI (OpenRouter)
 - Algorytm SM-2 dla spaced repetition
 - Własną implementację uwierzytelniania
@@ -277,7 +277,7 @@ Aplikacja Fiszki to system e-learningowy oparty na .NET 8 z Blazor Server, wykor
 ### Środowisko:
 - OS: [macOS/Windows/Linux]
 - Przeglądarka: [Chrome/Firefox/Safari/Edge] + wersja
-- .NET Runtime: 8.0
+- .NET Runtime: 10.0
 
 ### Kroki do reprodukcji:
 1. [Krok 1]

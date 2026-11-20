@@ -1,7 +1,7 @@
 # OpenRouter Service Implementation Guide
 
 ## 1. Service Description
-The OpenRouter Service encapsulates interaction with the OpenRouter API for Large Language Model (LLM) chat completions within a .NET 8 (C#) Blazor Server / ASP.NET Core application. It provides:
+The OpenRouter Service encapsulates interaction with the OpenRouter API for Large Language Model (LLM) chat completions within a .NET 10 (C#) Blazor Server / ASP.NET Core application. It provides:
 - Unified request construction for system/user/assistant/tool messages.
 - Support for structured JSON responses via `response_format` with strict JSON Schema validation.
 - Model selection, model parameter configuration, and capability introspection.
