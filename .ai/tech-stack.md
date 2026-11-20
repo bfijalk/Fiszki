@@ -3,7 +3,7 @@
 Minimalny, aktualny i docelowy zestaw technologii dla projektu.
 
 ## Core
-- Runtime / Framework: .NET 8 (ASP.NET Core Blazor Server)
+- Runtime / Framework: .NET 10 (ASP.NET Core Blazor Server)
 - Język: C# 12
 - Baza danych: PostgreSQL (EF Core / Npgsql)
 - ORM: Entity Framework Core 8

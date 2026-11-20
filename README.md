@@ -1,6 +1,6 @@
 # Fiszki
 
-[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Status](https://img.shields.io/badge/status-beta-green)](#project-status)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#license)
 
@@ -66,7 +66,7 @@ A modern web application that revolutionizes flashcard creation by combining AI 
 ## Tech Stack
 
 ### Backend
-- **.NET 8**: Latest version with modern C# features
+- **.NET 10**: Latest version with modern C# features
 - **Blazor Server**: Server-side rendering with real-time UI updates
 - **Entity Framework Core**: ORM with PostgreSQL provider
 - **PostgreSQL**: Robust, scalable database solution
@@ -95,7 +95,7 @@ A modern web application that revolutionizes flashcard creation by combining AI 
 ## Getting Started
 
 ### Prerequisites
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [PostgreSQL 16+](https://www.postgresql.org/download/)
 - [Git](https://git-scm.com/)
 
@@ -265,7 +265,7 @@ Our application features a comprehensive **double-gate CI/CD pipeline** that ens
 #### Pipeline Stages Breakdown
 
 ##### 🔨 Build Stage
-- .NET 8 SDK setup and environment preparation
+- .NET 10 SDK setup and environment preparation
 - NuGet package restoration and dependency resolution
 - Release configuration compilation
 - Build artifact generation and packaging
@@ -472,4 +472,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-*Built with ❤️ using .NET 8, Blazor Server, and modern web technologies.*
+*Built with ❤️ using .NET 10, Blazor Server, and modern web technologies.*

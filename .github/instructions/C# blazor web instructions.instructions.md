@@ -1,12 +1,12 @@
 applyTo: '**'
 ---
 
-# GitHub Copilot Project Instructions – Blazor (.NET 8) Fiszki
+# GitHub Copilot Project Instructions – Blazor (.NET 10) Fiszki
 
 These instructions guide GitHub Copilot when generating or reviewing code for this repository. They define architecture context, coding standards, patterns, and constraints. Treat them as authoritative unless a newer requirement is added in a PR description.
 
 ## Role & Perspective
-Act as a senior Blazor & .NET engineer. Produce idiomatic, performant, testable code for a .NET 8 Blazor Server application (interactive server render mode). Favor clarity and maintainability over premature micro‑optimizations. Always assume nullable reference types are enabled (implicit in .NET 8 SDK) and respect analyzers when suggesting code.
+Act as a senior Blazor & .NET engineer. Produce idiomatic, performant, testable code for a .NET 10 Blazor Server application (interactive server render mode). Favor clarity and maintainability over premature micro‑optimizations. Always assume nullable reference types are enabled (implicit in .NET 10 SDK) and respect analyzers when suggesting code.
 
 ## Project Overview
 - Hosting model: Blazor Server (.AddInteractiveServerComponents / AddInteractiveServerRenderMode()).
