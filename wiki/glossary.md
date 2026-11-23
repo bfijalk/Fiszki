@@ -7,7 +7,10 @@ sources:
   - Fiszki.Database/Entities/Flashcard.cs
   - Fiszki.Database/Entities/LearningProgress.cs
   - Components/Pages/Flashcards.razor
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Fiszki.Services/Services/GenerationService.cs
+  - Components/Pages/Generate/ProposalsSection.razor
+  - Components/Pages/Generate/SourceInputForm.razor
+verified_commit: 52f627aae9f0b25fa16da531aa2d9e66b421bcb9
 confidence: high
 ---
 
@@ -30,3 +33,11 @@ translated by the agent before searching.
 | Idempotent deletion | silent no-op, repeated delete | Deleting an unknown or foreign flashcard id does nothing and raises no error | [[flashcard-deletion]], [[flashcard-ownership]] |
 | Cascade delete | cascading | Deleting a parent row removes dependent rows: user to flashcards, flashcard to learning progress | [[flashcard-entity]], [[learning-progress-entity]] |
 | Test mode | in-memory database | Run with an in-memory database instead of PostgreSQL (`Test` environment, `TestMode` setting or `--test-mode`) | [[application-layers]] |
+| Proposal | suggestion, generated card, candidate | A flashcard suggested by the AI that is not saved until the user accepts and saves it; it has a front, a back, an example and notes | [[ai-flashcard-generation]], [[generation-job-flow]] |
+| Source text | input text, topic text | The text, 50 to 5000 characters, typed on the Generate page; the prompt uses it as a topic | [[ai-flashcard-generation]] |
+| Maximum cards | max cards, card limit | Upper limit of proposals to request, 1 to 50, default 20 | [[ai-flashcard-generation]] |
+| Accept All / Reject All | bulk accept, bulk reject | Bulk review actions on proposals; there is no accept action for a single card | [[ai-flashcard-generation]] |
+| Generation job | job, generation run | In-memory record of one generation with a state and its proposals | [[generation-job-flow]] |
+| Placeholder proposals | fallback, mock generation, dummy cards | Fake cards ("Polish Word 1") produced when the AI call fails, shown as a normal successful generation | [[ai-flashcard-generation]], [[openrouter-integration]] |
+| OpenRouter | LLM gateway, AI provider | The external service used to call language models | [[openrouter-integration]] |
+| Structured output | JSON schema response | An AI answer constrained to a JSON schema and parsed into objects | [[openrouter-integration]] |

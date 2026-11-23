@@ -9,6 +9,7 @@ Format of an entry: `- [[page-name]] - one-line description`.
 
 How user-visible features work: business rules and implementation.
 
+- [[ai-flashcard-generation]] - how a user generates flashcard proposals with AI, reviews and saves them: input limits, accept and reject, what is saved, placeholder fallback
 - [[flashcard-deletion]] - how a user permanently deletes their own flashcard: confirmation dialog, ownership check, cascade to learning progress
 
 ## Business rules
@@ -22,6 +23,8 @@ Cross-cutting rules that apply to more than one feature.
 Layers, components, services, integration points.
 
 - [[application-layers]] - Blazor Server layers, direct UI-to-service calls with no HTTP API, user identity flow, database provider and test mode
+- [[openrouter-integration]] - the minimal OpenRouter chat client: configuration, request, error mapping, no retries or rate limiting
+- [[generation-job-flow]] - in-memory generation jobs, background task, polling, states, what cancel and failure really do
 
 ## Data model
 

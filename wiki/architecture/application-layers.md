@@ -8,7 +8,7 @@ sources:
   - Fiszki.Services/DependencyInjection.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Components/Pages/Flashcards.razor
-verified_commit: 5d1568b818c698f75aa953c7422003d1563bec9d
+verified_commit: 52f627aae9f0b25fa16da531aa2d9e66b421bcb9
 confidence: high
 ---
 
@@ -54,6 +54,9 @@ service interfaces.
   `CustomAuthStateProvider` builds the claims of the signed-in user, including
   `NameIdentifier` (the user id), `Name` (email) and `Role`. Pages read the `NameIdentifier`
   claim and pass the user id to services, see [[flashcard-ownership]].
+- **Outbound AI call.** The application has no HTTP API of its own, but it makes one outbound
+  HTTP call: the generation service calls OpenRouter, see [[openrouter-integration]]. Generation
+  runs as a background job inside the service, see [[generation-job-flow]].
 - **Protected pages.** A page is protected with the `Authorize` attribute, for example
   `Components/Pages/Flashcards.razor` `Authorize`.
 
@@ -67,5 +70,8 @@ service interfaces.
 ## Related
 
 - [[flashcard-deletion]]
+- [[ai-flashcard-generation]]
+- [[openrouter-integration]]
+- [[generation-job-flow]]
 - [[flashcard-ownership]]
 - [[flashcard-entity]]

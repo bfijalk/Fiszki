@@ -7,7 +7,9 @@ sources:
   - Fiszki.Services/Services/FlashcardService.cs
   - Fiszki.Services/Interfaces/IFlashcardService.cs
   - Fiszki.Tests/Services/FlashcardServiceTests.cs
-verified_commit: 5d1568b818c698f75aa953c7422003d1563bec9d
+  - Fiszki.Services/Services/GenerationService.cs
+  - Fiszki.Services/Mapping/FlashcardMapper.cs
+verified_commit: 52f627aae9f0b25fa16da531aa2d9e66b421bcb9
 confidence: high
 ---
 
@@ -29,6 +31,7 @@ reports no error. The service therefore never reveals that another user's flashc
 ## Where it applies
 
 - [[flashcard-deletion]]: deleting another user's flashcard is a silent no-op.
+- [[ai-flashcard-generation]]: saved AI flashcards belong to the user who saved them.
 
 ## Evidence
 
@@ -37,6 +40,9 @@ reports no error. The service therefore never reveals that another user's flashc
   `Fiszki.Services/Services/FlashcardService.cs` `UpdateAsync`,
   `Fiszki.Services/Services/FlashcardService.cs` `DeleteAsync`)
 - Create assigns the acting user. (`Fiszki.Services/Services/FlashcardService.cs` `CreateAsync`)
+- Saving accepted AI proposals assigns the acting user to every new flashcard.
+  (`Fiszki.Services/Services/GenerationService.cs` `SaveProposalsAsync`,
+  `Fiszki.Services/Mapping/FlashcardMapper.cs` `ToEntity`)
 - Delete with another user's id leaves the flashcard and its owner unchanged.
   (`Fiszki.Tests/Services/FlashcardServiceTests.cs` `DeleteAsync_ShouldNotDeleteOtherUsersCard`)
 

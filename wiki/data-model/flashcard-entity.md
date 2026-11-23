@@ -11,7 +11,7 @@ sources:
   - Fiszki.Services/Services/FlashcardService.cs
   - Fiszki.Services/Services/GenerationService.cs
   - Fiszki.Services/Mapping/FlashcardMapper.cs
-verified_commit: 5d1568b818c698f75aa953c7422003d1563bec9d
+verified_commit: 52f627aae9f0b25fa16da531aa2d9e66b421bcb9
 confidence: high
 ---
 
@@ -58,7 +58,10 @@ The same cascade rules are in the initial migration
 - Created as `Manual` by `Fiszki.Services/Services/FlashcardService.cs` `CreateAsync`.
 - Created as `Ai` from accepted proposals: `Fiszki.Services/Services/GenerationService.cs`
   builds entities with `Fiszki.Services/Mapping/FlashcardMapper.cs` `ToEntity`. This page
-  does not cover the generation flow itself.
+  does not cover the generation flow itself. Only the front and back text are stored for these
+  flashcards: the example and notes shown during review are dropped, tags stay empty, and
+  `AiModel` and `OriginalTextHash` are left empty, so no record says which model wrote a card.
+  See [[ai-flashcard-generation]].
 - Updated by `FlashcardService.UpdateAsync`, which sets `UpdatedAt`.
 - Removed for good (no soft delete) by the deletion flow, see [[flashcard-deletion]].
 
