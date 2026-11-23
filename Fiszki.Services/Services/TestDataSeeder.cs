@@ -104,6 +104,7 @@ public class TestDataSeeder
         };
 
         _context.Users.AddRange(testUser, adminUser, demoUser, empty1User, empty2User, empty3User);
+        _context.Users.AddRange(CreateLeaderboardFillerUsers());
         await _context.SaveChangesAsync();
 
         // Create test flashcards
@@ -265,5 +266,32 @@ public class TestDataSeeder
         Console.WriteLine($"  - Created {await _context.Users.CountAsync()} users");
         Console.WriteLine($"  - Created {await _context.Flashcards.CountAsync()} flashcards");
         Console.WriteLine($"  - Created {await _context.LearningProgress.CountAsync()} learning progress entries");
+    }
+
+    /// <summary>
+    /// Active users without flashcards, so the leaderboard has more than one page (30 users per page)
+    /// in test mode. They never log in, so one shared password hash is enough (hashing each one
+    /// would slow down startup).
+    /// </summary>
+    private const int LeaderboardFillerUserCount = 31;
+
+    private static IEnumerable<User> CreateLeaderboardFillerUsers()
+    {
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword("leaderboard-filler-not-for-login");
+        for (var i = 1; i <= LeaderboardFillerUserCount; i++)
+        {
+            yield return new User
+            {
+                Id = Guid.NewGuid(),
+                Email = $"leaderboard.filler{i:D2}@example.com",
+                PasswordHash = passwordHash,
+                Role = UserRole.Basic,
+                IsActive = true,
+                TotalCardsGenerated = 0,
+                TotalCardsAccepted = 0,
+                CreatedAt = DateTime.UtcNow.AddDays(-90).AddMinutes(i),
+                UpdatedAt = DateTime.UtcNow
+            };
+        }
     }
 }

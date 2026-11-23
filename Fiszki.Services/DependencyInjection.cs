@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IFlashcardService, FlashcardService>();
         services.AddScoped<IGenerationService, GenerationService>();
+        services.AddScoped<ILeaderboardService, LeaderboardService>();
 
         // Test Data Seeder (for test mode)
         services.AddScoped<TestDataSeeder>();

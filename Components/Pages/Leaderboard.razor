@@ -1,0 +1,152 @@
+@page "/leaderboard"
+@using System.Security.Claims
+@using Fiszki.Services.Interfaces
+@using Fiszki.Services.Models
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+@inject ILeaderboardService LeaderboardService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Leaderboard - Fiszki</PageTitle>
+
+<div class="container mt-4" data-testid="leaderboard-page">
+    <h2 class="text-primary mb-3">
+        <span class="bi bi-trophy-fill me-2" aria-hidden="true"></span>Leaderboard
+    </h2>
+
+    @if (_isLoading)
+    {
+        <div class="text-center py-5" data-testid="leaderboard-loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (_error is not null)
+    {
+        <div class="alert alert-danger" role="alert" data-testid="leaderboard-error">@_error</div>
+    }
+    else if (_data is not null)
+    {
+        var banner = _data.Banner;
+
+        <div class="alert alert-info" role="status" id="leaderboard-banner" data-testid="leaderboard-banner">
+            <div data-testid="leaderboard-banner-position">
+                You are <strong>#@banner.Position</strong> with <strong>@banner.Points @(banner.Points == 1 ? "point" : "points")</strong>.
+            </div>
+
+            @if (banner.IsLeader)
+            {
+                <div data-testid="leaderboard-banner-leader">You lead the ranking. Keep creating flashcards to stay ahead!</div>
+            }
+            else if (banner.PointsGap == 0)
+            {
+                <div data-testid="leaderboard-banner-rival">
+                    <strong>@banner.RivalMaskedEmail</strong> has the same number of points but reached them first.
+                    Create one more flashcard to overtake them!
+                </div>
+            }
+            else
+            {
+                <div data-testid="leaderboard-banner-rival">
+                    <strong>@banner.RivalMaskedEmail</strong> has only <strong>@banner.PointsGap @(banner.PointsGap == 1 ? "point" : "points")</strong> more than you.
+                    Generate flashcards to catch up!
+                </div>
+            }
+
+            @if (banner.SamePointsCount > 0)
+            {
+                <div data-testid="leaderboard-banner-same-points">
+                    You also have <strong>@banner.SamePointsCount</strong> @(banner.SamePointsCount == 1 ? "rival" : "rivals") with the same number of points.
+                </div>
+            }
+
+            <button class="btn btn-primary btn-sm mt-2" @onclick="GoToGenerate" id="leaderboard-generate-button" data-testid="leaderboard-generate-button">
+                <span class="bi bi-lightning-fill me-1" aria-hidden="true"></span>Generate flashcards
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" data-testid="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 5rem;">#</th>
+                        <th scope="col">User</th>
+                        <th scope="col" class="text-end">Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _data.Rows)
+                    {
+                        <tr class="@(row.IsCurrentUser ? "table-primary fw-bold" : null)"
+                            data-testid="leaderboard-row"
+                            data-position="@row.Position"
+                            data-current-user="@(row.IsCurrentUser ? "true" : "false")">
+                            <td data-testid="leaderboard-position">@row.Position</td>
+                            <td data-testid="leaderboard-user">@row.MaskedEmail@(row.IsCurrentUser ? " (you)" : null)</td>
+                            <td class="text-end" data-testid="leaderboard-points">@row.Points</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Leaderboard pages" data-testid="leaderboard-pagination">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(_data.Page <= 1 ? "disabled" : null)">
+                    <button class="page-link" @onclick="() => LoadPage(_data.Page - 1)" disabled="@(_data.Page <= 1)" id="leaderboard-prev" data-testid="leaderboard-prev">Previous</button>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link" data-testid="leaderboard-page-indicator">Page @_data.Page of @_data.TotalPages</span>
+                </li>
+                <li class="page-item @(_data.Page >= _data.TotalPages ? "disabled" : null)">
+                    <button class="page-link" @onclick="() => LoadPage(_data.Page + 1)" disabled="@(_data.Page >= _data.TotalPages)" id="leaderboard-next" data-testid="leaderboard-next">Next</button>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@code {
+    private LeaderboardPageDto? _data;
+    private bool _isLoading = true;
+    private string? _error;
+    private Guid _userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var claim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+        if (claim is null || !Guid.TryParse(claim.Value, out _userId))
+        {
+            _error = "Unable to determine current user.";
+            _isLoading = false;
+            return;
+        }
+
+        await LoadPage(1);
+    }
+
+    private async Task LoadPage(int page)
+    {
+        _isLoading = true;
+        _error = null;
+        try
+        {
+            _data = await LeaderboardService.GetAsync(_userId, page);
+        }
+        catch (Exception)
+        {
+            _data = null;
+            _error = "The leaderboard could not be loaded. Please try again later.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void GoToGenerate() => Navigation.NavigateTo("generate");
+}

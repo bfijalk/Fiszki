@@ -73,3 +73,22 @@ public interface IFlashcardsPage : INavigable
     Task<bool> IsDeleteModalVisibleAsync();
     Task<string?> GetCreateErrorAsync();
 }
+
+public interface ILeaderboardPage : INavigable
+{
+    Task WaitUntilLoadedAsync();
+    Task OpenByUrlAsync();
+    Task<bool> WasRedirectedToLoginAsync();
+    Task<bool> WaitForMenuItemAsync();
+    Task<bool> IsMenuItemVisibleAsync();
+    Task<bool> IsLeaderboardPageShownAsync();
+    string CurrentUrl { get; }
+    Task<IReadOnlyList<Fiszki.FunctionalTests.PageObjects.LeaderboardRowInfo>> GetRowsAsync();
+    Task<Fiszki.FunctionalTests.PageObjects.LeaderboardBannerInfo> GetBannerAsync();
+    Task<(int Page, int TotalPages)> GetPageIndicatorAsync();
+    Task<bool> IsNextDisabledAsync();
+    Task<bool> IsPreviousDisabledAsync();
+    Task ClickNextAsync();
+    Task ClickPreviousAsync();
+    Task<string> GetVisibleTextAsync();
+}

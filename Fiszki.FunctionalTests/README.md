@@ -18,6 +18,7 @@ Fiszki.FunctionalTests/
 │   ├── LoginPage.cs       # Login page implementation
 │   ├── RegisterPage.cs    # Register page implementation
 │   ├── HomePage.cs        # Home page implementation
+│   ├── LeaderboardPage.cs # Leaderboard page implementation
 │   └── NavBar.cs          # Navigation component
 ├── Services/              # Business logic and utilities
 │   └── PageFactory.cs     # Creates page instances
@@ -26,8 +27,25 @@ Fiszki.FunctionalTests/
     │   └── BaseSteps.cs   # Common step functionality
     ├── LoginSteps.cs      # Login-specific steps
     ├── RegisterSteps.cs   # Register-specific steps
-    └── NavigationSteps.cs # Navigation-specific steps
+    ├── NavigationSteps.cs # Navigation-specific steps
+    └── LeaderboardSteps.cs # Leaderboard-specific steps
 ```
+
+## Leaderboard tests
+
+`Features/Leaderboard.feature` covers the leaderboard: menu item and access, points following the user's
+flashcards, ordering and unique positions, masked emails, pagination (30 users per page) and the motivation banner.
+
+- All scenarios share one database that other scenarios also change, so they assert on the logged-in
+  user's own row, points and banner and on structural properties of the ranking, never on the absolute
+  position of other users.
+- In test mode the seeder adds 31 active users without flashcards, so the leaderboard has more than one
+  page (`TestDataSeeder`).
+- Open the page through the `nav-leaderboard` menu link; a full page load drops the in-memory login.
+- Left to unit tests (`Fiszki.Tests/Services/LeaderboardServiceTests.cs`) because the UI cannot set up the data:
+  the tie-break by who reached the score first, AI and manual flashcards counting equally, inactive users
+  being left out, and the banner for the leader.
+- The leaderboard test ids are listed in `docs/TEST_SELECTORS.md`.
 
 ## SOLID Principles Applied
 
