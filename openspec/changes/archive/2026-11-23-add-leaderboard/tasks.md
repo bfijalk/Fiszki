@@ -25,7 +25,7 @@
 
 - [x] 4.1 Run the full existing test suite (`dotnet test`) and verify no regressions
 - [x] 4.2 Verify end to end in the running app with seeded users: ranking order, pagination at 30, creating and deleting a flashcard changes points and the banner, and no full email appears anywhere on the page
-- [ ] 4.3 Run the whole functional suite the way CI does (`ASPNETCORE_ENVIRONMENT=Test`, `TestMode=true`, `dotnet run --environment Test`) and verify all scenarios pass, including that the `Test` environment serves the static assets (`blazor.web.js` returned 404 in an earlier manual run)
+- [x] 4.3 Run the whole functional suite the way CI does (`ASPNETCORE_ENVIRONMENT=Test`, `TestMode=true`, `dotnet run --environment Test`) and verify all scenarios pass, including that the `Test` environment serves the static assets (`blazor.web.js` returned 404 in an earlier manual run)
 
 ## Workflow follow-up
 
