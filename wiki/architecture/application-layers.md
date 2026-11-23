@@ -8,7 +8,7 @@ sources:
   - Fiszki.Services/DependencyInjection.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Components/Pages/Flashcards.razor
-verified_commit: 6a27f79b9a9bb38c9e68a0f1e35a693394ffb792
+verified_commit: c20f71dc4bf41ad1693b6ec4a52ab177fb5fe501
 confidence: high
 ---
 
@@ -63,6 +63,8 @@ service interfaces.
 
 ## Configuration and wiring
 
+- **What happens at startup** (database check, test-mode seeding, no migrations) and how the code is
+  built and deployed are in [[ci-cd-and-startup]].
 - **Database provider.** In normal runs the app uses PostgreSQL through Npgsql with the
   connection string `FiszkiDatabase`. In **test mode** it uses an in-memory database named
   `FiszkiTestDb`. Test mode is on when the environment is `Test`, the `TestMode` setting is
@@ -72,6 +74,8 @@ service interfaces.
 
 - [[flashcard-deletion]]
 - [[authentication-session]]
+- [[ci-cd-and-startup]]
+- [[site-navigation]]
 - [[ai-flashcard-generation]]
 - [[openrouter-integration]]
 - [[generation-job-flow]]

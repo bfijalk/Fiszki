@@ -134,3 +134,31 @@ Findings worth a follow-up: a filter that matches nothing hides the counters, so
 cleared without a reload; counters undercount with more than 100 cards and older cards cannot be
 reached; no active scenario clicks a filter and the filter steps would assert almost nothing; the
 flip scenario is switched off; the page cannot search, sort, page or show tags.
+
+## [2026-11-23] ingest | Navigation, information pages and CI/CD (cold start)
+
+Created: features/site-navigation, features/information-pages, architecture/ci-cd-and-startup.
+Updated: features/user-login-and-logout (menu label), architecture/application-layers, glossary
+(8 terms), index.
+
+Verified against commit c20f71d. Sources: the menu, layout, routes, app shell, the five information
+pages, the error page, Program.cs, the CI workflow, the navigation scenario and step definitions.
+The historical .ai notes were used as a hint only. The About Me page is described generically; no
+personal data and no secret values were recorded.
+
+Discrepancies (code wins): redirect to login (notes say yes; the code shows a default message);
+component library (notes say MudBlazor everywhere; the menu and several pages use Bootstrap); error
+handling (notes describe an error boundary and toasts; the code has neither). In-app texts versus
+code, recorded as a verdict table on information-pages: spaced repetition and study sessions,
+progress tracking, flashcard editing, tags, "Register in the navigation", examples from other users,
+retry logic, token cost management, repository pattern, database migration, health check and rollback
+in deployment, manual-run deployment, Application Insights, security scanning, "ASP.NET Core 8".
+
+Unverified claims: none. Cloud settings named on the About Technicalities page (scaling,
+certificates, private endpoint, backups, custom domain, zero-downtime) are marked not checkable
+because they are not in the repository.
+
+Findings worth a follow-up: the About page text overstates the product in many places; a leftover
+"About" link in every page's top bar opens external documentation; the error page shows developer
+text to end users; there is no Register link in the menu; the deployment has no migration step, health
+check or rollback; the navigation has one test.

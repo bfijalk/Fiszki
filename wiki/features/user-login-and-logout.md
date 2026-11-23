@@ -20,7 +20,7 @@ sources:
   - Fiszki.Tests/Services/Validation/ValidatorTests.cs
   - Fiszki.FunctionalTests/Steps/LoginSteps.cs
   - Fiszki.FunctionalTests/Steps/DynamicLoginSteps.cs
-verified_commit: 6a27f79b9a9bb38c9e68a0f1e35a693394ffb792
+verified_commit: c20f71dc4bf41ad1693b6ec4a52ab177fb5fe501
 confidence: high
 ---
 
@@ -83,7 +83,8 @@ test**, or **code only** (read from the implementation, no automated test).
 ### Access and the menu
 
 8. **Two pages need a login:** Flashcards (`/flashcards`) and Generate (`/generate`). The other pages
-   (home, how to start, examples, about, about technicalities, login, logout, register) are open.
+   (Home, How to Start, Examples, About Technicalities, About Me, Login, Logout, Register) are open;
+   see [[site-navigation]].
    Backed by: code only (`Components/Pages/Flashcards.razor` `Authorize`,
    `Components/Pages/GeneratePage.razor` `Authorize`).
 9. **Opening a protected page without a login shows the framework's default "not authorized"
@@ -91,7 +92,7 @@ test**, or **code only** (read from the implementation, no automated test).
    login. The exact default text comes from the framework and was not checked by running the
    application. Backed by: code only (`Components/Routes.razor` `AuthorizeRouteView`).
 10. **The menu changes with the login.** Logged out, it shows "Login". Logged in, it shows Flashcards,
-    Generate and Logout. Home, How to start, Examples, About technicalities and About are always
+    Generate and Logout. Home, How to Start, Examples, About Technicalities and About Me are always
     shown. Backed by: code only (`Components/Layout/NavMenu.razor` `AuthorizeView`).
 11. **The login lasts only as long as the connection (circuit).** Reloading the page or opening a new
     tab starts a new connection and signs the user out, and so does a connection that is lost for good.

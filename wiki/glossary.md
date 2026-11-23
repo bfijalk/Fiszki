@@ -15,7 +15,9 @@ sources:
   - Fiszki.Services/Services/UserService.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Fiszki.Database/Entities/User.cs
-verified_commit: 1b5badb4dd95f2e2fd2a8d40d9daf5adfca8041b
+  - Components/Layout/NavMenu.razor
+  - Program.cs
+verified_commit: c20f71dc4bf41ad1693b6ec4a52ab177fb5fe501
 confidence: high
 ---
 
@@ -66,3 +68,11 @@ translated by the agent before searching.
 | Card view / List view | grid view, list mode, view mode | The two ways to show flashcards; card view is the default and the only one that can flip cards | [[flashcard-list-and-filters]] |
 | Flip | show answer, show question, turn card | Turning a card in card view to see its back; the state is not saved | [[flashcard-list-and-filters]] |
 | Empty state | no flashcards yet | The "No flashcards yet" message with the "Generate with AI" and "Create Manually" buttons; also shown when a filter matches nothing | [[flashcard-list-and-filters]], [[flashcard-deletion]] |
+| Navigation menu | menu, navbar, sidebar | The side menu that is the same for everyone except the Login or Flashcards, Generate and Logout group | [[site-navigation]] |
+| Information pages | home, how to start, examples, about, landing | The five open pages with fixed text; their claims often differ from the code | [[information-pages]] |
+| About Me | author page, developer profile | The `/about` page: a profile of the application's developer; unrelated to the "About" link in the top bar, which opens external documentation | [[site-navigation]], [[information-pages]] |
+| Sample flashcards | examples, demo cards | The ten cards written into the Examples page; not real user data | [[information-pages]] |
+| Pipeline | CI, CI/CD, workflow, GitHub Actions | The workflow that builds, tests and deploys; it never applies database migrations | [[ci-cd-and-startup]] |
+| Required status check | merge check, gate | The pipeline job that fails unless build, unit tests and (for pull requests and main) browser tests passed | [[ci-cd-and-startup]] |
+| Deployment | deploy, release, Azure | Publishing the built application to the Azure Web App on a push to main | [[ci-cd-and-startup]] |
+| Startup | boot, initialization | What the application does when it starts: pipeline setup and a database check, plus test-data seeding in test mode | [[ci-cd-and-startup]] |

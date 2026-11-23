@@ -14,6 +14,8 @@ How user-visible features work: business rules and implementation.
 - [[user-registration]] - how a visitor creates an account: fields, the mismatch message that does not block registration, email and password rules, duplicates, automatic login
 - [[user-login-and-logout]] - how a user signs in and out: messages, inactive accounts, protected pages, menu, how long the login lasts, what is missing
 - [[flashcard-list-and-filters]] - what the Flashcards page shows: states, newest-first list capped at 100, counters that filter, card and list views, flipping, and what is missing
+- [[site-navigation]] - the side menu for logged-out and logged-in users, open and protected pages, layout, error handling, and how little is tested
+- [[information-pages]] - what Home, How to Start, Examples, About Technicalities and About Me contain, and a table of their claims that do not match the code
 - [[flashcard-deletion]] - how a user permanently deletes their own flashcard: confirmation dialog, ownership check, cascade to learning progress
 
 ## Business rules
@@ -32,6 +34,7 @@ Layers, components, services, integration points.
 - [[openrouter-integration]] - the minimal OpenRouter chat client: configuration, request, error mapping, no retries or rate limiting
 - [[generation-job-flow]] - in-memory generation jobs, background task, polling, states, what cancel and failure really do
 - [[authentication-session]] - the in-memory login state per browser connection, unused cookie setup, page protection, roles with no effect
+- [[ci-cd-and-startup]] - what the CI/CD workflow and application startup really do, including what is missing: migrations, post-deploy health check, rollback
 
 ## Data model
 
