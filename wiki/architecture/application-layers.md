@@ -8,7 +8,7 @@ sources:
   - Fiszki.Services/DependencyInjection.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Components/Pages/Flashcards.razor
-verified_commit: 52f627aae9f0b25fa16da531aa2d9e66b421bcb9
+verified_commit: 6a27f79b9a9bb38c9e68a0f1e35a693394ffb792
 confidence: high
 ---
 
@@ -50,7 +50,8 @@ service interfaces.
 
 ## Interactions
 
-- **Who is the user.** `Fiszki.Services/Services/CustomAuthStateProvider.cs`
+- **Who is the user.** (The login state itself is an in-memory object per browser connection, see
+  [[authentication-session]].) `Fiszki.Services/Services/CustomAuthStateProvider.cs`
   `CustomAuthStateProvider` builds the claims of the signed-in user, including
   `NameIdentifier` (the user id), `Name` (email) and `Role`. Pages read the `NameIdentifier`
   claim and pass the user id to services, see [[flashcard-ownership]].
@@ -70,6 +71,7 @@ service interfaces.
 ## Related
 
 - [[flashcard-deletion]]
+- [[authentication-session]]
 - [[ai-flashcard-generation]]
 - [[openrouter-integration]]
 - [[generation-job-flow]]

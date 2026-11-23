@@ -82,3 +82,32 @@ say yes; the code accepts only in bulk). Findings worth a follow-up: the Edit bu
 shown and filtered nowhere; the dialog shows only "Validation failed" for over-long text; limits
 differ between manual create (1000, 2000), AI save (500, 500) and update; the AI-saved text is not
 trimmed; no test covers lengths, the update validator or a successful update.
+
+## [2026-11-23] ingest | Registration, login, logout and the User entity (cold start)
+
+Created: features/user-registration, features/user-login-and-logout,
+business-rules/credential-rules, data-model/user-entity, architecture/authentication-session.
+Updated: architecture/application-layers, glossary (9 terms), index.
+
+Verified against commit 6a27f79. Sources: the register and login Gherkin scenarios, the Register,
+Login and Logout pages, the menu and routes, UserService, CustomAuthStateProvider, validators,
+entity, configuration and migration, unit and validator tests, step definitions. The historical
+.ai notes were used as a hint only. No passwords or test account data were recorded.
+RegisterPage.cs has uncommitted changes in the repository and is not listed as a source.
+
+Discrepancies (code wins): password policy (notes: 8 characters with upper, lower and digit; code:
+3 characters and a digit); email format at registration (notes: required; code: not checked);
+hashing (notes: Argon2id; code: BCrypt); tokens and HTTP endpoints for register and login (none
+exist; login is kept in memory per connection); database plan (enum role type with lower-case
+values, snake_case columns and database defaults; code uses text roles, PascalCase columns and no
+defaults).
+
+Unverified claims: none. Two statements depend on framework behavior and are labeled: the exact
+default "not authorized" text, and how long a dropped connection keeps the login.
+
+Findings worth a follow-up: the password-mismatch message does not block registration; an account
+registered with a non-email value can never sign in; the registration page trims the password but
+login does not; inactive accounts see "Invalid credentials"; roles, the active flag and the
+counters have no effect or are never changed; cookie authentication is configured but unused; the
+registration page logs the typed email to the server console; no scenario covers a successful
+registration, logout or page protection.

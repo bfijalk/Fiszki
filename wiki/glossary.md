@@ -12,7 +12,10 @@ sources:
   - Components/Pages/Generate/SourceInputForm.razor
   - Fiszki.Services/Services/FlashcardService.cs
   - Fiszki.Services/Validation/CreateFlashcardCommandValidator.cs
-verified_commit: b495105fc83203eab08cd4f7daa346d228e4d01e
+  - Fiszki.Services/Services/UserService.cs
+  - Fiszki.Services/Services/CustomAuthStateProvider.cs
+  - Fiszki.Database/Entities/User.cs
+verified_commit: 6a27f79b9a9bb38c9e68a0f1e35a693394ffb792
 confidence: high
 ---
 
@@ -48,3 +51,12 @@ translated by the agent before searching.
 | Tags | labels, keywords | Optional free-form labels stored with a flashcard, at most 10 of up to 50 characters; not shown anywhere in the UI | [[manual-flashcard-creation]], [[flashcard-content-limits]] |
 | Content limits | length limits, maximum length | The maximum text and tag sizes enforced by the validators, which differ between manual create, AI save and update | [[flashcard-content-limits]] |
 | Concurrency check | stale update, expected update time | The service refuses an update when the caller's last seen update time no longer matches the stored one | [[manual-flashcard-creation]] |
+| Registration | sign-up, create account | Creating an account on the Register page; the user is logged in automatically afterwards | [[user-registration]] |
+| Login | sign-in, authentication | Signing in with email and password on the Login page; it lasts only for the current browser connection | [[user-login-and-logout]], [[authentication-session]] |
+| Logout | sign-out | Clearing the login, from the menu button or the logout page | [[user-login-and-logout]] |
+| Circuit | connection, session | The server-side connection of one browser tab to the Blazor application; the login lives as long as it | [[authentication-session]] |
+| Authentication state | logged-in state, claims | The in-memory record of who is logged in, with user id, email and role claims | [[authentication-session]] |
+| Credentials | email and password, login data | The email and password rules, which differ between registration and login | [[credential-rules]] |
+| Role | user role, Basic, Admin | Account role stored on the user and put in the login claims; nothing checks it | [[user-entity]], [[authentication-session]] |
+| Active account | inactive account, IsActive | A flag that blocks login when false; nothing in the application sets it to false | [[user-entity]], [[user-login-and-logout]] |
+| Password hash | BCrypt, stored password | The only form in which the password is stored: a BCrypt hash with work factor 12 | [[credential-rules]], [[user-entity]] |
