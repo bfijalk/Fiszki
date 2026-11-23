@@ -26,4 +26,19 @@ public class NavBar
         var link = GetLink(linkText);
         return await link.CountAsync() > 0;
     }
+
+    /// <summary>Marker returned by <see cref="GetMenuEntriesAsync"/> for a separator between menu groups.</summary>
+    public const string SeparatorMarker = "---";
+
+    /// <summary>
+    /// The side menu from top to bottom in one browser call: the text of each item and
+    /// <see cref="SeparatorMarker"/> for each separator.
+    /// </summary>
+    public async Task<IReadOnlyList<string>> GetMenuEntriesAsync()
+    {
+        var entries = await _page.EvaluateAsync<string[]>(
+            @"() => [...document.querySelector('nav.flex-column').children]
+                       .map(e => e.tagName === 'HR' ? '" + SeparatorMarker + @"' : e.innerText.trim())");
+        return entries;
+    }
 }

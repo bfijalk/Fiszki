@@ -33,6 +33,14 @@ public class NavigationSteps : BaseSteps
         text.Should().Contain(linkText);
     }
 
+    [Then("the menu should list, in order, {string}")]
+    public async Task ThenTheMenuShouldListInOrder(string expectedEntries)
+    {
+        var expected = expectedEntries.Split(" | ");
+        var actual = await NavBar.GetMenuEntriesAsync();
+        actual.Should().Equal(expected, "the menu order and separators ('---') are specified behavior");
+    }
+
     [When("I click \"(.*)\" button")]
     [Given("I click \"(.*)\" button")]
     public async Task WhenIClickButton(string buttonText)

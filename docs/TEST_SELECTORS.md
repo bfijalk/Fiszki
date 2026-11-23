@@ -65,22 +65,31 @@ cy.get('[data-testid="login-button"]').click();
 
 ## Navigation Menu
 
-### Navigation Links
+Order from top to bottom. `---` is a separator (shown only to logged-in users).
+
+- Logged in: Home, Flashcards, Generate, Leaderboard, `---`, How to Start, Examples, About Technicalities, About Me, `---`, Logout
+- Visitor: Home, How to Start, Examples, About Technicalities, About Me, Login
+
+### Always Visible Links
 - `navbar-brand` - Fiszki logo/brand link
-- `nav-home` - Home page link
+- `nav-home` - Home page link (always the first item)
 - `nav-how-to-start` - How to Start page link
 - `nav-examples` - Examples page link
 - `nav-about-technicalities` - About Technicalities page link
 - `nav-about` - About Me page link
 
 ### Authenticated User Links
-- `nav-flashcards` - Flashcards page link (only visible when logged in)
+- `nav-flashcards` - Flashcards page link (only visible when logged in, directly below Home)
 - `nav-generate` - Generate page link (only visible when logged in)
 - `nav-leaderboard` - Leaderboard page link (only visible when logged in)
-- `nav-logout` - Logout button (only visible when logged in)
+- `nav-logout` - Logout button (only visible when logged in, last item of the menu)
 
 ### Unauthenticated User Links
-- `nav-login` - Login page link (only visible when logged out)
+- `nav-login` - Login page link (only visible when logged out, last item of the menu)
+
+### Separators
+- `nav-separator-account` - Line between the logged-in items and the always visible links (logged in only)
+- `nav-separator-logout` - Line between the always visible links and Logout (logged in only)
 
 ---
 
