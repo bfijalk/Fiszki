@@ -111,3 +111,26 @@ login does not; inactive accounts see "Invalid credentials"; roles, the active f
 counters have no effect or are never changed; cookie authentication is configured but unused; the
 registration page logs the typed email to the server console; no scenario covers a successful
 registration, logout or page protection.
+
+## [2026-11-23] ingest | Flashcard list, counters and filters (cold start)
+
+Created: features/flashcard-list-and-filters. Updated: features/flashcard-deletion and
+features/manual-flashcard-creation (links), glossary (6 terms), index.
+
+Verified against commit 1b5badb. Sources: the Flashcards page, FlashcardService list and get,
+the DTO, the UI Gherkin scenarios, step definitions, page object, test-user hooks and the page's
+stylesheet. The historical .ai notes were used as a hint only. No test account data was recorded.
+
+Discrepancies (code wins): listing (notes describe paging with a page size, sorting, text search
+and tag and source filters on the server; the page loads the 100 newest cards and filters by source
+only, in the browser session); UI (notes describe server-side pagination with a table component; the
+page uses plain Bootstrap markup); single-card fetch (exists in the service, no screen uses it).
+
+Unverified claims: none. Two statements are labeled: the date is expected in the server's time
+zone (inferred from server-side rendering), and whether the stylesheet link with the Razor Pages
+tilde form loads was not checked.
+
+Findings worth a follow-up: a filter that matches nothing hides the counters, so it cannot be
+cleared without a reload; counters undercount with more than 100 cards and older cards cannot be
+reached; no active scenario clicks a filter and the filter steps would assert almost nothing; the
+flip scenario is switched off; the page cannot search, sort, page or show tags.

@@ -17,7 +17,7 @@ sources:
   - Fiszki.Tests/Services/Validation/ValidatorTests.cs
   - Fiszki.FunctionalTests/Steps/FlashcardSteps.cs
   - Fiszki.FunctionalTests/PageObjects/FlashcardsPage.cs
-verified_commit: b495105fc83203eab08cd4f7daa346d228e4d01e
+verified_commit: 1b5badb4dd95f2e2fd2a8d40d9daf5adfca8041b
 confidence: high
 ---
 
@@ -70,7 +70,7 @@ test**, or **code only** (read from the implementation, no automated test).
    (`Fiszki.Tests/Services/FlashcardServiceTests.cs` `CreateAsync_ShouldPersistAndReturnDto`).
    See [[flashcard-ownership]].
 9. **The list and counters update immediately.** The dialog closes, the card appears and the
-   "Total Cards" and "Manual" counters go up. The new card is added at the **end** of the visible
+   "Total Cards" and "Manual" counters go up (see [[flashcard-list-and-filters]]). The new card is added at the **end** of the visible
    list; after a reload the list is newest first, so it moves to the top. Backed by: Gherkin for
    "the dialog closes and the card is visible"
    (`Fiszki.FunctionalTests/Features/ManualFlashcardCreation.feature`, scenario "Create a manual flashcard successfully");
@@ -177,6 +177,7 @@ Older notes disagree with the code. The code wins (see SCHEMA, trust hierarchy).
 ## Related
 
 - [[flashcard-content-limits]]
+- [[flashcard-list-and-filters]]
 - [[flashcard-entity]]
 - [[flashcard-ownership]]
 - [[ai-flashcard-generation]]

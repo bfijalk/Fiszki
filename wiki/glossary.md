@@ -15,7 +15,7 @@ sources:
   - Fiszki.Services/Services/UserService.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Fiszki.Database/Entities/User.cs
-verified_commit: 6a27f79b9a9bb38c9e68a0f1e35a693394ffb792
+verified_commit: 1b5badb4dd95f2e2fd2a8d40d9daf5adfca8041b
 confidence: high
 ---
 
@@ -60,3 +60,9 @@ translated by the agent before searching.
 | Role | user role, Basic, Admin | Account role stored on the user and put in the login claims; nothing checks it | [[user-entity]], [[authentication-session]] |
 | Active account | inactive account, IsActive | A flag that blocks login when false; nothing in the application sets it to false | [[user-entity]], [[user-login-and-logout]] |
 | Password hash | BCrypt, stored password | The only form in which the password is stored: a BCrypt hash with work factor 12 | [[credential-rules]], [[user-entity]] |
+| Flashcards page | my flashcards, flashcard list, main screen | The `/flashcards` page: list, counters, views and the entry point for creating, deleting and generating | [[flashcard-list-and-filters]] |
+| Counters | statistics, stat cards, Total Cards, AI Generated, Manual | The three cards at the top of the Flashcards page; they count loaded cards and are also the filter buttons | [[flashcard-list-and-filters]] |
+| Filter | filter by source, AI filter, Manual filter | Showing only AI-generated or only manual cards by clicking a counter; no active test covers it | [[flashcard-list-and-filters]] |
+| Card view / List view | grid view, list mode, view mode | The two ways to show flashcards; card view is the default and the only one that can flip cards | [[flashcard-list-and-filters]] |
+| Flip | show answer, show question, turn card | Turning a card in card view to see its back; the state is not saved | [[flashcard-list-and-filters]] |
+| Empty state | no flashcards yet | The "No flashcards yet" message with the "Generate with AI" and "Create Manually" buttons; also shown when a filter matches nothing | [[flashcard-list-and-filters]], [[flashcard-deletion]] |

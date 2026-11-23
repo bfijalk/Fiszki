@@ -14,7 +14,7 @@ sources:
   - Fiszki.FunctionalTests/Steps/FlashcardSteps.cs
   - Fiszki.FunctionalTests/PageObjects/FlashcardsPage.cs
   - docs/TEST_SELECTORS.md
-verified_commit: 5d1568b818c698f75aa953c7422003d1563bec9d
+verified_commit: 1b5badb4dd95f2e2fd2a8d40d9daf5adfca8041b
 confidence: high
 ---
 
@@ -82,7 +82,8 @@ For analysts. Each rule says how it is backed: **Gherkin** (a `.feature` scenari
   after deleting the last card of that kind while other cards remain, the page shows
   "No flashcards yet" and the counter cards that clear the filter are not shown. The user has
   to reload to see the remaining cards. The same happens when a filter with no cards is
-  selected, regardless of deletion. See `Components/Pages/Flashcards.razor` `ApplyFilter`.
+  selected, regardless of deletion. See `Components/Pages/Flashcards.razor` `ApplyFilter` and
+  [[flashcard-list-and-filters]].
 - **100-card window.** The page loads only the 100 newest flashcards
   (`Components/Pages/Flashcards.razor` `LoadFlashcards`). Deleting a card does not reload the
   list, so an older card is not pulled in until the page is reloaded.
@@ -161,6 +162,7 @@ Older planning notes disagree with the code. The code wins (see SCHEMA, trust hi
 
 ## Related
 
+- [[flashcard-list-and-filters]]
 - [[flashcard-ownership]]
 - [[flashcard-entity]]
 - [[learning-progress-entity]]

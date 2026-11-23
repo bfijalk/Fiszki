@@ -13,6 +13,7 @@ How user-visible features work: business rules and implementation.
 - [[manual-flashcard-creation]] - how a user creates a flashcard by hand in the dialog: required fields, tags, limits, what is shown, and the service-only update with no screen
 - [[user-registration]] - how a visitor creates an account: fields, the mismatch message that does not block registration, email and password rules, duplicates, automatic login
 - [[user-login-and-logout]] - how a user signs in and out: messages, inactive accounts, protected pages, menu, how long the login lasts, what is missing
+- [[flashcard-list-and-filters]] - what the Flashcards page shows: states, newest-first list capped at 100, counters that filter, card and list views, flipping, and what is missing
 - [[flashcard-deletion]] - how a user permanently deletes their own flashcard: confirmation dialog, ownership check, cascade to learning progress
 
 ## Business rules
