@@ -1,0 +1,818 @@
+#!/usr/bin/env dotnet
+#:property PublishAot=false
+// wikitool - local tooling for the Fiszki wiki (a .NET file-based app, no dependencies).
+//
+//   wikitool search <query> [--type T] [--tag T]... [--limit N] [--json] [--root DIR]
+//
+// The file has no .cs extension on purpose: Fiszki.csproj lives in the repo root and the
+// SDK compiles every *.cs below it, which would pull this tool into the web application.
+//
+// Run through the wrappers `wiki/tools/search` (and `wiki/tools/lint`) or directly.
+
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+
+return Cli.Run(args);
+
+static class Cli
+{
+    public static string UsageText => Usage;
+
+    const string Usage = """
+        usage:
+          wikitool search <query> [--type T] [--tag T]... [--limit N] [--json] [--root DIR]
+          wikitool lint [--json] [--root DIR] [--repo DIR]
+
+        search  Rank wiki pages for a text query (BM25 over title, tags, summary, body).
+                Prints nothing and exits 0 when no page matches.
+          --type T    only pages whose frontmatter type is T (feature, business-rule, ...)
+          --tag T     only pages tagged T; repeat to require several tags
+          --limit N   maximum number of results (default 10)
+          --json      machine-readable output: path, title, type, summary, snippet, score
+          --root DIR  wiki directory (default: the wiki that contains this tool)
+
+        lint    Check wiki health. READ-ONLY: reports findings, never changes any file.
+                Exit code 1 when there is at least one error, 0 otherwise (warnings
+                do not fail). Checks: frontmatter, index coverage, dead [[links]],
+                orphans, code references (path, symbol, scenario, requirement),
+                sources, drift against verified_commit, log format and append-only.
+          --json      machine-readable output
+          --root DIR  wiki directory (default: the wiki that contains this tool)
+          --repo DIR  repository root used for sources and git (default: parent of the wiki)
+        """;
+
+    public static int Run(string[] args)
+    {
+        // Output must not depend on the machine's locale (decimal comma, etc.).
+        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+        System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
+        if (args.Length == 0) return Fail("missing command");
+        if (args[0] is "-h" or "--help" or "help")
+        {
+            Console.WriteLine(Usage);
+            return 0;
+        }
+
+        return args[0] switch
+        {
+            "search" => SearchCommand.Run(args[1..]),
+            "lint" => LintCommand.Run(args[1..]),
+            _ => Fail($"unknown command '{args[0]}'")
+        };
+    }
+
+    public static int Fail(string message)
+    {
+        Console.Error.WriteLine($"wikitool: {message}");
+        Console.Error.WriteLine(Usage);
+        return 2;
+    }
+
+    /// <summary>Default wiki root: the directory above wiki/tools, or found upward from cwd.</summary>
+    public static string? DefaultRoot()
+    {
+        var entryDir = AppContext.GetData("EntryPointFileDirectoryPath") as string;
+        if (entryDir is not null)
+        {
+            var candidate = Path.GetFullPath(Path.Combine(entryDir, ".."));
+            if (File.Exists(Path.Combine(candidate, "SCHEMA.md"))) return candidate;
+        }
+
+        for (var dir = new DirectoryInfo(Directory.GetCurrentDirectory()); dir is not null; dir = dir.Parent)
+        {
+            var candidate = Path.Combine(dir.FullName, "wiki");
+            if (File.Exists(Path.Combine(candidate, "SCHEMA.md"))) return candidate;
+        }
+
+        return null;
+    }
+}
+
+/// <summary>A wiki page: frontmatter plus body.</summary>
+sealed record Page(string FullPath, string RelPath, Dictionary<string, object> Meta, string Body)
+{
+    public string Slug => Path.GetFileNameWithoutExtension(FullPath);
+    public string Title => Scalar("title") ?? Slug;
+    public string Type => Scalar("type") ?? "";
+    public string Summary => Scalar("summary") ?? "";
+    public List<string> Tags => List("tags");
+
+    public string? Scalar(string key) =>
+        Meta.TryGetValue(key, out var v) ? v as string ?? string.Join(", ", (List<string>)v) : null;
+
+    public List<string> List(string key) =>
+        Meta.TryGetValue(key, out var v)
+            ? v as List<string> ?? (string.IsNullOrWhiteSpace((string)v) ? [] : [(string)v])
+            : [];
+}
+
+/// <summary>Loads pages and parses the small YAML subset used in frontmatter.</summary>
+static class PageLoader
+{
+    static readonly HashSet<string> RootFilesNotPages = new(StringComparer.OrdinalIgnoreCase)
+        { "index.md", "log.md", "SCHEMA.md" };
+
+    static readonly HashSet<string> DirsNotPages = new(StringComparer.OrdinalIgnoreCase)
+        { "templates", "tools" };
+
+    /// <summary>Markdown files that are wiki pages (not index, log, schema, templates, tools).</summary>
+    public static IEnumerable<string> PageFiles(string root) =>
+        Directory.EnumerateFiles(root, "*.md", SearchOption.AllDirectories)
+            .Where(f =>
+            {
+                var rel = Path.GetRelativePath(root, f).Replace('\\', '/');
+                var parts = rel.Split('/');
+                if (parts.Length == 1) return !RootFilesNotPages.Contains(parts[0]);
+                return !parts.Take(parts.Length - 1).Any(p => DirsNotPages.Contains(p) || p.StartsWith('.'));
+            })
+            .OrderBy(f => f, StringComparer.Ordinal);
+
+    /// <summary>Pages that have valid frontmatter. Pages without it are skipped (lint reports them).</summary>
+    public static List<Page> Load(string root)
+    {
+        var pages = new List<Page>();
+        foreach (var file in PageFiles(root))
+        {
+            var parsed = Parse(File.ReadAllText(file));
+            if (parsed is null) continue;
+            var rel = Path.GetRelativePath(Directory.GetCurrentDirectory(), file).Replace('\\', '/');
+            pages.Add(new Page(file, rel, parsed.Value.Meta, parsed.Value.Body));
+        }
+
+        return pages;
+    }
+
+    public static (Dictionary<string, object> Meta, string Body)? Parse(string text)
+    {
+        text = text.Replace("\r\n", "\n");
+        if (!text.StartsWith("---\n")) return null;
+        var end = text.IndexOf("\n---", 4, StringComparison.Ordinal);
+        if (end < 0) return null;
+        var yaml = text[4..end];
+        var afterFence = text.IndexOf('\n', end + 1);
+        var body = afterFence < 0 ? "" : text[(afterFence + 1)..];
+
+        var meta = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        string? listKey = null;
+        foreach (var raw in yaml.Split('\n'))
+        {
+            var line = StripComment(raw);
+            if (string.IsNullOrWhiteSpace(line)) continue;
+
+            var trimmed = line.TrimStart();
+            if (listKey is not null && trimmed.StartsWith("- ") || trimmed == "-")
+            {
+                if (listKey is not null)
+                    ((List<string>)meta[listKey]).Add(Unquote(trimmed.Length > 1 ? trimmed[2..].Trim() : ""));
+                continue;
+            }
+
+            var colon = line.IndexOf(':');
+            if (colon <= 0 || char.IsWhiteSpace(line[0])) { listKey = null; continue; }
+
+            var key = line[..colon].Trim();
+            var value = line[(colon + 1)..].Trim();
+            if (value.Length == 0)
+            {
+                meta[key] = new List<string>();
+                listKey = key;
+            }
+            else if (value.StartsWith('[') && value.EndsWith(']'))
+            {
+                meta[key] = value[1..^1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Select(Unquote).Where(s => s.Length > 0).ToList();
+                listKey = null;
+            }
+            else
+            {
+                meta[key] = Unquote(value);
+                listKey = null;
+            }
+        }
+
+        return (meta, body);
+    }
+
+    static string StripComment(string line)
+    {
+        var i = line.IndexOf(" #", StringComparison.Ordinal);
+        return i >= 0 ? line[..i] : line;
+    }
+
+    static string Unquote(string s) =>
+        s.Length >= 2 && (s[0] == '"' && s[^1] == '"' || s[0] == '\'' && s[^1] == '\'') ? s[1..^1] : s;
+}
+
+/// <summary>Tokenization shared by indexing and queries.</summary>
+static class Text
+{
+    static readonly HashSet<string> StopWords = new()
+    {
+        "a", "an", "the", "of", "to", "in", "on", "at", "by", "for", "with", "from", "and", "or", "not",
+        "is", "are", "was", "were", "be", "it", "its", "this", "that", "as", "how", "what", "which",
+        "who", "when", "where", "why", "do", "does", "did", "can", "i", "we", "you", "my", "our"
+    };
+
+    static readonly Regex CamelBoundary = new(@"(?<=[\p{Ll}\p{N}])(?=\p{Lu})", RegexOptions.Compiled);
+    static readonly Regex Word = new(@"[\p{L}\p{N}]+", RegexOptions.Compiled);
+
+    /// <summary>Lowercase terms: camelCase and kebab-case are split, plurals are folded, stop words dropped.</summary>
+    public static List<string> Tokenize(string text)
+    {
+        var terms = new List<string>();
+        foreach (Match m in Word.Matches(CamelBoundary.Replace(text, " ")))
+        {
+            var word = m.Value.ToLowerInvariant();
+            // Check stop words before stemming: "does" would otherwise become "doe" and slip through.
+            if (word.Length < 2 || StopWords.Contains(word)) continue;
+            terms.Add(Stem(word));
+        }
+
+        return terms;
+    }
+
+    static string Stem(string t)
+    {
+        if (t.Length > 4 && t.EndsWith("ies", StringComparison.Ordinal)) return t[..^3] + "y";
+        if (t.Length > 3 && t.EndsWith('s') && !t.EndsWith("ss", StringComparison.Ordinal)) return t[..^1];
+        return t;
+    }
+}
+
+record SearchHit(string Path, string Title, string Type, string Summary, string Snippet, double Score);
+
+static class SearchCommand
+{
+    // BM25F parameters and field weights: matches in structure outrank matches in prose.
+    const double K1 = 1.2, B = 0.75;
+    const double WTitle = 5, WTags = 4, WSummary = 3, WBody = 1;
+
+    public static int Run(string[] args)
+    {
+        var queryParts = new List<string>();
+        var tags = new List<string>();
+        string? type = null, root = null;
+        var limit = 10;
+        var json = false;
+
+        if (args.Any(a => a is "-h" or "--help"))
+        {
+            Console.WriteLine(Cli.UsageText);
+            return 0;
+        }
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            var arg = args[i];
+            string? Value(string name)
+            {
+                if (arg.StartsWith(name + "=", StringComparison.Ordinal)) return arg[(name.Length + 1)..];
+                return i + 1 < args.Length ? args[++i] : null;
+            }
+
+            var name = arg.Contains('=') ? arg[..arg.IndexOf('=')] : arg;
+            switch (name)
+            {
+                case "--type": type = Value(name); if (type is null) return Cli.Fail("--type needs a value"); break;
+                case "--tag":
+                    var tag = Value(name);
+                    if (tag is null) return Cli.Fail("--tag needs a value");
+                    tags.Add(tag);
+                    break;
+                case "--limit":
+                    if (!int.TryParse(Value(name), out limit) || limit < 1) return Cli.Fail("--limit needs a positive integer");
+                    break;
+                case "--root": root = Value(name); if (root is null) return Cli.Fail("--root needs a value"); break;
+                case "--json": json = true; break;
+                default:
+                    if (arg.StartsWith("--", StringComparison.Ordinal)) return Cli.Fail($"unknown option '{arg}'");
+                    queryParts.Add(arg);
+                    break;
+            }
+        }
+
+        var query = string.Join(' ', queryParts);
+        var terms = Text.Tokenize(query).Distinct().ToList();
+        if (terms.Count == 0) return Cli.Fail("query has no searchable terms");
+
+        root ??= Cli.DefaultRoot();
+        if (root is null || !Directory.Exists(root)) return Cli.Fail("wiki root not found (use --root DIR)");
+
+        var hits = Search(PageLoader.Load(root), terms, type, tags).Take(limit).ToList();
+        Print(hits, json);
+        return 0;
+    }
+
+    sealed class Doc
+    {
+        public required Page Page { get; init; }
+        public required Dictionary<string, int>[] Tf { get; init; }
+        public required int[] Len { get; init; }
+    }
+
+    static readonly double[] Weights = [WTitle, WTags, WSummary, WBody];
+
+    public static List<SearchHit> Search(List<Page> pages, List<string> terms, string? type, List<string> tags)
+    {
+        // Statistics are computed over ALL pages so that scores do not depend on the filters.
+        var docs = pages.Select(p =>
+        {
+            var fields = new[]
+            {
+                Text.Tokenize(p.Title + " " + p.Slug),
+                Text.Tokenize(string.Join(' ', p.Tags)),
+                Text.Tokenize(p.Summary),
+                Text.Tokenize(p.Body)
+            };
+            return new Doc
+            {
+                Page = p,
+                Tf = fields.Select(f => f.GroupBy(t => t).ToDictionary(g => g.Key, g => g.Count())).ToArray(),
+                Len = fields.Select(f => f.Count).ToArray()
+            };
+        }).ToList();
+
+        var n = docs.Count;
+        if (n == 0) return [];
+        var avgLen = Enumerable.Range(0, 4).Select(f => Math.Max(1.0, docs.Average(d => d.Len[f]))).ToArray();
+
+        var idf = terms.ToDictionary(t => t, t =>
+        {
+            var df = docs.Count(d => d.Tf.Any(f => f.ContainsKey(t)));
+            return Math.Log(1 + (n - df + 0.5) / (df + 0.5));
+        });
+
+        var hits = new List<SearchHit>();
+        foreach (var d in docs)
+        {
+            var p = d.Page;
+            if (type is not null && !string.Equals(p.Type, type, StringComparison.OrdinalIgnoreCase)) continue;
+            if (tags.Any(t => !p.Tags.Contains(t, StringComparer.OrdinalIgnoreCase))) continue;
+
+            var score = 0.0;
+            foreach (var t in terms)
+            {
+                var weighted = 0.0;
+                for (var f = 0; f < 4; f++)
+                {
+                    if (!d.Tf[f].TryGetValue(t, out var tf)) continue;
+                    weighted += Weights[f] * tf / (1 - B + B * d.Len[f] / avgLen[f]);
+                }
+
+                if (weighted > 0) score += idf[t] * weighted / (K1 + weighted);
+            }
+
+            if (score <= 0) continue;
+            hits.Add(new SearchHit(p.RelPath, p.Title, p.Type, p.Summary, Snippet(p, terms), Math.Round(score, 4)));
+        }
+
+        return hits.OrderByDescending(h => h.Score).ThenBy(h => h.Path, StringComparer.Ordinal).ToList();
+    }
+
+    /// <summary>The body line that matches the most distinct query terms, trimmed around the first match.</summary>
+    static string Snippet(Page p, List<string> terms)
+    {
+        const int max = 200;
+        string? best = null;
+        var bestCount = 0;
+        foreach (var raw in p.Body.Split('\n'))
+        {
+            // Headings only repeat the title; the summary is the better fallback.
+            if (raw.TrimStart().StartsWith('#')) continue;
+            var line = raw.Trim().TrimStart('-', '*', '>', ' ', '|').Trim();
+            if (line.Length == 0) continue;
+            var lineTerms = Text.Tokenize(line).ToHashSet();
+            var count = terms.Count(lineTerms.Contains);
+            if (count > bestCount) { best = line; bestCount = count; }
+        }
+
+        if (best is null) return p.Summary;
+        if (best.Length <= max) return best;
+
+        var pos = terms.Select(t => best.IndexOf(t, StringComparison.OrdinalIgnoreCase)).Where(i => i >= 0).DefaultIfEmpty(0).Min();
+        var start = Math.Clamp(pos - 60, 0, best.Length - max);
+        return (start > 0 ? "..." : "") + best.Substring(start, max).Trim() + (start + max < best.Length ? "..." : "");
+    }
+
+    static void Print(List<SearchHit> hits, bool json)
+    {
+        var stdout = new StreamWriter(Console.OpenStandardOutput(), new UTF8Encoding(false)) { AutoFlush = true };
+        if (json)
+        {
+            stdout.WriteLine(JsonSerializer.Serialize(hits, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            }));
+            return;
+        }
+
+        for (var i = 0; i < hits.Count; i++)
+        {
+            var h = hits[i];
+            stdout.WriteLine($"{i + 1}. {h.Path}  [{h.Type}]  score {h.Score:0.0000}");
+            stdout.WriteLine($"   {h.Title}");
+            if (h.Summary.Length > 0) stdout.WriteLine($"   {h.Summary}");
+            if (h.Snippet.Length > 0 && h.Snippet != h.Summary) stdout.WriteLine($"   > {h.Snippet}");
+        }
+    }
+}
+
+record Finding(string Severity, string Code, string Path, string Message);
+
+/// <summary>
+/// Deterministic wiki checks. Strictly read-only: it reads files and runs read-only git
+/// commands (with optional locks disabled so git does not even refresh the index).
+/// Checks that need judgment (claims without a source, concepts without a page) are left
+/// to the agent that runs the wiki-lint skill.
+/// </summary>
+static class LintCommand
+{
+    static readonly string[] RequiredFields = ["title", "type", "summary", "tags", "sources", "verified_commit", "confidence"];
+    static readonly string[] Types = ["feature", "business-rule", "architecture", "data-model", "synthesis", "glossary"];
+    static readonly string[] Confidences = ["high", "medium", "low"];
+
+    static readonly Regex Sha = new("^[0-9a-f]{40}$", RegexOptions.Compiled);
+    static readonly Regex WikiLink = new(@"\[\[([^\]\|#]+)(?:#[^\]\|]*)?(?:\|[^\]]*)?\]\]", RegexOptions.Compiled);
+    static readonly Regex InlineCode = new("`([^`\\n]+)`", RegexOptions.Compiled);
+    static readonly Regex Fence = new(@"^[ \t]*```.*?^[ \t]*```[^\n]*$", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
+    static readonly Regex PathToken = new(@"^[A-Za-z0-9_.\-/]+\.(cs|razor|cshtml|feature|json|md|csproj|sln|css|yml|yaml|sh|sql)$", RegexOptions.Compiled);
+    static readonly Regex SymbolToken = new(@"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*(\(\))?$", RegexOptions.Compiled);
+    static readonly Regex ScenarioCite = new("`([^`\\n]+\\.feature)`,\\s*scenario\\s+\"([^\"]+)\"", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    static readonly Regex RequirementCite = new("`([^`\\n]+spec\\.md)`,\\s*requirement\\s+\"([^\"]+)\"", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    static readonly Regex LogEntry = new(@"^## \[\d{4}-\d{2}-\d{2}\] (bootstrap|ingest|query|lint) \| \S.*$", RegexOptions.Compiled);
+
+    public static int Run(string[] args)
+    {
+        string? root = null, repo = null;
+        var json = false;
+        for (var i = 0; i < args.Length; i++)
+        {
+            switch (args[i])
+            {
+                case "-h" or "--help": Console.WriteLine(Cli.UsageText); return 0;
+                case "--json": json = true; break;
+                case "--root":
+                    if (++i >= args.Length) return Cli.Fail("--root needs a value");
+                    root = args[i];
+                    break;
+                case "--repo":
+                    if (++i >= args.Length) return Cli.Fail("--repo needs a value");
+                    repo = args[i];
+                    break;
+                default: return Cli.Fail($"unknown argument '{args[i]}'");
+            }
+        }
+
+        root ??= Cli.DefaultRoot();
+        if (root is null || !Directory.Exists(root)) return Cli.Fail("wiki root not found (use --root DIR)");
+        root = Path.GetFullPath(root);
+        repo = Path.GetFullPath(repo ?? Path.Combine(root, ".."));
+
+        var findings = Check(root, repo, out var pageCount);
+        var errors = findings.Count(f => f.Severity == "error");
+        var warnings = findings.Count - errors;
+        Print(findings, pageCount, errors, warnings, json);
+        return errors > 0 ? 1 : 0;
+    }
+
+    public static List<Finding> Check(string root, string repo, out int pageCount)
+    {
+        var findings = new List<Finding>();
+        void Add(string severity, string code, string path, string message) =>
+            findings.Add(new Finding(severity, code, path, message));
+        string Rel(string full) => Path.GetRelativePath(repo, full).Replace('\\', '/');
+
+        var files = PageLoader.PageFiles(root).ToList();
+        pageCount = files.Count;
+
+        // --- slugs ---------------------------------------------------------------------
+        var slugs = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var f in files)
+        {
+            var slug = Path.GetFileNameWithoutExtension(f);
+            if (!slugs.TryGetValue(slug, out var list)) slugs[slug] = list = [];
+            list.Add(Rel(f));
+        }
+
+        foreach (var kv in slugs.Where(k => k.Value.Count > 1))
+            Add("error", "duplicate-slug", kv.Value[0], $"slug '{kv.Key}' is used by several pages: {string.Join(", ", kv.Value)}");
+
+        var known = new HashSet<string>(slugs.Keys, StringComparer.OrdinalIgnoreCase) { "index", "log", "SCHEMA" };
+
+        // --- per page: frontmatter, links, references ----------------------------------
+        var pages = new List<Page>();
+        var outLinks = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        var fileCache = new Dictionary<string, string?>();
+
+        string? ReadRepoFile(string rel)
+        {
+            if (fileCache.TryGetValue(rel, out var cached)) return cached;
+            var full = Path.Combine(repo, rel);
+            string? text = null;
+            try
+            {
+                if (File.Exists(full) && new FileInfo(full).Length <= 2_000_000) text = File.ReadAllText(full);
+            }
+            catch (IOException) { }
+            return fileCache[rel] = text;
+        }
+
+        bool RepoPathExists(string rel) => File.Exists(Path.Combine(repo, rel)) || Directory.Exists(Path.Combine(repo, rel));
+
+        foreach (var file in files)
+        {
+            var rel = Rel(file);
+            var slug = Path.GetFileNameWithoutExtension(file);
+            var text = File.ReadAllText(file);
+            var parsed = PageLoader.Parse(text);
+            var linkText = text;
+
+            if (parsed is null)
+            {
+                Add("error", "frontmatter-missing", rel, "page has no valid YAML frontmatter block");
+            }
+            else
+            {
+                var page = new Page(file, rel, parsed.Value.Meta, parsed.Value.Body);
+                pages.Add(page);
+                linkText = parsed.Value.Body;
+                CheckFrontmatter(page, Add);
+                CheckStructure(page, Add);
+                CheckSources(page, Add, RepoPathExists);
+                CheckCodeReferences(page, Add, RepoPathExists, ReadRepoFile);
+            }
+
+            outLinks[slug] = Links(linkText);
+        }
+
+        // --- links: dead links and orphans -------------------------------------------------
+        foreach (var (slug, targets) in outLinks)
+            foreach (var t in targets.Where(t => !known.Contains(t)))
+                Add("error", "dead-link", Rel(slugs[slug][0]), $"[[{t}]] does not match any page");
+
+        var inbound = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (slug, targets) in outLinks)
+            foreach (var t in targets.Where(t => !t.Equals(slug, StringComparison.OrdinalIgnoreCase)))
+            {
+                if (!inbound.TryGetValue(t, out var set)) inbound[t] = set = new(StringComparer.OrdinalIgnoreCase);
+                set.Add(slug);
+            }
+
+        foreach (var p in pages.Where(p => p.Type != "glossary"))
+            if (!inbound.ContainsKey(p.Slug))
+                Add("warning", "orphan", p.RelPath, "no other page links here");
+
+        // --- index.md --------------------------------------------------------------------
+        var indexPath = Path.Combine(root, "index.md");
+        if (!File.Exists(indexPath))
+        {
+            Add("error", "index-missing", Rel(indexPath), "index.md does not exist");
+        }
+        else
+        {
+            var indexLinks = Links(File.ReadAllText(indexPath));
+            foreach (var t in indexLinks.Where(t => !known.Contains(t)))
+                Add("error", "dead-link", Rel(indexPath), $"[[{t}]] does not match any page");
+            foreach (var kv in slugs.Where(k => !indexLinks.Contains(k.Key)))
+                Add("error", "not-in-index", kv.Value[0], "page is not listed in index.md");
+        }
+
+        CheckLog(root, repo, Rel, Add);
+        CheckDrift(pages, repo, Add);
+
+        return findings
+            .OrderBy(f => f.Path, StringComparer.Ordinal).ThenBy(f => f.Code, StringComparer.Ordinal)
+            .ThenBy(f => f.Message, StringComparer.Ordinal).ToList();
+    }
+
+    // ---------------------------------------------------------------------------------------
+
+    static string StripCode(string text) => InlineCode.Replace(Fence.Replace(text, "\n"), " ");
+
+    static HashSet<string> Links(string text)
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (Match m in WikiLink.Matches(StripCode(text))) set.Add(m.Groups[1].Value.Trim());
+        return set;
+    }
+
+    static bool IsEmpty(object v) => v is string s ? string.IsNullOrWhiteSpace(s) : v is List<string> l && l.Count == 0;
+
+    static void CheckFrontmatter(Page p, Action<string, string, string, string> add)
+    {
+        foreach (var key in RequiredFields)
+            if (!p.Meta.TryGetValue(key, out var v) || IsEmpty(v))
+                add("error", "frontmatter-field", p.RelPath, $"frontmatter field '{key}' is missing or empty");
+
+        if (p.Type.Length > 0 && !Types.Contains(p.Type))
+            add("error", "frontmatter-field", p.RelPath, $"type '{p.Type}' is not one of: {string.Join(", ", Types)}");
+
+        var confidence = p.Scalar("confidence");
+        if (!string.IsNullOrEmpty(confidence) && !Confidences.Contains(confidence))
+            add("error", "frontmatter-field", p.RelPath, $"confidence '{confidence}' is not one of: {string.Join(", ", Confidences)}");
+
+        var sha = p.Scalar("verified_commit");
+        if (!string.IsNullOrEmpty(sha) && !Sha.IsMatch(sha))
+            add("error", "frontmatter-field", p.RelPath, $"verified_commit '{sha}' is not a 40-character commit SHA");
+    }
+
+    static void CheckStructure(Page p, Action<string, string, string, string> add)
+    {
+        if (p.Type == "feature")
+        {
+            foreach (var heading in new[] { "Business rules", "Implementation" })
+                if (!Regex.IsMatch(p.Body, $@"^##\s+{heading}\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase))
+                    add("error", "feature-sections", p.RelPath, $"feature page has no '## {heading}' section");
+        }
+
+        var m = Regex.Match(p.Body, @"^##\s+Discrepancies\s*$(?<body>.*?)(?=^#{1,2}\s|\z)", RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        if (m.Success)
+        {
+            var content = Regex.Replace(m.Groups["body"].Value, "<!--.*?-->", "", RegexOptions.Singleline).Trim();
+            if (content.Length > 0) add("warning", "discrepancy-open", p.RelPath, "page has a Discrepancies section that is not resolved");
+        }
+    }
+
+    static void CheckSources(Page p, Action<string, string, string, string> add, Func<string, bool> exists)
+    {
+        foreach (var raw in p.List("sources"))
+        {
+            var src = raw.Trim().Replace('\\', '/').TrimEnd('/');
+            if (src.Length == 0) continue;
+            if (src == ".ai" || src.StartsWith(".ai/", StringComparison.Ordinal))
+                add("error", "source-forbidden", p.RelPath, $"source '{raw}' points into .ai/, which is being phased out; cite code or openspec instead");
+            else if (!exists(src))
+                add("error", "source-missing", p.RelPath, $"source '{raw}' does not exist in the repository");
+        }
+    }
+
+    static void CheckCodeReferences(Page p, Action<string, string, string, string> add,
+        Func<string, bool> exists, Func<string, string?> read)
+    {
+        var body = Fence.Replace(p.Body, "\n");
+        var tokens = InlineCode.Matches(body).ToList();
+
+        for (var i = 0; i < tokens.Count; i++)
+        {
+            var value = tokens[i].Groups[1].Value.Trim();
+            if (!PathToken.IsMatch(value) || value.Contains('<')) continue;
+
+            if (!exists(value))
+            {
+                add("error", "code-ref-path", p.RelPath, $"cites `{value}`, which does not exist");
+                continue;
+            }
+
+            // `path` `Symbol`: the symbol must still be present in that file.
+            if (i + 1 < tokens.Count)
+            {
+                var between = body.Substring(tokens[i].Index + tokens[i].Length, tokens[i + 1].Index - tokens[i].Index - tokens[i].Length);
+                var next = tokens[i + 1].Groups[1].Value.Trim();
+                if (between.Trim().Length == 0 && !PathToken.IsMatch(next) && SymbolToken.IsMatch(next))
+                {
+                    var symbol = next.Replace("()", "").Split('.').Last();
+                    var text = read(value);
+                    if (text is not null && !Regex.IsMatch(text, $@"\b{Regex.Escape(symbol)}\b"))
+                        add("error", "code-ref-symbol", p.RelPath, $"cites symbol `{next}` in `{value}`, but '{symbol}' is not in that file");
+                }
+            }
+        }
+
+        foreach (Match m in ScenarioCite.Matches(body))
+        {
+            var file = m.Groups[1].Value;
+            var name = m.Groups[2].Value.Trim();
+            var text = read(file);
+            if (text is null) continue; // missing file is reported as code-ref-path
+            if (!Regex.IsMatch(text, $@"^\s*(Scenario Outline|Scenario|Example):\s*{Regex.Escape(name)}\s*$", RegexOptions.Multiline))
+                add("error", "scenario-missing", p.RelPath, $"cites scenario \"{name}\" in `{file}`, but no such scenario exists");
+        }
+
+        foreach (Match m in RequirementCite.Matches(body))
+        {
+            var file = m.Groups[1].Value;
+            var name = m.Groups[2].Value.Trim();
+            var text = read(file);
+            if (text is null) continue;
+            if (!Regex.IsMatch(text, $@"^###\s+Requirement:\s*{Regex.Escape(name)}\s*$", RegexOptions.Multiline))
+                add("error", "requirement-missing", p.RelPath, $"cites requirement \"{name}\" in `{file}`, but no such requirement exists");
+        }
+    }
+
+    static void CheckLog(string root, string repo, Func<string, string> rel, Action<string, string, string, string> add)
+    {
+        var logPath = Path.Combine(root, "log.md");
+        if (!File.Exists(logPath))
+        {
+            add("error", "log-missing", rel(logPath), "log.md does not exist");
+            return;
+        }
+
+        var lines = File.ReadAllLines(logPath);
+        for (var i = 0; i < lines.Length; i++)
+            if (lines[i].StartsWith("## [", StringComparison.Ordinal) && !LogEntry.IsMatch(lines[i]))
+                add("error", "log-format", rel(logPath), $"line {i + 1}: entry must look like '## [YYYY-MM-DD] <ingest|query|lint|bootstrap> | <title>'");
+
+        // Append-only: against the committed version, no line may have been removed or changed.
+        var logRel = rel(logPath);
+        if (!Git.IsRepo(repo) || !Git.Succeeds(repo, "ls-files", "--error-unmatch", "--", logRel)) return;
+        if (!Git.Succeeds(repo, "rev-parse", "--verify", "-q", "HEAD")) return;
+        var (code, numstat) = Git.Run(repo, "diff", "HEAD", "--numstat", "--", logRel);
+        if (code != 0) return;
+        var parts = numstat.Trim().Split('\t');
+        if (parts.Length >= 2 && int.TryParse(parts[1], out var deleted) && deleted > 0)
+            add("error", "log-edited", logRel, $"{deleted} existing line(s) were removed or changed; log.md is append-only");
+    }
+
+    static void CheckDrift(List<Page> pages, string repo, Action<string, string, string, string> add)
+    {
+        if (!Git.IsRepo(repo))
+        {
+            add("warning", "no-git", "", $"'{repo}' is not a git repository; drift against verified_commit was not checked");
+            return;
+        }
+
+        foreach (var p in pages)
+        {
+            var sha = p.Scalar("verified_commit");
+            var sources = p.List("sources").Select(s => s.Trim().Replace('\\', '/')).Where(s => s.Length > 0).ToList();
+            if (string.IsNullOrEmpty(sha) || !Sha.IsMatch(sha) || sources.Count == 0) continue; // reported as a frontmatter error
+
+            if (!Git.Succeeds(repo, "cat-file", "-e", sha + "^{commit}"))
+            {
+                add("error", "commit-unknown", p.RelPath, $"verified_commit {sha[..7]} is not a commit in this repository");
+                continue;
+            }
+
+            var args = new List<string> { "diff", "--name-only", $"{sha}..HEAD", "--" };
+            args.AddRange(sources);
+            var (code, output) = Git.Run(repo, args.ToArray());
+            if (code != 0) continue;
+            var changed = output.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+            if (changed.Count == 0) continue;
+
+            var shown = string.Join(", ", changed.Take(5)) + (changed.Count > 5 ? $" (+{changed.Count - 5} more)" : "");
+            add("warning", "stale", p.RelPath, $"sources changed since verified_commit {sha[..7]}: {shown}");
+        }
+    }
+
+    static void Print(List<Finding> findings, int pageCount, int errors, int warnings, bool json)
+    {
+        var stdout = new StreamWriter(Console.OpenStandardOutput(), new UTF8Encoding(false)) { AutoFlush = true };
+        if (json)
+        {
+            stdout.WriteLine(JsonSerializer.Serialize(new { pages = pageCount, errors, warnings, findings }, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            }));
+            return;
+        }
+
+        foreach (var f in findings)
+            stdout.WriteLine($"{f.Severity,-7}  {f.Code,-20}  {(f.Path.Length > 0 ? f.Path : "-")}  {f.Message}");
+        stdout.WriteLine($"{errors} error(s), {warnings} warning(s) in {pageCount} page(s)");
+    }
+}
+
+/// <summary>Read-only git access. GIT_OPTIONAL_LOCKS=0 keeps git from refreshing the index.</summary>
+static class Git
+{
+    public static (int Code, string Output) Run(string repo, params string[] args)
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo("git")
+        {
+            WorkingDirectory = repo,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false
+        };
+        psi.Environment["GIT_OPTIONAL_LOCKS"] = "0";
+        psi.ArgumentList.Add("-c");
+        psi.ArgumentList.Add("core.quotepath=off");
+        foreach (var a in args) psi.ArgumentList.Add(a);
+
+        try
+        {
+            using var process = System.Diagnostics.Process.Start(psi)!;
+            var stdout = process.StandardOutput.ReadToEndAsync();
+            var stderr = process.StandardError.ReadToEndAsync();
+            process.WaitForExit();
+            stderr.Wait();
+            return (process.ExitCode, stdout.Result);
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return (127, "");
+        }
+    }
+
+    public static bool Succeeds(string repo, params string[] args) => Run(repo, args).Code == 0;
+
+    public static bool IsRepo(string repo) => Succeeds(repo, "rev-parse", "--git-dir");
+}

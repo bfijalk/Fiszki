@@ -1,0 +1,6 @@
+namespace Fiszki.Services.Services;
+
+public class FlashcardService
+{
+    public Task DeleteAsync(int flashcardId, string userId) => Task.CompletedTask;
+}
