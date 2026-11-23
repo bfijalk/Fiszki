@@ -28,6 +28,7 @@ public class PageFactory : IPageFactory
             nameof(NavBar) => new NavBar(Page) as T,
             nameof(FlashcardGenerationPage) => new FlashcardGenerationPage(Page, BaseUrl) as T,
             nameof(FlashcardsPage) => new FlashcardsPage(Page, BaseUrl) as T,
+            nameof(LeaderboardPage) => new LeaderboardPage(Page, BaseUrl) as T,
             _ => throw new NotSupportedException($"Page type {typeof(T).Name} is not supported")
         } ?? throw new InvalidOperationException($"Failed to create page of type {typeof(T).Name}");
     }

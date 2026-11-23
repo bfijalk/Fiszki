@@ -32,6 +32,7 @@ public static class TestConstants
         public const string Register = "/register";
         public const string Generate = "/generate";
         public const string Flashcards = "/flashcards";
+        public const string Leaderboard = "/leaderboard";
     }
 
     public static class Selectors

@@ -76,6 +76,7 @@ cy.get('[data-testid="login-button"]').click();
 ### Authenticated User Links
 - `nav-flashcards` - Flashcards page link (only visible when logged in)
 - `nav-generate` - Generate page link (only visible when logged in)
+- `nav-leaderboard` - Leaderboard page link (only visible when logged in)
 - `nav-logout` - Logout button (only visible when logged in)
 
 ### Unauthenticated User Links
@@ -154,6 +155,39 @@ cy.get('[data-testid="login-button"]').click();
 - `edit-proposal-button` - Edit proposal button
 - `reject-proposal-button` - Reject proposal button
 - `undo-reject-button` - Undo rejection button
+
+---
+
+## Leaderboard Page (`/leaderboard`)
+
+Logged-in users only. Open it through the `nav-leaderboard` menu link, not by URL: a full page load drops
+the in-memory login.
+
+### Page States
+- `leaderboard-page` - Page container
+- `leaderboard-loading` - Loading spinner
+- `leaderboard-error` - Error alert shown when the leaderboard cannot be loaded
+
+### Motivation Banner
+- `leaderboard-banner` - Banner container
+- `leaderboard-banner-position` - "You are #N with P points" line
+- `leaderboard-banner-leader` - Message shown to the user at position 1 (no rival above)
+- `leaderboard-banner-rival` - Nearest user above, with the point gap, or the "same number of points" message
+- `leaderboard-banner-same-points` - Number of other users with exactly the same points (only when there are any)
+- `leaderboard-generate-button` - Button that opens the Generate page
+
+### Ranking Table
+- `leaderboard-table` - Table
+- `leaderboard-row` - One row per user (attributes `data-position` and `data-current-user="true|false"`)
+- `leaderboard-position` - Position cell
+- `leaderboard-user` - Masked email cell (the current user's row ends with "(you)")
+- `leaderboard-points` - Points cell
+
+### Pagination (30 users per page)
+- `leaderboard-pagination` - Pagination container
+- `leaderboard-prev` - Previous page button
+- `leaderboard-next` - Next page button
+- `leaderboard-page-indicator` - "Page N of M" text
 
 ---
 
