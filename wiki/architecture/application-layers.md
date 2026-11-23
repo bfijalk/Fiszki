@@ -8,7 +8,7 @@ sources:
   - Fiszki.Services/DependencyInjection.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Components/Pages/Flashcards.razor
-verified_commit: 5d1568b818c698f75aa953c7422003d1563bec9d
+verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
 confidence: high
 ---
 
@@ -50,15 +50,21 @@ service interfaces.
 
 ## Interactions
 
-- **Who is the user.** `Fiszki.Services/Services/CustomAuthStateProvider.cs`
+- **Who is the user.** (The login state itself is an in-memory object per browser connection, see
+  [[authentication-session]].) `Fiszki.Services/Services/CustomAuthStateProvider.cs`
   `CustomAuthStateProvider` builds the claims of the signed-in user, including
   `NameIdentifier` (the user id), `Name` (email) and `Role`. Pages read the `NameIdentifier`
   claim and pass the user id to services, see [[flashcard-ownership]].
+- **Outbound AI call.** The application has no HTTP API of its own, but it makes one outbound
+  HTTP call: the generation service calls OpenRouter, see [[openrouter-integration]]. Generation
+  runs as a background job inside the service, see [[generation-job-flow]].
 - **Protected pages.** A page is protected with the `Authorize` attribute, for example
   `Components/Pages/Flashcards.razor` `Authorize`.
 
 ## Configuration and wiring
 
+- **What happens at startup** (database check, test-mode seeding, no migrations) and how the code is
+  built and deployed are in [[ci-cd-and-startup]].
 - **Database provider.** In normal runs the app uses PostgreSQL through Npgsql with the
   connection string `FiszkiDatabase`. In **test mode** it uses an in-memory database named
   `FiszkiTestDb`. Test mode is on when the environment is `Test`, the `TestMode` setting is
@@ -67,5 +73,11 @@ service interfaces.
 ## Related
 
 - [[flashcard-deletion]]
+- [[authentication-session]]
+- [[ci-cd-and-startup]]
+- [[site-navigation]]
+- [[ai-flashcard-generation]]
+- [[openrouter-integration]]
+- [[generation-job-flow]]
 - [[flashcard-ownership]]
 - [[flashcard-entity]]

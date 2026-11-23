@@ -60,7 +60,7 @@ wiki/
   index.md        catalog of all pages (read first)
   log.md          append-only operation log
   SCHEMA.md       this file
-  glossary.md     domain terms and synonyms (English + Polish)
+  glossary.md     domain terms and synonyms
   features/       one page per user-visible feature
   business-rules/ rules shared by several features
   architecture/   layers, components, integrations
@@ -270,8 +270,8 @@ match only in the body text. This is why `summary` and `tags` must be accurate.
 
 Rules for agents:
 - **Translate first.** Pages are in English and ranking is lexical. If the question is in
-  Polish, search with English terms (for example `usuwanie fiszki` -> `flashcard deletion`
-  `delete`). Use the synonyms and Polish equivalents in [[glossary]] for domain terms.
+  another language, translate it and search with English terms (a question about removing a
+  card becomes `flashcard deletion` or `delete flashcard`). Use the synonyms in [[glossary]] for domain terms.
 - **Try synonyms.** The search does not understand meaning. If a query returns nothing,
   retry with a synonym or a tag before concluding the wiki has a gap.
 - **Filter when the question is typed.** Business questions: `--type business-rule`
