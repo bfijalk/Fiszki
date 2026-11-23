@@ -39,7 +39,7 @@ Created: features/ai-flashcard-generation, architecture/openrouter-integration,
 architecture/generation-job-flow. Updated: data-model/flashcard-entity,
 business-rules/flashcard-ownership, architecture/application-layers, glossary (8 terms), index.
 
-Verified against commit 52f627a. Sources: the generation Gherkin scenario, the Generate page and
+Verified against commit 5367383. Sources: the generation Gherkin scenario, the Generate page and
 its components, GenerationService, the OpenRouter client, validators, unit tests, CI workflow and
 settings files. The historical .ai notes were used as a hint only.
 
@@ -66,7 +66,7 @@ Created: features/manual-flashcard-creation, business-rules/flashcard-content-li
 features/ai-flashcard-generation (corrected a test-coverage statement), data-model/flashcard-entity,
 glossary (5 terms), index.
 
-Verified against commit b495105. Sources: the manual creation and AI creation Gherkin scenarios,
+Verified against commit 5367383. Sources: the manual creation and AI creation Gherkin scenarios,
 the Flashcards page, FlashcardService, commands and validators, unit and validator tests, step
 definitions and page object.
 
@@ -89,7 +89,7 @@ Created: features/user-registration, features/user-login-and-logout,
 business-rules/credential-rules, data-model/user-entity, architecture/authentication-session.
 Updated: architecture/application-layers, glossary (9 terms), index.
 
-Verified against commit 6a27f79. Sources: the register and login Gherkin scenarios, the Register,
+Verified against commit 5367383. Sources: the register and login Gherkin scenarios, the Register,
 Login and Logout pages, the menu and routes, UserService, CustomAuthStateProvider, validators,
 entity, configuration and migration, unit and validator tests, step definitions. The historical
 .ai notes were used as a hint only. No passwords or test account data were recorded.
@@ -117,7 +117,7 @@ registration, logout or page protection.
 Created: features/flashcard-list-and-filters. Updated: features/flashcard-deletion and
 features/manual-flashcard-creation (links), glossary (6 terms), index.
 
-Verified against commit 1b5badb. Sources: the Flashcards page, FlashcardService list and get,
+Verified against commit 5367383. Sources: the Flashcards page, FlashcardService list and get,
 the DTO, the UI Gherkin scenarios, step definitions, page object, test-user hooks and the page's
 stylesheet. The historical .ai notes were used as a hint only. No test account data was recorded.
 
@@ -141,7 +141,7 @@ Created: features/site-navigation, features/information-pages, architecture/ci-c
 Updated: features/user-login-and-logout (menu label), architecture/application-layers, glossary
 (8 terms), index.
 
-Verified against commit c20f71d. Sources: the menu, layout, routes, app shell, the five information
+Verified against commit 5367383. Sources: the menu, layout, routes, app shell, the five information
 pages, the error page, Program.cs, the CI workflow, the navigation scenario and step definitions.
 The historical .ai notes were used as a hint only. The About Me page is described generically; no
 personal data and no secret values were recorded.

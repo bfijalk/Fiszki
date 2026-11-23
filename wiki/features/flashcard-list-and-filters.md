@@ -15,7 +15,7 @@ sources:
   - Fiszki.FunctionalTests/Steps/FlashcardSteps.cs
   - Fiszki.FunctionalTests/PageObjects/FlashcardsPage.cs
   - Fiszki.FunctionalTests/Hooks/SeededTestUserHooks.cs
-verified_commit: 1b5badb4dd95f2e2fd2a8d40d9daf5adfca8041b
+verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
 confidence: high
 ---
 

@@ -20,7 +20,7 @@ sources:
   - Fiszki.Tests/Services/Validation/ValidatorTests.cs
   - Fiszki.FunctionalTests/Steps/LoginSteps.cs
   - Fiszki.FunctionalTests/Steps/DynamicLoginSteps.cs
-verified_commit: c20f71dc4bf41ad1693b6ec4a52ab177fb5fe501
+verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
 confidence: high
 ---
 

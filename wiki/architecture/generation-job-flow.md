@@ -13,7 +13,7 @@ sources:
   - Fiszki.Services/DependencyInjection.cs
   - Components/Pages/GeneratePage.razor.cs
   - Fiszki.Tests/Services/GenerationServiceTests.cs
-verified_commit: 52f627aae9f0b25fa16da531aa2d9e66b421bcb9
+verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
 confidence: high
 ---
 

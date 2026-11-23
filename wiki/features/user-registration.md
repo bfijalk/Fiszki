@@ -14,7 +14,7 @@ sources:
   - Fiszki.Tests/Services/UserServiceTests.cs
   - Fiszki.Tests/Services/Validation/ValidatorTests.cs
   - Fiszki.FunctionalTests/Steps/RegisterSteps.cs
-verified_commit: 6a27f79b9a9bb38c9e68a0f1e35a693394ffb792
+verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
 confidence: high
 ---
 

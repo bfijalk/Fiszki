@@ -11,7 +11,7 @@ sources:
   - Fiszki.Services/Services/UserService.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Fiszki.Services/Services/TestDataSeeder.cs
-verified_commit: 6a27f79b9a9bb38c9e68a0f1e35a693394ffb792
+verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
 confidence: high
 ---
 

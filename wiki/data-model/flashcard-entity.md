@@ -11,7 +11,7 @@ sources:
   - Fiszki.Services/Services/FlashcardService.cs
   - Fiszki.Services/Services/GenerationService.cs
   - Fiszki.Services/Mapping/FlashcardMapper.cs
-verified_commit: b495105fc83203eab08cd4f7daa346d228e4d01e
+verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
 confidence: high
 ---
 
