@@ -162,3 +162,15 @@ Findings worth a follow-up: the About page text overstates the product in many p
 "About" link in every page's top bar opens external documentation; the error page shows developer
 text to end users; there is no Register link in the menu; the deployment has no migration step, health
 check or rollback; the navigation has one test.
+
+## [2026-11-23] ingest | Archive of bootstrap-llm-wiki and five document-*-in-wiki changes
+
+Mode: after archive. Six OpenSpec changes were archived on 2026-11-23: `bootstrap-llm-wiki` (synced
+five new main specs: wiki-ingest, wiki-lint, wiki-query, wiki-search, wiki-structure) and the five
+`document-*-in-wiki` changes (documentation only, no delta specs).
+
+Result: no pages needed an update. The archived changes touched only `wiki/`, `openspec/`, the wiki
+skills and `CLAUDE.md`, and no page lists any of those as a source. All pages stay verified against
+their existing commit; lint reports 0 errors and 0 stale pages.
+
+Pages created: none. Pages updated: none. New discrepancies: none. Unverified claims: none.
