@@ -14,9 +14,10 @@ How user-visible features work: business rules and implementation.
 - [[user-registration]] - how a visitor creates an account: fields, the mismatch message that does not block registration, email and password rules, duplicates, automatic login
 - [[user-login-and-logout]] - how a user signs in and out: messages, inactive accounts, protected pages, menu, how long the login lasts, what is missing
 - [[flashcard-list-and-filters]] - what the Flashcards page shows: states, newest-first list capped at 100, counters that filter, card and list views, flipping, and what is missing
-- [[site-navigation]] - the side menu for logged-out and logged-in users, open and protected pages, layout, error handling, and how little is tested
+- [[site-navigation]] - the side menu for logged-out and logged-in users and its order and separators, open and protected pages, layout, error handling, and how it is tested
 - [[information-pages]] - what Home, How to Start, Examples, About Technicalities and About Me contain, and a table of their claims that do not match the code
 - [[flashcard-deletion]] - how a user permanently deletes their own flashcard: confirmation dialog, ownership check, cascade to learning progress
+- [[leaderboard]] - how active users are ranked by the number of flashcards they own: points, ordering and tie-break, masked emails, 30 per page, the motivation banner, and what the tests cover
 
 ## Business rules
 

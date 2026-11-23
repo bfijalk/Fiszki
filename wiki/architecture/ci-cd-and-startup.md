@@ -9,7 +9,7 @@ sources:
   - Fiszki.Services/Services/TestDataSeeder.cs
   - test-mode.sh
   - Fiszki.csproj
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -81,7 +81,8 @@ that way on port 5000, which is what the functional tests and the CI job rely on
 - **Database schema:** because neither the application nor the workflow applies migrations, the
   schema of a real database has to be created some other way (outside the repository's automation).
 - **Test data:** the seeder creates the accounts and flashcards that the browser tests use; their
-  details are intentionally not recorded in this wiki.
+  details are intentionally not recorded in this wiki. It also creates 31 further active users without
+  flashcards, so the [[leaderboard]] has a second page.
 
 ## Behavior worth knowing (code reading)
 

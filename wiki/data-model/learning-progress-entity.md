@@ -8,7 +8,7 @@ sources:
   - Fiszki.Database/Configurations/LearningProgressConfiguration.cs
   - Fiszki.Database/Migrations/20251014085238_InitialCreate.cs
   - Fiszki.Services/Services/TestDataSeeder.cs
-verified_commit: 5d1568b818c698f75aa953c7422003d1563bec9d
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
