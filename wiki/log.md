@@ -59,3 +59,26 @@ Findings worth a follow-up: no accept action for a single proposal; Example and 
 saved; the "leave without saving" warning is not wired; page cancel does not cancel the job; the
 page uses none of the job's error text; SemaphoreRateLimiter and four options are unused; no test
 covers saving through the UI, the prompt or the real OpenRouter client.
+
+## [2026-11-23] ingest | Manual flashcard creation (cold start)
+
+Created: features/manual-flashcard-creation, business-rules/flashcard-content-limits. Updated:
+features/ai-flashcard-generation (corrected a test-coverage statement), data-model/flashcard-entity,
+glossary (5 terms), index.
+
+Verified against commit b495105. Sources: the manual creation and AI creation Gherkin scenarios,
+the Flashcards page, FlashcardService, commands and validators, unit and validator tests, step
+definitions and page object.
+
+Correction: ai-flashcard-generation said saving through the UI was untested; FlashcardCreation.feature
+does click Save Selected, but its checks pass when nothing was saved (empty or seeded collection,
+no-op steps), so the conclusion stands with a more precise explanation.
+
+Discrepancies (code wins): limits (notes say 2000 for question and answer and 40 per tag; code
+1000, 2000 and 50); a learning-progress record on manual create (none is created); editing (notes
+describe PUT or PATCH and an edit dialog; the service has the update, no screen); client-side
+validation (notes say forms mirror the limits; the dialog does not); per-proposal accept (notes
+say yes; the code accepts only in bulk). Findings worth a follow-up: the Edit button does nothing and the service update has no screen; tags are stored but
+shown and filtered nowhere; the dialog shows only "Validation failed" for over-long text; limits
+differ between manual create (1000, 2000), AI save (500, 500) and update; the AI-saved text is not
+trimmed; no test covers lengths, the update validator or a successful update.

@@ -10,6 +10,7 @@ Format of an entry: `- [[page-name]] - one-line description`.
 How user-visible features work: business rules and implementation.
 
 - [[ai-flashcard-generation]] - how a user generates flashcard proposals with AI, reviews and saves them: input limits, accept and reject, what is saved, placeholder fallback
+- [[manual-flashcard-creation]] - how a user creates a flashcard by hand in the dialog: required fields, tags, limits, what is shown, and the service-only update with no screen
 - [[flashcard-deletion]] - how a user permanently deletes their own flashcard: confirmation dialog, ownership check, cascade to learning progress
 
 ## Business rules
@@ -17,6 +18,7 @@ How user-visible features work: business rules and implementation.
 Cross-cutting rules that apply to more than one feature.
 
 - [[flashcard-ownership]] - users read, update and delete only their own flashcards; foreign ids behave as not found
+- [[flashcard-content-limits]] - length and tag limits for manual create, AI save and update, what screens enforce, and where the limits disagree
 
 ## Architecture
 

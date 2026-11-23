@@ -10,7 +10,9 @@ sources:
   - Fiszki.Services/Services/GenerationService.cs
   - Components/Pages/Generate/ProposalsSection.razor
   - Components/Pages/Generate/SourceInputForm.razor
-verified_commit: 52f627aae9f0b25fa16da531aa2d9e66b421bcb9
+  - Fiszki.Services/Services/FlashcardService.cs
+  - Fiszki.Services/Validation/CreateFlashcardCommandValidator.cs
+verified_commit: b495105fc83203eab08cd4f7daa346d228e4d01e
 confidence: high
 ---
 
@@ -41,3 +43,8 @@ translated by the agent before searching.
 | Placeholder proposals | fallback, mock generation, dummy cards | Fake cards ("Polish Word 1") produced when the AI call fails, shown as a normal successful generation | [[ai-flashcard-generation]], [[openrouter-integration]] |
 | OpenRouter | LLM gateway, AI provider | The external service used to call language models | [[openrouter-integration]] |
 | Structured output | JSON schema response | An AI answer constrained to a JSON schema and parsed into objects | [[openrouter-integration]] |
+| Manual flashcard | hand-made card, created by the user | A flashcard typed in the Create Manual Flashcard dialog; creation source `Manual` | [[manual-flashcard-creation]] |
+| Create dialog | create modal, Add Manual Card, Create Manually | The "Create Manual Flashcard" dialog opened from the Flashcards page | [[manual-flashcard-creation]] |
+| Tags | labels, keywords | Optional free-form labels stored with a flashcard, at most 10 of up to 50 characters; not shown anywhere in the UI | [[manual-flashcard-creation]], [[flashcard-content-limits]] |
+| Content limits | length limits, maximum length | The maximum text and tag sizes enforced by the validators, which differ between manual create, AI save and update | [[flashcard-content-limits]] |
+| Concurrency check | stale update, expected update time | The service refuses an update when the caller's last seen update time no longer matches the stored one | [[manual-flashcard-creation]] |

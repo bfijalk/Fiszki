@@ -31,7 +31,8 @@ sources:
   - Fiszki.FunctionalTests/PageObjects/FlashcardGenerationPage.cs
   - README.md
   - Components/Pages/AboutTechnicalities.razor
-verified_commit: 52f627aae9f0b25fa16da531aa2d9e66b421bcb9
+  - Fiszki.FunctionalTests/Features/FlashcardCreation.feature
+verified_commit: b495105fc83203eab08cd4f7daa346d228e4d01e
 confidence: high
 ---
 
@@ -141,11 +142,12 @@ test**, or **code only** (read from the implementation, no automated test).
     not limit length, so an over-long text is only caught when saving, and the user sees
     "Failed to save flashcards: Validation failed". Backed by: code only
     (`Fiszki.Services/Validation/SaveProposalsCommandValidator.cs` `SaveProposalsCommandValidator`).
+    These limits are lower than for manual creation, see [[flashcard-content-limits]].
 18. **After a successful save the page resets.** The proposals are cleared, the page returns to
     its starting state and the message "Selected flashcards have been saved successfully." is
     shown. Backed by: code only
-    (`Components/Pages/GeneratePage.razor.cs` `HandleSaveSelected`). The Gherkin scenario stops
-    before saving, see Test coverage.
+    (`Components/Pages/GeneratePage.razor.cs` `HandleSaveSelected`). The generation scenario
+    stops before saving; a second scenario does save but checks almost nothing, see Test coverage.
 19. **Saving does not change the user's generation counters.** `TotalCardsGenerated` and
     `TotalCardsAccepted` are never updated by generation or saving; they only hold seeded test
     values. Backed by: code only (no code writes them).
@@ -233,8 +235,14 @@ For developers. Layers and wiring: [[application-layers]].
   archaeological site), set 5 cards, generate, see "Generation completed", see proposals and the
   "X of Y selected" header, click Accept All, check all are selected and Save Selected is enabled.
   Browser actions are in `Fiszki.FunctionalTests/PageObjects/FlashcardGenerationPage.cs`.
-- **Gaps in the scenario:** it never clicks Save Selected, so saving through the UI is untested
-  end to end. The step "the generated flashcards should contain expected content"
+- **Gaps in the scenario:** it never clicks Save Selected. Saving is exercised only by
+  `Fiszki.FunctionalTests/Features/FlashcardCreation.feature` (scenario "Login and create flashcards from source text"),
+  which generates, clicks Accept All and Save Selected, then opens the Flashcards page. Its checks
+  are too weak to prove that anything was saved: "I should see all expected flashcards" passes
+  when the collection is empty and when the user only has seeded test flashcards, "I click all
+  expected flashcards" does nothing when none are found, and the last step
+  (`Fiszki.FunctionalTests/Steps/FlashcardSteps.cs` `ThenAllFlashcardInteractionsShouldBeSuccessful`) has an
+  empty body. So saving through the UI is effectively untested end to end. The step "the generated flashcards should contain expected content"
   (`Fiszki.FunctionalTests/Steps/FlashcardSteps.cs` `ThenTheGeneratedFlashcardsShouldContainExpectedContent`)
   passes if **any one** of five expected words appears **anywhere on the page**, not specifically
   in a generated card. Whether the run produced real or placeholder cards depends on the API key
@@ -263,6 +271,9 @@ Older notes and some UI texts disagree with the code. The code wins (see SCHEMA,
   `IGenerationService` directly, see [[application-layers]].
 - **"Retry logic".** `Components/Pages/AboutTechnicalities.razor` says the OpenRouter integration
   has retry logic. The code has none, see [[openrouter-integration]].
+- **Per-proposal actions.** The historical UI plan (ui-plan-prompted.md in the old `.ai` folder)
+  says each proposal can be accepted, edited or rejected. The code has edit and reject per
+  proposal but accepts only in bulk (rule 12).
 - **Configuration name.** `README.md` shows `OpenRouter__BaseUrl`, but the option read by the code
   is `BaseUri`.
 
@@ -270,6 +281,8 @@ Older notes and some UI texts disagree with the code. The code wins (see SCHEMA,
 
 - [[openrouter-integration]]
 - [[generation-job-flow]]
+- [[flashcard-content-limits]]
+- [[manual-flashcard-creation]]
 - [[flashcard-entity]]
 - [[flashcard-ownership]]
 - [[flashcard-deletion]]
