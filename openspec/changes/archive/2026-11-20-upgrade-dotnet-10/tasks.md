@@ -21,9 +21,9 @@
 
 ## 4. CI/CD
 
-- [ ] 4.1 W `.github/workflows/ci-cd.yml` zmienić `DOTNET_VERSION` na `'10.0.x'` i zweryfikować, że joby `build` i `unit-tests` na gałęzi przechodzą na zielono. Stan: zmiana w ci-cd.yml wprowadzona lokalnie (YAML poprawny); czeka na weryfikację w CI po wypchnięciu gałęzi.
-- [ ] 4.2 Zastąpić na sztywno wpisaną ścieżkę `bin/Debug/net8.0/playwright.ps1` wartością zależną od jednej zmiennej TFM (np. `DOTNET_TFM: 'net10.0'`) i zweryfikować, że krok instalacji Playwrighta w jobie `functional-tests` znajduje skrypt i instaluje Chromium. Stan: dodano zmienną DOTNET_TFM i użyto jej w ścieżce; skrypt playwright.ps1 istnieje lokalnie w bin/Debug/net10.0; czeka na weryfikację w CI.
-- [ ] 4.3 Zweryfikować, że job `functional-tests` na PR przechodzi w całości, a `required-status-check` jest zielony.
+- [x] 4.1 W `.github/workflows/ci-cd.yml` zmienić `DOTNET_VERSION` na `'10.0.x'` i zweryfikować, że joby `build` i `unit-tests` na gałęzi przechodzą na zielono. Wynik: w CI (PR #22) joby Build i Unit Tests przeszły na SDK 10.0.x.
+- [x] 4.2 Zastąpić na sztywno wpisaną ścieżkę `bin/Debug/net8.0/playwright.ps1` wartością zależną od jednej zmiennej TFM (np. `DOTNET_TFM: 'net10.0'`) i zweryfikować, że krok instalacji Playwrighta w jobie `functional-tests` znajduje skrypt i instaluje Chromium. Wynik: w CI (PR #22) krok Playwrighta znalazł skrypt i zainstalował Chromium.
+- [x] 4.3 Zweryfikować, że job `functional-tests` na PR przechodzi w całości, a `required-status-check` jest zielony. Wynik: PR #22 w pełni zielony (Functional Tests 4 min 41 s, Required Status Check pass).
 
 ## 5. Dokumentacja
 
