@@ -17,7 +17,8 @@ sources:
   - Fiszki.Tests/Services/Validation/ValidatorTests.cs
   - Fiszki.FunctionalTests/Steps/FlashcardSteps.cs
   - Fiszki.FunctionalTests/PageObjects/FlashcardsPage.cs
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Fiszki.Services/Services/LeaderboardService.cs
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -158,6 +159,7 @@ For developers. Layers and wiring: [[application-layers]].
 
 - Creates a flashcard that [[flashcard-deletion]] can later remove.
 - Does not change the user's generation counters (they are not updated by any flow).
+- Adds one point on the [[leaderboard]]; manual and AI flashcards count the same.
 
 ## Discrepancies
 

@@ -174,3 +174,27 @@ skills and `CLAUDE.md`, and no page lists any of those as a source. All pages st
 their existing commit; lint reports 0 errors and 0 stale pages.
 
 Pages created: none. Pages updated: none. New discrepancies: none. Unverified claims: none.
+
+## [2026-11-23] ingest | Archive of add-leaderboard and reorder-nav-menu
+
+Mode: after archive. Two OpenSpec changes were archived together on 2026-11-23 and synced two new main specs:
+`leaderboard` (from `add-leaderboard`) and `site-navigation` (from `reorder-nav-menu`). The code of both is on
+`main` (PR #27 and #28); the archive commit is `cdf3374`.
+
+Pages created: `features/leaderboard.md` (rules 1-14: access, points, ordering and tie-break, masked emails,
+pagination, banner, loading and errors; implementation; test coverage).
+
+Pages updated: `features/site-navigation.md` (menu order, separators, three protected pages, new Navigation
+scenarios, renumbered layout rules), `architecture/authentication-session.md`, `features/user-login-and-logout.md`,
+`glossary.md` (leaderboard, points, rival, masked email, menu separator), `architecture/application-layers.md`,
+`architecture/ci-cd-and-startup.md` (31 extra seeded users), `data-model/user-entity.md`,
+`data-model/flashcard-entity.md`, `business-rules/flashcard-ownership.md`, `features/flashcard-deletion.md`,
+`features/manual-flashcard-creation.md`, `features/ai-flashcard-generation.md`, and `index.md`. Reviewed with no text
+change, `verified_commit` refreshed: `data-model/learning-progress-entity.md`, `architecture/generation-job-flow.md`,
+`architecture/openrouter-integration.md`, `features/information-pages.md`.
+
+Discrepancies recorded: the archived design says to mask "the first two characters (fewer if shorter)" while the code
+never shows a local part in full; the banner wording for users with 0 points says the rival "reached" the same points.
+
+Unverified: how the ranking query behaves on PostgreSQL (all tests use the in-memory provider), and the loading and error
+states of the leaderboard page (no test fails the service). The leaderboard page is therefore `confidence: medium`.

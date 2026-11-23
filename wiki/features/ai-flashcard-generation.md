@@ -32,7 +32,8 @@ sources:
   - README.md
   - Components/Pages/AboutTechnicalities.razor
   - Fiszki.FunctionalTests/Features/FlashcardCreation.feature
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Fiszki.Services/Services/LeaderboardService.cs
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -253,6 +254,7 @@ For developers. Layers and wiring: [[application-layers]].
 - Creates flashcards that appear in [[flashcard-deletion]]'s list and can be deleted there.
 - Calls an external AI service, see [[openrouter-integration]]; it needs an API key to work.
 - Does not change user counters (rule 19).
+- Each saved flashcard adds one point on the [[leaderboard]], the same as a manual one.
 
 ## Discrepancies
 

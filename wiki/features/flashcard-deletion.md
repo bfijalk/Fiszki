@@ -14,7 +14,8 @@ sources:
   - Fiszki.FunctionalTests/Steps/FlashcardSteps.cs
   - Fiszki.FunctionalTests/PageObjects/FlashcardsPage.cs
   - docs/TEST_SELECTORS.md
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Fiszki.Services/Services/LeaderboardService.cs
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -144,6 +145,7 @@ For developers. Layers and wiring: [[application-layers]].
 
 - Removes the flashcard's learning-progress record (rule 9).
 - Changes the page counters but not the user's generation counters (rule 12).
+- Removes one point from the user on the [[leaderboard]], because points are counted from the flashcards the user owns.
 - No HTTP API is involved: the page calls the service directly, see [[application-layers]].
 
 ## Discrepancies

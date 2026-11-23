@@ -8,7 +8,7 @@ sources:
   - Fiszki.Services/DependencyInjection.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Components/Pages/Flashcards.razor
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -43,7 +43,8 @@ service interfaces.
   Styling is mixed: the Flashcards page uses plain Bootstrap markup, while other pages (for
   example the login, home and generation pages) use MudBlazor components.
 - **Services:** `Fiszki.Services/DependencyInjection.cs` `AddFiszkiServices` registers
-  validators and services as scoped, including `IFlashcardService` mapped to `FlashcardService`.
+  validators and services as scoped, including `IFlashcardService` mapped to `FlashcardService` and `ILeaderboardService` mapped to
+  `LeaderboardService` (see [[leaderboard]]).
   `Program.cs` calls it once at startup.
 - **Database:** `FiszkiDbContext` is registered in `Program.cs`. Entities are mapped by
   configuration classes found in the database assembly.

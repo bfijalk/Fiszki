@@ -2,7 +2,7 @@
 title: User entity
 type: data-model
 summary: The users table and User entity: fields, the case-insensitive unique email, role and active flag, card counters, relations and delete cascade, and which fields the application actually uses or ever changes.
-tags: [user, users, entity, table, database, email, unique, citext, role, admin, active, counters, password-hash, cascade]
+tags: [user, users, entity, table, database, email, unique, citext, role, admin, active, counters, password-hash, cascade, leaderboard]
 sources:
   - Fiszki.Database/Entities/User.cs
   - Fiszki.Database/Configurations/UserConfiguration.cs
@@ -11,7 +11,8 @@ sources:
   - Fiszki.Services/Services/UserService.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Fiszki.Services/Services/TestDataSeeder.cs
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Fiszki.Services/Services/LeaderboardService.cs
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -59,12 +60,16 @@ database. The service passes the data to pages as a DTO without the hash
 - **`Role` has no effect.** The role is put in the login claims but nothing checks it, so an `Admin`
   can do exactly what a `Basic` user can. Only seeded test data contains an `Admin`. See
   [[authentication-session]].
-- **`IsActive` is only read** when signing in, see [[user-login-and-logout]]. Nothing sets it to
-  false.
+- **`IsActive` is only read** when signing in, see [[user-login-and-logout]], and by the [[leaderboard]],
+  which leaves inactive users out. Nothing sets it to false.
 - **The counters are never updated.** Generating or saving flashcards does not change them; they hold
   only the numbers set for seeded test users, see [[ai-flashcard-generation]].
 - **Lookup by id exists but the application does not use it.** `UserService.GetByIdAsync` is only
   called from tests.
+- **Read by the leaderboard.** The [[leaderboard]] lists active users by their masked `Email`, using `IsActive` and
+  `CreatedAt`; it does not use the two counters (points are counted from the flashcards). In test mode the
+  seeder also creates 31 active users without flashcards for it
+  (`Fiszki.Services/Services/TestDataSeeder.cs` `CreateLeaderboardFillerUsers`).
 
 ## Discrepancies
 
@@ -87,3 +92,4 @@ differs in form. The code wins.
 - [[flashcard-entity]]
 - [[learning-progress-entity]]
 - [[authentication-session]]
+- [[leaderboard]]

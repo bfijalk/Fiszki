@@ -13,7 +13,8 @@ sources:
   - Components/Pages/Logout.razor
   - Components/Pages/Flashcards.razor
   - Components/Pages/GeneratePage.razor
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Components/Pages/Leaderboard.razor
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -57,13 +58,14 @@ server's memory, one per browser connection. The user-facing flows are in
   provider, so the user is logged out. There is no "remember me" and nothing is stored in the browser.
   How long a dropped connection is kept is framework behavior and was not checked.
 - **Protected pages.** A page is guarded with the `Authorize` attribute. Only
-  `Components/Pages/Flashcards.razor` and `Components/Pages/GeneratePage.razor` have it.
+  `Components/Pages/Flashcards.razor`, `Components/Pages/GeneratePage.razor` and
+  `Components/Pages/Leaderboard.razor` have it.
 - **Not logged in.** The routing component uses the framework's authorization-aware route view and
   defines no custom "not authorized" content and no redirect to the login page, so the framework's
   default message is shown. (`Components/Routes.razor` `AuthorizeRouteView`; the default text was not
   checked by running the application.)
-- **Menu.** `Components/Layout/NavMenu.razor` shows Login when logged out and Flashcards, Generate
-  and Logout when logged in.
+- **Menu.** `Components/Layout/NavMenu.razor` shows Login when logged out and Flashcards, Generate,
+  Leaderboard and Logout when logged in; the order is in [[site-navigation]].
 - **Who is the user for the services.** Pages read the user id from the `NameIdentifier` claim and
   pass it to the services, see [[flashcard-ownership]]. If the claim is missing, pages show
   "Unable to determine current user." (the Flashcards page) or ask the user to log in again (the

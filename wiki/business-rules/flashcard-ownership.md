@@ -9,7 +9,8 @@ sources:
   - Fiszki.Tests/Services/FlashcardServiceTests.cs
   - Fiszki.Services/Services/GenerationService.cs
   - Fiszki.Services/Mapping/FlashcardMapper.cs
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Fiszki.Services/Services/LeaderboardService.cs
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -32,6 +33,8 @@ reports no error. The service therefore never reveals that another user's flashc
 
 - [[flashcard-deletion]]: deleting another user's flashcard is a silent no-op.
 - [[ai-flashcard-generation]]: saved AI flashcards belong to the user who saved them.
+- [[leaderboard]]: the one place where one user sees data about other users, and it exposes only counts of
+  their flashcards and a masked email, never the content (`Fiszki.Services/Services/LeaderboardService.cs` `GetAsync`).
 
 ## Evidence
 
@@ -60,3 +63,4 @@ are visible in the service code; this page does not claim tests for them.
 - [[flashcard-deletion]]
 - [[flashcard-entity]]
 - [[application-layers]]
+- [[leaderboard]]

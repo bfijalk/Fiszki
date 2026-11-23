@@ -2,7 +2,7 @@
 title: Glossary
 type: glossary
 summary: Domain terms of the Fiszki project with English synonyms, so that lexical search finds the right page whichever word is used.
-tags: [glossary, terminology, synonyms]
+tags: [glossary, terminology, synonyms, leaderboard, points, masked-email]
 sources:
   - Fiszki.Database/Entities/Flashcard.cs
   - Fiszki.Database/Entities/LearningProgress.cs
@@ -17,7 +17,10 @@ sources:
   - Fiszki.Database/Entities/User.cs
   - Components/Layout/NavMenu.razor
   - Program.cs
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Components/Pages/Leaderboard.razor
+  - Fiszki.Services/Services/LeaderboardService.cs
+  - Fiszki.Services/Services/EmailMasker.cs
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -68,7 +71,12 @@ translated by the agent before searching.
 | Card view / List view | grid view, list mode, view mode | The two ways to show flashcards; card view is the default and the only one that can flip cards | [[flashcard-list-and-filters]] |
 | Flip | show answer, show question, turn card | Turning a card in card view to see its back; the state is not saved | [[flashcard-list-and-filters]] |
 | Empty state | no flashcards yet | The "No flashcards yet" message with the "Generate with AI" and "Create Manually" buttons; also shown when a filter matches nothing | [[flashcard-list-and-filters]], [[flashcard-deletion]] |
-| Navigation menu | menu, navbar, sidebar | The side menu that is the same for everyone except the Login or Flashcards, Generate and Logout group | [[site-navigation]] |
+| Navigation menu | menu, navbar, sidebar | The side menu: Home first; for logged-in users the Flashcards, Generate and Leaderboard group sits above the open links, separated by a line, with Logout last; visitors see the open links and Login | [[site-navigation]] |
+| Leaderboard | ranking, rank, top users, scoreboard | The `/leaderboard` page that ranks active users by points and tells the user how far the user above is | [[leaderboard]] |
+| Points | score, flashcard count | One point per flashcard a user currently owns, AI and manual alike; deleting a flashcard removes a point | [[leaderboard]] |
+| Rival | competitor, user above, nearest user above | In the leaderboard banner, the user directly above the current user, or users with exactly the same points | [[leaderboard]] |
+| Masked email | hidden email, anonymized email | How other users appear in the leaderboard: the first two characters, `***` and the domain | [[leaderboard]] |
+| Menu separator | divider, menu line | The thin line between menu groups, shown only to logged-in users | [[site-navigation]] |
 | Information pages | home, how to start, examples, about, landing | The five open pages with fixed text; their claims often differ from the code | [[information-pages]] |
 | About Me | author page, developer profile | The `/about` page: a profile of the application's developer; unrelated to the "About" link in the top bar, which opens external documentation | [[site-navigation]], [[information-pages]] |
 | Sample flashcards | examples, demo cards | The ten cards written into the Examples page; not real user data | [[information-pages]] |

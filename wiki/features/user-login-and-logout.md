@@ -20,7 +20,8 @@ sources:
   - Fiszki.Tests/Services/Validation/ValidatorTests.cs
   - Fiszki.FunctionalTests/Steps/LoginSteps.cs
   - Fiszki.FunctionalTests/Steps/DynamicLoginSteps.cs
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+  - Components/Pages/Leaderboard.razor
+verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
 confidence: high
 ---
 
@@ -82,17 +83,19 @@ test**, or **code only** (read from the implementation, no automated test).
 
 ### Access and the menu
 
-8. **Two pages need a login:** Flashcards (`/flashcards`) and Generate (`/generate`). The other pages
+8. **Three pages need a login:** Flashcards (`/flashcards`), Generate (`/generate`) and Leaderboard
+   (`/leaderboard`). The other pages
    (Home, How to Start, Examples, About Technicalities, About Me, Login, Logout, Register) are open;
    see [[site-navigation]].
    Backed by: code only (`Components/Pages/Flashcards.razor` `Authorize`,
-   `Components/Pages/GeneratePage.razor` `Authorize`).
+   `Components/Pages/GeneratePage.razor` `Authorize`,
+   `Components/Pages/Leaderboard.razor` `Authorize`).
 9. **Opening a protected page without a login shows the framework's default "not authorized"
    message**, not the Login page. The routing component defines no custom message and no redirect to
    login. The exact default text comes from the framework and was not checked by running the
    application. Backed by: code only (`Components/Routes.razor` `AuthorizeRouteView`).
 10. **The menu changes with the login.** Logged out, it shows "Login". Logged in, it shows Flashcards,
-    Generate and Logout. Home, How to Start, Examples, About Technicalities and About Me are always
+    Generate, Leaderboard and Logout. Home, How to Start, Examples, About Technicalities and About Me are always
     shown. Backed by: code only (`Components/Layout/NavMenu.razor` `AuthorizeView`).
 11. **The login lasts only as long as the connection (circuit).** Reloading the page or opening a new
     tab starts a new connection and signs the user out, and so does a connection that is lost for good.
