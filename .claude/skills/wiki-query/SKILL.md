@@ -14,7 +14,7 @@ synthesis.
 1. **Read `wiki/index.md`** and pick the pages that match the question.
 2. **Search if the index is not enough.** Pages are in English and ranking is lexical, so
    translate the question's terms into English first (use `wiki/glossary.md` for domain
-   terms and Polish equivalents), then run:
+   terms and synonyms), then run:
    `wiki/tools/search "<english terms>" --json` (add `--type` / `--tag` for typed questions).
    If nothing is found, retry with a synonym or a tag before concluding there is a gap.
 3. **Open the pages** and follow `[[links]]` where the answer continues.
