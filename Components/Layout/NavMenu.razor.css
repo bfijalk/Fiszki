@@ -81,6 +81,15 @@
     color: white;
 }
 
+/* Separator between menu groups. It is an <hr>, not a div, so .nav-item:first-of-type and
+   .nav-item:last-of-type keep matching Home and the last menu item. */
+.nav-separator {
+    margin: 0.25rem 1rem 0.75rem;
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,0.25);
+    opacity: 1;
+}
+
 .nav-scrollable {
     display: none;
 }

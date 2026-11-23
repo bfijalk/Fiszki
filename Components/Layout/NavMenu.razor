@@ -14,6 +14,29 @@
                 <span>Home</span>
             </NavLink>
         </div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="flashcards" id="nav-flashcards" data-testid="nav-flashcards">
+                        <span class="bi bi-collection fs-5" aria-hidden="true"></span>
+                        <span>Flashcards</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="generate" id="nav-generate" data-testid="nav-generate">
+                        <span class="bi bi-lightning-fill fs-5" aria-hidden="true"></span>
+                        <span>Generate</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="leaderboard" id="nav-leaderboard" data-testid="nav-leaderboard">
+                        <span class="bi bi-trophy-fill fs-5" aria-hidden="true"></span>
+                        <span>Leaderboard</span>
+                    </NavLink>
+                </div>
+                <hr class="nav-separator" data-testid="nav-separator-account" />
+            </Authorized>
+        </AuthorizeView>
         <div class="nav-item px-3">
             <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="how-to-start" id="nav-how-to-start" data-testid="nav-how-to-start">
                 <span class="bi bi-play-circle-fill fs-5" aria-hidden="true"></span>
@@ -40,24 +63,7 @@
         </div>
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="flashcards" id="nav-flashcards" data-testid="nav-flashcards">
-                        <span class="bi bi-collection fs-5" aria-hidden="true"></span>
-                        <span>Flashcards</span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="generate" id="nav-generate" data-testid="nav-generate">
-                        <span class="bi bi-lightning-fill fs-5" aria-hidden="true"></span>
-                        <span>Generate</span>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="leaderboard" id="nav-leaderboard" data-testid="nav-leaderboard">
-                        <span class="bi bi-trophy-fill fs-5" aria-hidden="true"></span>
-                        <span>Leaderboard</span>
-                    </NavLink>
-                </div>
+                <hr class="nav-separator" data-testid="nav-separator-logout" />
                 <div class="nav-item px-3">
                     <button class="nav-link btn btn-link d-flex align-items-center gap-2 py-2" @onclick="Logout" id="nav-logout" data-testid="nav-logout">
                         <span class="bi bi-box-arrow-right fs-5" aria-hidden="true"></span>
