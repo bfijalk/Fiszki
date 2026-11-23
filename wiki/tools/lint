@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Check wiki health (read-only): wiki/tools/lint [--json] [--root DIR] [--repo DIR]
+# Run `wiki/tools/lint --help` for details. Arguments go after `--` so that
+# `dotnet run` does not interpret options such as --help itself.
+exec dotnet run --file "$(dirname "$0")/wikitool" -- lint "$@"

@@ -1,0 +1,7 @@
+namespace Fiszki.Database.Entities;
+
+public class Flashcard
+{
+    public int Id { get; set; }
+    public string UserId { get; set; } = "";
+}

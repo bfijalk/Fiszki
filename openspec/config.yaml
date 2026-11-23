@@ -30,3 +30,13 @@ schema: spec-driven
 #     archive:
 #       guidance:
 #         - Summarize the archive outcome before finishing
+operations:
+  archive:
+    guidance:
+      - >-
+        Make the wiki ingest the LAST step of archiving. After the delta specs are synced
+        and the change is moved to the archive, run the wiki-ingest skill in its "After
+        archive" mode for this change (the wiki lives in wiki/, rules in wiki/SCHEMA.md).
+        Add the ingest report (pages created, pages updated, discrepancies, claims that
+        could not be verified) to the archive summary. If the change affects no source
+        listed in any wiki page, say so; the ingest still appends a wiki/log.md entry.
