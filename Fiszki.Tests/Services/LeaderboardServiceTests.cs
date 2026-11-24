@@ -247,6 +247,133 @@ public class LeaderboardServiceTests : IDisposable
         result.Rows.Select(r => r.MaskedEmail).Should().NotContain(e => e.Contains("kowalski"));
     }
 
+    private void Archive(IEnumerable<Flashcard> cards, DateTime at)
+    {
+        foreach (var card in cards) card.ArchivedAt = at;
+        _db.SaveChanges();
+    }
+
+    [Fact]
+    public async Task ArchivedFlashcard_IsWorthFourPoints()
+    {
+        var user = AddUser();
+        var cards = AddCards(user, 5);
+        Archive(cards.Take(1), Start.AddDays(10));
+
+        var row = (await _svc.GetAsync(user.Id)).Rows.Single();
+
+        row.Points.Should().Be(8);
+        row.Flashcards.Should().Be(5);
+        row.Archived.Should().Be(1);
+        row.LearningProgress.Should().Be(20);
+    }
+
+    [Fact]
+    public async Task RestoringArchivedFlashcard_RemovesExtraPoints()
+    {
+        var user = AddUser();
+        var cards = AddCards(user, 5);
+        Archive(cards.Take(2), Start.AddDays(10));
+        (await _svc.GetAsync(user.Id)).Rows.Single().Points.Should().Be(11);
+
+        cards[0].ArchivedAt = null;
+        _db.SaveChanges();
+
+        var row = (await _svc.GetAsync(user.Id)).Rows.Single();
+        row.Points.Should().Be(8);
+        row.Archived.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task DeletingArchivedFlashcard_RemovesFourPoints()
+    {
+        var user = AddUser();
+        var cards = AddCards(user, 5);
+        Archive(cards.Take(1), Start.AddDays(10));
+        (await _svc.GetAsync(user.Id)).Rows.Single().Points.Should().Be(8);
+
+        _db.Flashcards.Remove(cards[0]);
+        _db.SaveChanges();
+
+        var row = (await _svc.GetAsync(user.Id)).Rows.Single();
+        row.Points.Should().Be(4);
+        row.Flashcards.Should().Be(4);
+        row.Archived.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task ArchivingAfterRival_LosesTheTie()
+    {
+        // Both users end with 8 points. "early" created everything first but archived last,
+        // so "late" reached 8 points first and ranks higher.
+        var early = AddUser();
+        var late = AddUser();
+        Archive(AddCards(early, 5, firstAt: Start.AddDays(1)).Take(1), Start.AddDays(20));
+        Archive(AddCards(late, 5, firstAt: Start.AddDays(2)).Take(1), Start.AddDays(10));
+
+        var result = await _svc.GetAsync(early.Id);
+
+        result.Rows.Select(r => r.Points).Should().Equal(8, 8);
+        result.Rows.Select(r => r.IsCurrentUser).Should().Equal(false, true);
+    }
+
+    [Fact]
+    public async Task CreationOnlyTies_StillUseNewestFlashcard()
+    {
+        var later = AddUser();
+        var earlier = AddUser();
+        AddCards(later, 4, firstAt: Start.AddDays(5));
+        AddCards(earlier, 4, firstAt: Start.AddDays(1));
+
+        var result = await _svc.GetAsync(later.Id);
+
+        result.Rows.Select(r => r.IsCurrentUser).Should().Equal(false, true);
+    }
+
+    [Fact]
+    public async Task LearningProgress_NeverChangesTheOrder()
+    {
+        var learner = AddUser();   // 4 cards, 3 archived -> 4 + 9 = 13 points, 75%
+        var creator = AddUser();   // 14 cards, none archived -> 14 points, 0%
+        Archive(AddCards(learner, 4).Take(3), Start.AddDays(10));
+        AddCards(creator, 14);
+
+        var result = await _svc.GetAsync(learner.Id);
+
+        result.Rows.Select(r => r.Points).Should().Equal(14, 13);
+        result.Rows.Select(r => r.LearningProgress).Should().Equal(0, 75);
+    }
+
+    [Fact]
+    public async Task Banner_ShowsOwnNumbers()
+    {
+        var me = AddUser();
+        Archive(AddCards(me, 4).Take(1), Start.AddDays(10));
+
+        var banner = (await _svc.GetAsync(me.Id)).Banner;
+
+        banner.Points.Should().Be(7);
+        banner.Flashcards.Should().Be(4);
+        banner.Archived.Should().Be(1);
+        banner.LearningProgress.Should().Be(25);
+    }
+
+    [Fact]
+    public async Task ProgressInLeaderboard_EqualsFlashcardSummary()
+    {
+        var user = AddUser();
+        Archive(AddCards(user, 3).Take(1), Start.AddDays(10));
+        var flashcards = new FlashcardService(
+            _db,
+            new Moq.Mock<FluentValidation.IValidator<Fiszki.Services.Commands.CreateFlashcardCommand>>().Object,
+            new Moq.Mock<FluentValidation.IValidator<Fiszki.Services.Commands.UpdateFlashcardCommand>>().Object);
+
+        var summary = await flashcards.GetSummaryAsync(user.Id);
+        var row = (await _svc.GetAsync(user.Id)).Rows.Single();
+
+        row.LearningProgress.Should().Be(summary.LearningProgress).And.Be(33);
+    }
+
     [Fact]
     public void Service_IsRegisteredInDependencyInjection()
     {

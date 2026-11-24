@@ -138,6 +138,30 @@ Order from top to bottom. `---` is a separator (shown only to logged-in users).
 - `cancel-delete-button` - Cancel button (X icon)
 - `cancel-delete-modal-button` - Cancel button (text)
 
+### Card Buttons (every card, in card view and list view)
+- `archive-card-button` - "I learned it" button (active view only), opens the archive confirmation
+- `edit-card-button` - Edit button (active view only; currently does nothing)
+- `restore-card-button` - "Restore" button (archived view only), restores at once, no dialog
+- `delete-card-button` - Delete button (both views), opens the delete confirmation
+  (the buttons also keep their `title` attributes: "I learned it", "Edit", "Restore", "Delete")
+
+### Archive ("I learned it") Confirmation Modal
+- `archive-confirmation-modal` - Modal container
+- `confirm-archive-button` - Confirm button, archives the flashcard
+- `cancel-archive-button` - Cancel button (X icon)
+- `cancel-archive-modal-button` - Cancel button (text)
+
+### Learning Progress and Archived View
+- `learning-progress` - Learning progress card
+- `learning-progress-value` - Percentage text, for example "25%" (archived / all flashcards, rounded down)
+- `learning-progress-bar` - Progress bar
+- `archived-count` - Number of archived flashcards
+- `view-active-button` - Switch to the active (main) list
+- `view-archived-button` - Switch to the archived list; its label is "Archived (N)"
+- `flashcards-view-empty` - Message shown when the chosen view has no flashcards while the user has some
+
+The `total-count`, `ai-count` and `manual-count` numbers include archived flashcards.
+
 ---
 
 ## Generate Page (`/generate`)
@@ -183,6 +207,8 @@ the in-memory login.
 - `leaderboard-banner-leader` - Message shown to the user at position 1 (no rival above)
 - `leaderboard-banner-rival` - Nearest user above, with the point gap, or the "same number of points" message
 - `leaderboard-banner-same-points` - Number of other users with exactly the same points (only when there are any)
+- `leaderboard-banner-own` - The user's own flashcards, archived and learning progress line
+- `leaderboard-banner-flashcards` / `leaderboard-banner-archived` / `leaderboard-banner-progress` - Those three numbers
 - `leaderboard-generate-button` - Button that opens the Generate page
 
 ### Ranking Table
@@ -190,7 +216,10 @@ the in-memory login.
 - `leaderboard-row` - One row per user (attributes `data-position` and `data-current-user="true|false"`)
 - `leaderboard-position` - Position cell
 - `leaderboard-user` - Masked email cell (the current user's row ends with "(you)")
-- `leaderboard-points` - Points cell
+- `leaderboard-flashcards` - Number of flashcards the user owns
+- `leaderboard-archived` - Number of archived flashcards
+- `leaderboard-progress` - Learning progress, for example "25%" (information only, not part of the points)
+- `leaderboard-points` - Points cell (flashcards plus 3 per archived flashcard)
 
 ### Pagination (30 users per page)
 - `leaderboard-pagination` - Pagination container

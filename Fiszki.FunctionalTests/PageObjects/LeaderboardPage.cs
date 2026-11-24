@@ -6,7 +6,7 @@ using Fiszki.FunctionalTests.Constants;
 namespace Fiszki.FunctionalTests.PageObjects;
 
 /// <summary>One row of the leaderboard table as shown on the page.</summary>
-public record LeaderboardRowInfo(int Position, string User, int Points, bool IsCurrentUser);
+public record LeaderboardRowInfo(int Position, string User, int Points, bool IsCurrentUser, int Flashcards, int Archived, int LearningProgress);
 
 /// <summary>What the motivation banner currently says about the logged-in user.</summary>
 public record LeaderboardBannerInfo(
@@ -15,7 +15,10 @@ public record LeaderboardBannerInfo(
     bool IsLeader,
     string? RivalText,
     int? SamePointsCount,
-    string FullText);
+    string FullText,
+    int Flashcards,
+    int Archived,
+    int LearningProgress);
 
 public class LeaderboardPage : BasePage, ILeaderboardPage
 {
@@ -107,7 +110,10 @@ public class LeaderboardPage : BasePage, ILeaderboardPage
             var user = (await row.GetByTestId("leaderboard-user").InnerTextAsync()).Trim();
             var points = int.Parse((await row.GetByTestId("leaderboard-points").InnerTextAsync()).Trim());
             var isCurrent = await row.GetAttributeAsync("data-current-user") == "true";
-            result.Add(new LeaderboardRowInfo(position, user, points, isCurrent));
+            var flashcards = int.Parse((await row.GetByTestId("leaderboard-flashcards").InnerTextAsync()).Trim());
+            var archived = int.Parse((await row.GetByTestId("leaderboard-archived").InnerTextAsync()).Trim());
+            var progress = ParsePercent(await row.GetByTestId("leaderboard-progress").InnerTextAsync());
+            result.Add(new LeaderboardRowInfo(position, user, points, isCurrent, flashcards, archived, progress));
         }
         return result;
     }
@@ -137,7 +143,10 @@ public class LeaderboardPage : BasePage, ILeaderboardPage
             await Page.GetByTestId("leaderboard-banner-leader").CountAsync() > 0,
             await rival.CountAsync() > 0 ? (await rival.InnerTextAsync()).Trim() : null,
             samePoints,
-            full.Trim());
+            full.Trim(),
+            int.Parse((await Page.GetByTestId("leaderboard-banner-flashcards").InnerTextAsync()).Trim()),
+            int.Parse((await Page.GetByTestId("leaderboard-banner-archived").InnerTextAsync()).Trim()),
+            ParsePercent(await Page.GetByTestId("leaderboard-banner-progress").InnerTextAsync()));
     }
 
     public async Task<(int Page, int TotalPages)> GetPageIndicatorAsync()
@@ -169,6 +178,8 @@ public class LeaderboardPage : BasePage, ILeaderboardPage
     }
 
     public async Task<string> GetVisibleTextAsync() => await Page.GetByTestId("leaderboard-page").InnerTextAsync();
+
+    private static int ParsePercent(string text) => int.Parse(text.Replace("%", string.Empty).Trim());
 
     private async Task WaitForPageNumberAsync(int expected)
     {

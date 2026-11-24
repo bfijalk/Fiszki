@@ -23,7 +23,8 @@ internal static class ServiceMapping
         f.AiModel,
         f.Tags.AsReadOnly(),
         f.CreatedAt,
-        f.UpdatedAt);
+        f.UpdatedAt,
+        f.ArchivedAt);
 
     public static LearningProgressDto ToDto(this LearningProgress lp) => new(
         lp.FlashcardId,

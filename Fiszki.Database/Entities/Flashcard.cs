@@ -19,6 +19,9 @@ public class Flashcard
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    /// <summary>When the user marked the flashcard as learned (archived); null while it is active.</summary>
+    public DateTime? ArchivedAt { get; set; }
+
     public User? User { get; set; }
     public LearningProgress? LearningProgress { get; set; }
 }

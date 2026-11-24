@@ -598,4 +598,102 @@ public class FlashcardsPage : BasePage, IFlashcardsPage
         await cancelButton.ClickAsync();
         await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
     }
+    // ----- Archiving ("I learned it"), archived view and learning progress -----
+
+    private ILocator CardContainer(string cardText) =>
+        Page.Locator(".card.h-100.shadow, .list-group-item").Filter(new() { HasText = cardText });
+
+    public async Task<bool> HasArchiveButtonAsync(string cardText) =>
+        await CardContainer(cardText).First.GetByTestId("archive-card-button").CountAsync() > 0;
+
+    public async Task<bool> HasRestoreButtonAsync(string cardText) =>
+        await CardContainer(cardText).First.GetByTestId("restore-card-button").CountAsync() > 0;
+
+    public async Task<bool> HasDeleteButtonAsync(string cardText) =>
+        await CardContainer(cardText).First.GetByTestId("delete-card-button").CountAsync() > 0;
+
+    public async Task ClickArchiveCardAsync(string cardText)
+    {
+        await CardContainer(cardText).First.GetByTestId("archive-card-button").ClickAsync();
+        await Page.GetByTestId("archive-confirmation-modal").WaitForAsync(new()
+        {
+            State = WaitForSelectorState.Visible,
+            Timeout = TestConstants.Timeouts.NavigationTimeoutMs
+        });
+    }
+
+    public async Task<bool> IsArchiveModalVisibleAsync() =>
+        await Page.GetByTestId("archive-confirmation-modal").IsVisibleAsync();
+
+    public async Task<string> GetArchiveModalTextAsync() =>
+        await Page.GetByTestId("archive-confirmation-modal").InnerTextAsync();
+
+    public async Task ConfirmArchiveAsync()
+    {
+        await Page.GetByTestId("confirm-archive-button").ClickAsync();
+        await Page.GetByTestId("archive-confirmation-modal").WaitForAsync(new()
+        {
+            State = WaitForSelectorState.Hidden,
+            Timeout = TestConstants.Timeouts.NavigationTimeoutMs
+        });
+        await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
+    }
+
+    public async Task CancelArchiveAsync()
+    {
+        await Page.GetByTestId("cancel-archive-modal-button").ClickAsync();
+        await Page.GetByTestId("archive-confirmation-modal").WaitForAsync(new()
+        {
+            State = WaitForSelectorState.Hidden,
+            Timeout = TestConstants.Timeouts.NavigationTimeoutMs
+        });
+    }
+
+    public async Task RestoreCardAsync(string cardText)
+    {
+        var card = CardContainer(cardText).First;
+        await card.GetByTestId("restore-card-button").ClickAsync();
+        await card.WaitForAsync(new()
+        {
+            State = WaitForSelectorState.Detached,
+            Timeout = TestConstants.Timeouts.NavigationTimeoutMs
+        });
+        await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
+    }
+
+    public async Task SwitchToArchivedViewAsync() => await SwitchViewAsync("view-archived-button");
+
+    public async Task SwitchToActiveViewAsync() => await SwitchViewAsync("view-active-button");
+
+    private async Task SwitchViewAsync(string buttonTestId)
+    {
+        await Page.GetByTestId(buttonTestId).ClickAsync();
+        // The list is reloaded: wait until the loading spinner is gone and the page shows cards or the empty message.
+        await Page.Locator("[data-testid=flashcards-loading-spinner]").WaitForAsync(new()
+        {
+            State = WaitForSelectorState.Hidden,
+            Timeout = TestConstants.Timeouts.NavigationTimeoutMs
+        });
+        await Page.Locator("[data-testid=flashcards-card-view], [data-testid=flashcards-list-view], [data-testid=flashcards-view-empty]")
+            .First.WaitForAsync(new() { State = WaitForSelectorState.Attached, Timeout = TestConstants.Timeouts.NavigationTimeoutMs });
+        await WaitAsync(TestConstants.Timeouts.DefaultWaitMs);
+    }
+
+    public async Task<bool> IsViewEmptyMessageVisibleAsync() =>
+        await Page.GetByTestId("flashcards-view-empty").IsVisibleAsync();
+
+    public async Task<bool> IsLearningProgressVisibleAsync() =>
+        await Page.GetByTestId("learning-progress").IsVisibleAsync();
+
+    public async Task<int> GetLearningProgressAsync()
+    {
+        var text = await Page.GetByTestId("learning-progress-value").InnerTextAsync();
+        return int.Parse(text.Replace("%", string.Empty).Trim());
+    }
+
+    public async Task<int> GetArchivedCountAsync()
+    {
+        var text = await Page.GetByTestId("archived-count").InnerTextAsync();
+        return int.Parse(text.Trim());
+    }
 }

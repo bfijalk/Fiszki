@@ -72,6 +72,23 @@ public interface IFlashcardsPage : INavigable
     Task<bool> IsCreateModalVisibleAsync();
     Task<bool> IsDeleteModalVisibleAsync();
     Task<string?> GetCreateErrorAsync();
+
+    // Archiving ("I learned it") for FlashcardArchiving.feature
+    Task<bool> HasArchiveButtonAsync(string cardText);
+    Task<bool> HasRestoreButtonAsync(string cardText);
+    Task<bool> HasDeleteButtonAsync(string cardText);
+    Task ClickArchiveCardAsync(string cardText);
+    Task<bool> IsArchiveModalVisibleAsync();
+    Task<string> GetArchiveModalTextAsync();
+    Task ConfirmArchiveAsync();
+    Task CancelArchiveAsync();
+    Task RestoreCardAsync(string cardText);
+    Task SwitchToArchivedViewAsync();
+    Task SwitchToActiveViewAsync();
+    Task<bool> IsViewEmptyMessageVisibleAsync();
+    Task<int> GetLearningProgressAsync();
+    Task<int> GetArchivedCountAsync();
+    Task<bool> IsLearningProgressVisibleAsync();
 }
 
 public interface ILeaderboardPage : INavigable

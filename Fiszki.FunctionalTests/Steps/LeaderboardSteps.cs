@@ -21,6 +21,8 @@ public class LeaderboardSteps : BaseSteps
     private readonly ScenarioContext _scenarioContext;
     private ILeaderboardPage? _leaderboardPage;
     private int _rememberedPoints;
+    private int _rememberedFlashcards;
+    private int _rememberedArchived;
 
     public LeaderboardSteps(ScenarioContext scenarioContext) : base(scenarioContext)
     {
@@ -88,7 +90,63 @@ public class LeaderboardSteps : BaseSteps
     [When("I remember my leaderboard points")]
     public async Task WhenIRememberMyLeaderboardPoints()
     {
-        _rememberedPoints = (await Leaderboard.GetBannerAsync()).Points;
+        var banner = await Leaderboard.GetBannerAsync();
+        _rememberedPoints = banner.Points;
+        _rememberedFlashcards = banner.Flashcards;
+        _rememberedArchived = banner.Archived;
+    }
+
+    [Then("my leaderboard flashcards should be {int} higher than before")]
+    public async Task ThenMyLeaderboardFlashcardsShouldBeHigherThanBefore(int difference)
+    {
+        (await Leaderboard.GetBannerAsync()).Flashcards.Should().Be(_rememberedFlashcards + difference);
+    }
+
+    [Then("my leaderboard archived flashcards should be {int} higher than before")]
+    public async Task ThenMyLeaderboardArchivedShouldBeHigherThanBefore(int difference)
+    {
+        (await Leaderboard.GetBannerAsync()).Archived.Should().Be(_rememberedArchived + difference);
+    }
+
+    [Then("my leaderboard flashcards and archived flashcards should be the same as before")]
+    public async Task ThenMyLeaderboardCountsShouldBeTheSameAsBefore()
+    {
+        var banner = await Leaderboard.GetBannerAsync();
+        banner.Flashcards.Should().Be(_rememberedFlashcards);
+        banner.Archived.Should().Be(_rememberedArchived);
+    }
+
+    [Then("every user on the page should have points equal to flashcards plus 3 per archived flashcard")]
+    public async Task ThenEveryRowShouldFollowThePointsFormula()
+    {
+        var rows = await Leaderboard.GetRowsAsync();
+        rows.Should().NotBeEmpty();
+        foreach (var row in rows)
+        {
+            row.Archived.Should().BeLessThanOrEqualTo(row.Flashcards, $"position {row.Position} cannot archive more than it owns");
+            row.Points.Should().Be(row.Flashcards + 3 * row.Archived, $"position {row.Position} gets 1 point per flashcard and 3 extra per archived one");
+        }
+    }
+
+    [Then("every user on the page should show a learning progress matching their archived and total flashcards")]
+    public async Task ThenEveryRowShouldShowTheRightProgress()
+    {
+        foreach (var row in await Leaderboard.GetRowsAsync())
+        {
+            var expected = row.Flashcards == 0 ? 0 : row.Archived * 100 / row.Flashcards;
+            row.LearningProgress.Should().Be(expected, $"position {row.Position} has {row.Archived} of {row.Flashcards} archived");
+        }
+    }
+
+    [Then("the banner should show my own flashcards, archived flashcards and learning progress from my row")]
+    public async Task ThenTheBannerShouldShowMyOwnNumbers()
+    {
+        var banner = await Leaderboard.GetBannerAsync();
+        var me = (await ReadWholeRankingAsync()).Single(r => r.IsCurrentUser);
+        banner.Flashcards.Should().Be(me.Flashcards);
+        banner.Archived.Should().Be(me.Archived);
+        banner.LearningProgress.Should().Be(me.LearningProgress);
+        banner.Points.Should().Be(me.Points);
     }
 
     [Then("my leaderboard points should be {int} higher than before")]

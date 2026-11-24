@@ -52,13 +52,50 @@ public class FlashcardService : IFlashcardService
         return entity?.ToDto();
     }
 
-    public async Task<IReadOnlyCollection<FlashcardDto>> ListAsync(Guid userId, int skip = 0, int take = 100, CancellationToken ct = default)
+    public async Task<IReadOnlyCollection<FlashcardDto>> ListAsync(Guid userId, int skip = 0, int take = 100, FlashcardListState state = FlashcardListState.Active, CancellationToken ct = default)
     {
         take = Math.Clamp(take, 1, 500);
         skip = Math.Max(skip, 0);
-        var query = _db.Flashcards.AsNoTracking().Where(f => f.UserId == userId).OrderByDescending(f => f.CreatedAt).Skip(skip).Take(take);
-        var list = await query.ToListAsync(ct);
+        var owned = _db.Flashcards.AsNoTracking().Where(f => f.UserId == userId);
+        var query = state == FlashcardListState.Archived
+            ? owned.Where(f => f.ArchivedAt != null).OrderByDescending(f => f.ArchivedAt).ThenByDescending(f => f.CreatedAt)
+            : owned.Where(f => f.ArchivedAt == null).OrderByDescending(f => f.CreatedAt);
+        var list = await query.Skip(skip).Take(take).ToListAsync(ct);
         return list.Select(f => f.ToDto()).ToList();
+    }
+
+    public async Task<FlashcardSummaryDto> GetSummaryAsync(Guid userId, CancellationToken ct = default)
+    {
+        var owned = _db.Flashcards.AsNoTracking().Where(f => f.UserId == userId);
+        var total = await owned.CountAsync(ct);
+        var ai = await owned.CountAsync(f => f.CreationSource == CreationSource.Ai, ct);
+        var archived = await owned.CountAsync(f => f.ArchivedAt != null, ct);
+        return new FlashcardSummaryDto(total, ai, total - ai, archived, LearningProgressCalculator.Percent(archived, total));
+    }
+
+    public async Task ArchiveAsync(Guid userId, Guid flashcardId, CancellationToken ct = default)
+    {
+        var entity = await _db.Flashcards.FirstOrDefaultAsync(f => f.Id == flashcardId && f.UserId == userId, ct);
+        if (entity == null || entity.ArchivedAt != null)
+        {
+            return; // idempotent: missing, foreign or already archived
+        }
+        var now = DateTime.UtcNow;
+        entity.ArchivedAt = now;
+        entity.UpdatedAt = now;
+        await _db.SaveChangesAsync(ct);
+    }
+
+    public async Task RestoreAsync(Guid userId, Guid flashcardId, CancellationToken ct = default)
+    {
+        var entity = await _db.Flashcards.FirstOrDefaultAsync(f => f.Id == flashcardId && f.UserId == userId, ct);
+        if (entity == null || entity.ArchivedAt == null)
+        {
+            return; // idempotent: missing, foreign or not archived
+        }
+        entity.ArchivedAt = null;
+        entity.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync(ct);
     }
 
     public async Task<FlashcardDto> UpdateAsync(Guid userId, UpdateFlashcardCommand command, CancellationToken ct = default)

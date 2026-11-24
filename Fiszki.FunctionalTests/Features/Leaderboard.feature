@@ -1,16 +1,20 @@
 Feature: Leaderboard
   As a logged-in user
-  I want to see how I rank against other users by the number of flashcards I own
-  So that I am motivated to create more flashcards and overtake the users above me
+  I want to see how I rank against other users by the flashcards I own and the ones I have learned
+  So that I am motivated to create and learn more flashcards and overtake the users above me
 
   # All scenarios share one database that other scenarios also change, so they assert on the
   # logged-in user's own row, points and banner and on structural properties of the ranking,
   # never on the absolute position of other users.
   #
+  # Points are 1 per flashcard plus 3 per archived (learned) flashcard, so an archived flashcard is worth 4.
+  # The learning progress is shown next to the points but never decides the order.
+  #
   # Not covered here, because they need controlled data that the UI cannot set up, and are covered
   # by unit tests (Fiszki.Tests/Services/LeaderboardServiceTests.cs): the tie-break by who reached
-  # the score first, AI and manual flashcards counting equally, inactive users being left out, and
-  # the banner for the leader.
+  # the score first (including archiving as a score event), AI and manual flashcards counting equally,
+  # the learning progress never changing the order, inactive users being left out, and the banner for
+  # the leader.
 
   Background:
     Given the application is running
@@ -47,6 +51,45 @@ Feature: Leaderboard
     And I confirm the deletion
     And I open the leaderboard
     Then my leaderboard points should be the same as before
+
+  Scenario: Archiving, restoring and deleting an archived flashcard move my points
+    When I login with my test user
+    And I open the leaderboard
+    And I remember my leaderboard points
+    And I navigate to the Flashcards page
+    And I create the manual flashcard "Leaderboard archive question" with answer "Leaderboard archive answer"
+    And I open the leaderboard
+    Then my leaderboard points should be 1 higher than before
+    When I navigate to the Flashcards page
+    And I click I learned it on the flashcard "Leaderboard archive question"
+    And I confirm the archiving
+    And I open the leaderboard
+    Then my leaderboard points should be 4 higher than before
+    And my leaderboard flashcards should be 1 higher than before
+    And my leaderboard archived flashcards should be 1 higher than before
+    When I navigate to the Flashcards page
+    And I switch to the archived view
+    And I restore the flashcard "Leaderboard archive question"
+    And I open the leaderboard
+    Then my leaderboard points should be 1 higher than before
+    And my leaderboard flashcards should be 1 higher than before
+    And my leaderboard archived flashcards should be 0 higher than before
+    When I navigate to the Flashcards page
+    And I click I learned it on the flashcard "Leaderboard archive question"
+    And I confirm the archiving
+    And I switch to the archived view
+    And I click delete on card "Leaderboard archive question"
+    And I confirm the deletion
+    And I open the leaderboard
+    Then my leaderboard points should be the same as before
+    And my leaderboard flashcards and archived flashcards should be the same as before
+
+  Scenario: Rows show flashcards, archived flashcards, learning progress and points
+    When I login with my test user
+    And I open the leaderboard
+    Then every user on the page should have points equal to flashcards plus 3 per archived flashcard
+    And every user on the page should show a learning progress matching their archived and total flashcards
+    And the banner should show my own flashcards, archived flashcards and learning progress from my row
 
   Scenario: Ranking is sorted with unique consecutive positions
     When I login with my test user
