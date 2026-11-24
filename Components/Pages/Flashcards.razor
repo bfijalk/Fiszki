@@ -50,7 +50,7 @@
             </div>
         </div>
     }
-    else if (_flashcards.Count == 0)
+    else if (_summary.Total == 0)
     {
         <div class="row">
             <div class="col-12 text-center">
@@ -85,7 +85,7 @@
                                 <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
                             }
                         </h5>
-                        <h2 id="total-count" data-testid="total-count">@_allFlashcards.Count</h2>
+                        <h2 id="total-count" data-testid="total-count">@_summary.Total</h2>
                     </div>
                 </div>
             </div>
@@ -100,7 +100,7 @@
                                 <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
                             }
                         </h5>
-                        <h2 id="ai-count" data-testid="ai-count">@_allFlashcards.Count(f => f.CreationSource == "Ai")</h2>
+                        <h2 id="ai-count" data-testid="ai-count">@_summary.Ai</h2>
                     </div>
                 </div>
             </div>
@@ -115,8 +115,46 @@
                                 <i class="bi bi-check-circle-fill ms-2 animate-check"></i>
                             }
                         </h5>
-                        <h2 id="manual-count" data-testid="manual-count">@_allFlashcards.Count(f => f.CreationSource == "Manual")</h2>
+                        <h2 id="manual-count" data-testid="manual-count">@_summary.Manual</h2>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning progress -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card" id="learning-progress" data-testid="learning-progress">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold">
+                                <i class="bi bi-mortarboard me-2"></i>Learning progress
+                            </span>
+                            <span>
+                                <strong id="learning-progress-value" data-testid="learning-progress-value">@_summary.LearningProgress%</strong>
+                                <span class="text-muted ms-2">
+                                    (<span id="archived-count" data-testid="archived-count">@_summary.Archived</span> of @_summary.Total learned)
+                                </span>
+                            </span>
+                        </div>
+                        <div class="progress" role="progressbar" aria-label="Learning progress" aria-valuenow="@_summary.LearningProgress" aria-valuemin="0" aria-valuemax="100" data-testid="learning-progress-bar">
+                            <div class="progress-bar bg-success" style="width: @(_summary.LearningProgress)%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active / Archived switch -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="btn-group" role="group" aria-label="Flashcards view">
+                    <button type="button" class="btn @(_showArchived ? "btn-outline-primary" : "btn-primary")" @onclick="() => SwitchViewAsync(false)" id="view-active-button" data-testid="view-active-button">
+                        Active
+                    </button>
+                    <button type="button" class="btn @(_showArchived ? "btn-primary" : "btn-outline-primary")" @onclick="() => SwitchViewAsync(true)" id="view-archived-button" data-testid="view-archived-button">
+                        Archived (@_summary.Archived)
+                    </button>
                 </div>
             </div>
         </div>
@@ -171,7 +209,52 @@
             </div>
         }
 
-        @if (_isCardView)
+        @if (_cardToArchive != null)
+        {
+            <!-- Archive ("I learned it") Confirmation Modal -->
+            <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);" id="archive-confirmation-modal" data-testid="archive-confirmation-modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirm "I learned it"</h5>
+                            <button type="button" class="btn-close" @onclick="CancelArchive" id="cancel-archive-button" data-testid="cancel-archive-button"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to mark this flashcard as learned? It will be moved to the archive.</p>
+                            <div class="card">
+                                <div class="card-body">
+                                    <strong>Question:</strong> @_cardToArchive.FrontContent
+                                    <br>
+                                    <strong>Answer:</strong> @_cardToArchive.BackContent
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CancelArchive" id="cancel-archive-modal-button" data-testid="cancel-archive-modal-button">Cancel</button>
+                            <button type="button" class="btn btn-success" @onclick="ConfirmArchive" id="confirm-archive-button" data-testid="confirm-archive-button">
+                                <i class="bi bi-check2-circle me-1"></i>
+                                I learned it
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (_flashcards.Count == 0)
+        {
+            <div class="text-center text-muted p-4" id="flashcards-view-empty" data-testid="flashcards-view-empty">
+                @if (_showArchived)
+                {
+                    <p class="mb-0">No flashcards archived yet. Mark a flashcard as learned with "I learned it" and it will show up here.</p>
+                }
+                else
+                {
+                    <p class="mb-0">No active flashcards to show.</p>
+                }
+            </div>
+        }
+        else if (_isCardView)
         {
             <!-- Card View -->
             <div class="row" id="flashcards-card-view" data-testid="flashcards-card-view">
@@ -192,14 +275,7 @@
                                         <small class="text-muted">Manual</small>
                                     }
                                 </span>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => EditCard(card)" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(card)" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
+                                @CardActions(card)
                             </div>
                             
                             <div class="card-body">
@@ -270,15 +346,12 @@
                                 </div>
                                 <div class="text-muted mb-2">@card.BackContent</div>
                                 <small class="text-muted">Created @card.CreatedAt.ToLocalTime().ToString("g")</small>
+                                @if (card.ArchivedAt != null)
+                                {
+                                    <small class="text-muted ms-2">Learned @card.ArchivedAt.Value.ToLocalTime().ToString("g")</small>
+                                }
                             </div>
-                            <div>
-                                <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => EditCard(card)" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(card)" title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
+                            @CardActions(card)
                         </div>
                     </div>
                 }
@@ -356,6 +429,9 @@
     private bool _isCardView = true;
     private HashSet<Guid> _flippedCards = new();
     private FlashcardDto? _cardToDelete;
+    private FlashcardDto? _cardToArchive;
+    private bool _showArchived;
+    private FlashcardSummaryDto _summary = new(0, 0, 0, 0, 0);
     private bool _showCreateModal = false;
     private string _newCardFront = string.Empty;
     private string _newCardBack = string.Empty;
@@ -385,8 +461,9 @@
                 _error = "Invalid user identifier.";
                 return;
             }
-            var list = await FlashcardService.ListAsync(userId, take: 100);
+            var list = await FlashcardService.ListAsync(userId, take: 100, state: _showArchived ? FlashcardListState.Archived : FlashcardListState.Active);
             _allFlashcards = list.ToList();
+            _summary = await FlashcardService.GetSummaryAsync(userId);
             ApplyFilter();
         }
         catch (Exception ex)
@@ -398,6 +475,112 @@
             _isLoading = false;
         }
     }
+
+    private async Task<Guid?> GetUserIdAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var claim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+        return claim != null && Guid.TryParse(claim.Value, out var id) ? id : null;
+    }
+
+    private async Task RefreshSummaryAsync(Guid userId)
+    {
+        _summary = await FlashcardService.GetSummaryAsync(userId);
+    }
+
+    private async Task SwitchViewAsync(bool showArchived)
+    {
+        if (_showArchived == showArchived) return;
+        _showArchived = showArchived;
+        _flippedCards.Clear();
+        _cardToArchive = null;
+        _cardToDelete = null;
+        _isLoading = true;
+        await LoadFlashcards();
+    }
+
+    private void ShowArchiveConfirmation(FlashcardDto card)
+    {
+        _cardToArchive = card;
+    }
+
+    private void CancelArchive()
+    {
+        _cardToArchive = null;
+    }
+
+    private async Task ConfirmArchive()
+    {
+        if (_cardToArchive == null) return;
+
+        try
+        {
+            var userId = await GetUserIdAsync();
+            if (userId == null)
+            {
+                _error = "Unable to determine current user.";
+                return;
+            }
+
+            var id = _cardToArchive.Id;
+            await FlashcardService.ArchiveAsync(userId.Value, id);
+
+            _allFlashcards.RemoveAll(f => f.Id == id);
+            _flashcards.RemoveAll(f => f.Id == id);
+            _flippedCards.Remove(id);
+            _cardToArchive = null;
+            await RefreshSummaryAsync(userId.Value);
+        }
+        catch (Exception ex)
+        {
+            _error = $"Failed to archive flashcard: {ex.Message}";
+        }
+    }
+
+    private async Task RestoreCard(FlashcardDto card)
+    {
+        try
+        {
+            var userId = await GetUserIdAsync();
+            if (userId == null)
+            {
+                _error = "Unable to determine current user.";
+                return;
+            }
+
+            await FlashcardService.RestoreAsync(userId.Value, card.Id);
+
+            _allFlashcards.RemoveAll(f => f.Id == card.Id);
+            _flashcards.RemoveAll(f => f.Id == card.Id);
+            _flippedCards.Remove(card.Id);
+            await RefreshSummaryAsync(userId.Value);
+        }
+        catch (Exception ex)
+        {
+            _error = $"Failed to restore flashcard: {ex.Message}";
+        }
+    }
+
+    private RenderFragment CardActions(FlashcardDto card) => @<div>
+        @if (!_showArchived)
+        {
+            <button class="btn btn-sm btn-outline-success me-1" @onclick="() => ShowArchiveConfirmation(card)" title="I learned it" data-testid="archive-card-button">
+                <i class="bi bi-check2-circle me-1"></i>I learned it
+            </button>
+            <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => EditCard(card)" title="Edit" data-testid="edit-card-button">
+                <i class="bi bi-pencil"></i>
+            </button>
+        }
+        else
+        {
+            <button class="btn btn-sm btn-outline-success me-1" @onclick="() => RestoreCard(card)" title="Restore" data-testid="restore-card-button">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
+            </button>
+        }
+        <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(card)" title="Delete" data-testid="delete-card-button">
+            <i class="bi bi-trash"></i>
+        </button>
+    </div>;
 
     private void ApplyFilter()
     {
@@ -486,6 +669,9 @@
             
             // Close the modal
             _cardToDelete = null;
+
+            // Total, archived count and learning progress change with a deletion
+            await RefreshSummaryAsync(userId);
             
             StateHasChanged();
         }
@@ -556,9 +742,13 @@
 
             var newCard = await FlashcardService.CreateAsync(userId, command);
             
-            // Add the new card to both collections
-            _allFlashcards.Add(newCard);
-            ApplyFilter(); // This will update _flashcards based on current filter
+            // Add the new card to the visible list (the archived view does not show new, active cards)
+            if (!_showArchived)
+            {
+                _allFlashcards.Add(newCard);
+                ApplyFilter(); // This will update _flashcards based on current filter
+            }
+            await RefreshSummaryAsync(userId);
             
             // Close the modal and reset form
             _showCreateModal = false;

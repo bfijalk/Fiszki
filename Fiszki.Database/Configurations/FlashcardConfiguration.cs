@@ -19,6 +19,7 @@ public class FlashcardConfiguration : IEntityTypeConfiguration<Flashcard>
         b.Property(f => f.Tags).HasColumnName("tags");
         b.Property(f => f.CreatedAt).HasColumnName("created_at");
         b.Property(f => f.UpdatedAt).HasColumnName("updated_at");
+        b.Property(f => f.ArchivedAt).HasColumnName("archived_at");
         b.HasOne(f => f.User)
             .WithMany(u => u.Flashcards)
             .HasForeignKey(f => f.UserId)

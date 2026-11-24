@@ -36,23 +36,28 @@
             <div data-testid="leaderboard-banner-position">
                 You are <strong>#@banner.Position</strong> with <strong>@banner.Points @(banner.Points == 1 ? "point" : "points")</strong>.
             </div>
+            <div data-testid="leaderboard-banner-own">
+                You have <strong data-testid="leaderboard-banner-flashcards">@banner.Flashcards</strong> @(banner.Flashcards == 1 ? "flashcard" : "flashcards"),
+                <strong data-testid="leaderboard-banner-archived">@banner.Archived</strong> archived
+                (learning progress <strong data-testid="leaderboard-banner-progress">@banner.LearningProgress%</strong>).
+            </div>
 
             @if (banner.IsLeader)
             {
-                <div data-testid="leaderboard-banner-leader">You lead the ranking. Keep creating flashcards to stay ahead!</div>
+                <div data-testid="leaderboard-banner-leader">You lead the ranking. Keep creating and learning flashcards to stay ahead!</div>
             }
             else if (banner.PointsGap == 0)
             {
                 <div data-testid="leaderboard-banner-rival">
                     <strong>@banner.RivalMaskedEmail</strong> has the same number of points but reached them first.
-                    Create one more flashcard to overtake them!
+                    Create or learn one more flashcard to overtake them!
                 </div>
             }
             else
             {
                 <div data-testid="leaderboard-banner-rival">
                     <strong>@banner.RivalMaskedEmail</strong> has only <strong>@banner.PointsGap @(banner.PointsGap == 1 ? "point" : "points")</strong> more than you.
-                    Generate flashcards to catch up!
+                    Create or learn flashcards to catch up!
                 </div>
             }
 
@@ -74,6 +79,9 @@
                     <tr>
                         <th scope="col" style="width: 5rem;">#</th>
                         <th scope="col">User</th>
+                        <th scope="col" class="text-end">Flashcards</th>
+                        <th scope="col" class="text-end">Archived</th>
+                        <th scope="col" class="text-end">Learning progress</th>
                         <th scope="col" class="text-end">Points</th>
                     </tr>
                 </thead>
@@ -86,6 +94,9 @@
                             data-current-user="@(row.IsCurrentUser ? "true" : "false")">
                             <td data-testid="leaderboard-position">@row.Position</td>
                             <td data-testid="leaderboard-user">@row.MaskedEmail@(row.IsCurrentUser ? " (you)" : null)</td>
+                            <td class="text-end" data-testid="leaderboard-flashcards">@row.Flashcards</td>
+                            <td class="text-end" data-testid="leaderboard-archived">@row.Archived</td>
+                            <td class="text-end text-muted" data-testid="leaderboard-progress">@row.LearningProgress%</td>
                             <td class="text-end" data-testid="leaderboard-points">@row.Points</td>
                         </tr>
                     }

@@ -39,9 +39,9 @@ namespace Fiszki.FunctionalTests.Features
         public static async System.Threading.Tasks.Task FeatureSetupAsync()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunnerForAssembly(null, TechTalk.SpecFlow.xUnit.SpecFlowPlugin.XUnitParallelWorkerTracker.Instance.GetWorkerId());
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Leaderboard", "  As a logged-in user\n  I want to see how I rank against other users by the numbe" +
-                    "r of flashcards I own\n  So that I am motivated to create more flashcards and ove" +
-                    "rtake the users above me", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Leaderboard", "  As a logged-in user\n  I want to see how I rank against other users by the flash" +
+                    "cards I own and the ones I have learned\n  So that I am motivated to create and l" +
+                    "earn more flashcards and overtake the users above me", ProgrammingLanguage.CSharp, featureTags);
             await testRunner.OnFeatureStartAsync(featureInfo);
         }
         
@@ -80,9 +80,9 @@ namespace Fiszki.FunctionalTests.Features
         
         public virtual async System.Threading.Tasks.Task FeatureBackgroundAsync()
         {
-#line 15
+#line 19
   #line hidden
-#line 16
+#line 20
     await testRunner.GivenAsync("the application is running", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -105,7 +105,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Leaderboard menu item is visible after login and opens the leaderboard", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 18
+#line 22
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -115,22 +115,22 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 19
+#line 23
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 20
+#line 24
     await testRunner.ThenAsync("I should see the Leaderboard menu item", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 21
+#line 25
     await testRunner.WhenAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 22
+#line 26
     await testRunner.ThenAsync("I should be on the leaderboard page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 23
+#line 27
     await testRunner.AndAsync("the banner should show my position and points", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -145,7 +145,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Leaderboard menu item is hidden for visitors", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 25
+#line 29
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -155,13 +155,13 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 26
+#line 30
     await testRunner.GivenAsync("I am on the Home page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 27
+#line 31
     await testRunner.ThenAsync("I should not see the Leaderboard menu item", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -176,7 +176,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Leaderboard page requires login", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 29
+#line 33
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -186,13 +186,13 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 30
+#line 34
     await testRunner.WhenAsync("I open the leaderboard address without logging in", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 31
+#line 35
     await testRunner.ThenAsync("I should be asked to log in", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -207,7 +207,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("My points follow my flashcards", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 33
+#line 37
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -217,56 +217,215 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 34
+#line 38
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 35
-    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 36
-    await testRunner.AndAsync("I remember my leaderboard points", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 37
-    await testRunner.AndAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 38
-    await testRunner.AndAsync("I click Add Manual Card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
 #line 39
-    await testRunner.AndAsync("I enter question \"Leaderboard points question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 40
-    await testRunner.AndAsync("I enter answer \"Leaderboard points answer\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    await testRunner.AndAsync("I remember my leaderboard points", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 41
-    await testRunner.AndAsync("I click Create Card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    await testRunner.AndAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 42
-    await testRunner.ThenAsync("I should see the flashcard \"Leaderboard points question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    await testRunner.AndAsync("I click Add Manual Card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 43
-    await testRunner.WhenAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    await testRunner.AndAsync("I enter question \"Leaderboard points question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 44
-    await testRunner.ThenAsync("my leaderboard points should be 1 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    await testRunner.AndAsync("I enter answer \"Leaderboard points answer\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 45
-    await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    await testRunner.AndAsync("I click Create Card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 46
-    await testRunner.AndAsync("I click delete on card \"Leaderboard points question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    await testRunner.ThenAsync("I should see the flashcard \"Leaderboard points question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 47
-    await testRunner.AndAsync("I confirm the deletion", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    await testRunner.WhenAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 48
-    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    await testRunner.ThenAsync("my leaderboard points should be 1 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 49
+    await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 50
+    await testRunner.AndAsync("I click delete on card \"Leaderboard points question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 51
+    await testRunner.AndAsync("I confirm the deletion", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 52
+    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 53
     await testRunner.ThenAsync("my leaderboard points should be the same as before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Archiving, restoring and deleting an archived flashcard move my points")]
+        [Xunit.TraitAttribute("FeatureTitle", "Leaderboard")]
+        [Xunit.TraitAttribute("Description", "Archiving, restoring and deleting an archived flashcard move my points")]
+        public async System.Threading.Tasks.Task ArchivingRestoringAndDeletingAnArchivedFlashcardMoveMyPoints()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Archiving, restoring and deleting an archived flashcard move my points", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 55
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 19
+  this.FeatureBackgroundAsync();
+#line hidden
+#line 56
+    await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 57
+    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 58
+    await testRunner.AndAsync("I remember my leaderboard points", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 59
+    await testRunner.AndAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 60
+    await testRunner.AndAsync("I create the manual flashcard \"Leaderboard archive question\" with answer \"Leaderb" +
+                        "oard archive answer\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 61
+    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 62
+    await testRunner.ThenAsync("my leaderboard points should be 1 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 63
+    await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 64
+    await testRunner.AndAsync("I click I learned it on the flashcard \"Leaderboard archive question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 65
+    await testRunner.AndAsync("I confirm the archiving", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 66
+    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 67
+    await testRunner.ThenAsync("my leaderboard points should be 4 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 68
+    await testRunner.AndAsync("my leaderboard flashcards should be 1 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 69
+    await testRunner.AndAsync("my leaderboard archived flashcards should be 1 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 70
+    await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 71
+    await testRunner.AndAsync("I switch to the archived view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 72
+    await testRunner.AndAsync("I restore the flashcard \"Leaderboard archive question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 73
+    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 74
+    await testRunner.ThenAsync("my leaderboard points should be 1 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 75
+    await testRunner.AndAsync("my leaderboard flashcards should be 1 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 76
+    await testRunner.AndAsync("my leaderboard archived flashcards should be 0 higher than before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 77
+    await testRunner.WhenAsync("I navigate to the Flashcards page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 78
+    await testRunner.AndAsync("I click I learned it on the flashcard \"Leaderboard archive question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 79
+    await testRunner.AndAsync("I confirm the archiving", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 80
+    await testRunner.AndAsync("I switch to the archived view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 81
+    await testRunner.AndAsync("I click delete on card \"Leaderboard archive question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 82
+    await testRunner.AndAsync("I confirm the deletion", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 83
+    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 84
+    await testRunner.ThenAsync("my leaderboard points should be the same as before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 85
+    await testRunner.AndAsync("my leaderboard flashcards and archived flashcards should be the same as before", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Rows show flashcards, archived flashcards, learning progress and points")]
+        [Xunit.TraitAttribute("FeatureTitle", "Leaderboard")]
+        [Xunit.TraitAttribute("Description", "Rows show flashcards, archived flashcards, learning progress and points")]
+        public async System.Threading.Tasks.Task RowsShowFlashcardsArchivedFlashcardsLearningProgressAndPoints()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Rows show flashcards, archived flashcards, learning progress and points", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 87
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 19
+  this.FeatureBackgroundAsync();
+#line hidden
+#line 88
+    await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 89
+    await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 90
+    await testRunner.ThenAsync("every user on the page should have points equal to flashcards plus 3 per archived" +
+                        " flashcard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 91
+    await testRunner.AndAsync("every user on the page should show a learning progress matching their archived an" +
+                        "d total flashcards", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 92
+    await testRunner.AndAsync("the banner should show my own flashcards, archived flashcards and learning progre" +
+                        "ss from my row", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -280,7 +439,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ranking is sorted with unique consecutive positions", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 51
+#line 94
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -290,22 +449,22 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 52
+#line 95
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 53
+#line 96
     await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 54
+#line 97
     await testRunner.ThenAsync("the points on the page should be sorted from highest to lowest", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 55
+#line 98
     await testRunner.AndAsync("the positions on the page should be unique and consecutive starting from 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 56
+#line 99
     await testRunner.AndAsync("users without points should be listed after users with points", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -320,7 +479,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Users are shown with masked emails", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 58
+#line 101
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -330,22 +489,22 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 59
+#line 102
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 60
+#line 103
     await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 61
+#line 104
     await testRunner.ThenAsync("every user on the page should be shown with a masked email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 62
+#line 105
     await testRunner.AndAsync("the page should not show my full email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 63
+#line 106
     await testRunner.AndAsync("my own row should be highlighted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -360,7 +519,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Leaderboard is paginated by 30 users", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 65
+#line 108
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -370,52 +529,52 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 66
+#line 109
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 67
+#line 110
     await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 68
+#line 111
     await testRunner.ThenAsync("I should see 30 users on the page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 69
+#line 112
     await testRunner.AndAsync("the first position on the page should be 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 70
+#line 113
     await testRunner.AndAsync("the previous page button should be disabled", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 71
+#line 114
     await testRunner.AndAsync("the leaderboard should have more than one page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 72
+#line 115
     await testRunner.WhenAsync("I go to the next page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 73
+#line 116
     await testRunner.ThenAsync("the first position on the page should be 31", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 74
+#line 117
     await testRunner.AndAsync("the previous page button should be enabled", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 75
+#line 118
     await testRunner.AndAsync("the banner should still be shown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 76
+#line 119
     await testRunner.WhenAsync("I go to the last page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 77
+#line 120
     await testRunner.ThenAsync("the next page button should be disabled", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 78
+#line 121
     await testRunner.AndAsync("the page should list between 1 and 30 users", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 79
+#line 122
     await testRunner.WhenAsync("I go to the previous page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 80
+#line 123
     await testRunner.ThenAsync("the next page button should be enabled", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -430,7 +589,7 @@ namespace Fiszki.FunctionalTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Banner matches the ranking table", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 82
+#line 125
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -440,16 +599,16 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 83
+#line 126
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 84
+#line 127
     await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 85
+#line 128
     await testRunner.ThenAsync("the banner should match the ranking table", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -466,7 +625,7 @@ namespace Fiszki.FunctionalTests.Features
                     "empty1"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Banner for a user without flashcards", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 88
+#line 131
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -476,26 +635,26 @@ namespace Fiszki.FunctionalTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 15
+#line 19
   this.FeatureBackgroundAsync();
 #line hidden
-#line 89
+#line 132
     await testRunner.WhenAsync("I login with my test user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 90
+#line 133
     await testRunner.AndAsync("I open the leaderboard", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 91
+#line 134
     await testRunner.ThenAsync("my leaderboard points should be 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 92
+#line 135
     await testRunner.AndAsync("the banner should match the ranking table", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 93
+#line 136
     await testRunner.AndAsync("the banner should name a rival above me with the same points who reached them fir" +
                         "st", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 94
+#line 137
     await testRunner.AndAsync("the banner should say I have at least 30 rivals with the same points", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

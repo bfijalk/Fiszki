@@ -35,6 +35,10 @@ namespace Fiszki.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("ai_model");
 
+                    b.Property<DateTime?>("ArchivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("archived_at");
+
                     b.Property<string>("BackContent")
                         .IsRequired()
                         .HasColumnType("text")

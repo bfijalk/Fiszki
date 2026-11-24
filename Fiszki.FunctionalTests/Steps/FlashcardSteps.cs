@@ -318,8 +318,14 @@ public class FlashcardSteps : BaseSteps
 
             totalCount.Should().BeGreaterThan(0, "Total flashcard count should be greater than 0");
             (aiCount + manualCount).Should().Be(totalCount, "AI + Manual counts should equal total count");
+
+            // The counters include archived flashcards, and the learning progress is the archived share of the total
+            var archivedCount = await FlashcardsPage.GetArchivedCountAsync();
+            var progress = await FlashcardsPage.GetLearningProgressAsync();
+            archivedCount.Should().BeLessThanOrEqualTo(totalCount, "archived flashcards are part of the total");
+            progress.Should().Be(archivedCount * 100 / totalCount, "the learning progress is archived / total in whole percent, rounded down");
             
-            Console.WriteLine($"Flashcard statistics: Total={totalCount}, AI={aiCount}, Manual={manualCount}");
+            Console.WriteLine($"Flashcard statistics: Total={totalCount}, AI={aiCount}, Manual={manualCount}, Archived={archivedCount}, Progress={progress}%");
         }
     }
 

@@ -8,6 +8,7 @@ public record FlashcardDto(
     string? AiModel,
     IReadOnlyCollection<string> Tags,
     DateTime CreatedAt,
-    DateTime UpdatedAt
+    DateTime UpdatedAt,
+    DateTime? ArchivedAt = null
 );
 
