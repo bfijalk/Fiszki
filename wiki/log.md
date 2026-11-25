@@ -198,3 +198,36 @@ never shows a local part in full; the banner wording for users with 0 points say
 
 Unverified: how the ranking query behaves on PostgreSQL (all tests use the in-memory provider), and the loading and error
 states of the leaderboard page (no test fails the service). The leaderboard page is therefore `confidence: medium`.
+
+## [2026-11-24] ingest | Archive of add-flashcard-archiving
+
+Mode: after archive. The OpenSpec change `add-flashcard-archiving` was archived on 2026-11-24 to
+`openspec/changes/archive/2026-11-24-add-flashcard-archiving` and synced two main specs: a new `flashcard-archiving` and a
+modified `leaderboard` (one requirement renamed, four modified). The code is on `main` (PR #30, commit `fd1cb20`).
+The synced specs and this wiki update are not committed yet.
+
+Pages created: `features/flashcard-archiving.md` (rules 1-14: the "I learned it" button and confirmation, archive and
+restore, the Archived view, deleting an archived card, learning progress rounded down, counters that include archived
+cards, the empty-state rule, errors, points; implementation; tests).
+
+Pages updated: `features/leaderboard.md` (points = flashcards + 3 per archived, new columns and learning progress, tie-break by
+the latest creation or archiving, banner with own numbers and new wording, 11 scenarios, stale-purpose discrepancy),
+`features/flashcard-list-and-filters.md` (active list only, counters from a database count and including archived cards, the
+progress bar and view switch, the empty state only without any flashcards, the stuck-filter behavior gone),
+`features/flashcard-deletion.md` (archived cards, effect on progress and points, the new test ids),
+`data-model/flashcard-entity.md` (`ArchivedAt` / `archived_at`, archive and restore lifecycle, migration),
+`data-model/learning-progress-entity.md` (clarifies it is not the percentage), `business-rules/flashcard-ownership.md`,
+`features/manual-flashcard-creation.md`, `features/information-pages.md` (the "Progress tracking" claim is now mostly false
+instead of false), `glossary.md`, and `index.md`. Reviewed with no text change, `verified_commit` refreshed:
+`architecture/application-layers.md`, `architecture/authentication-session.md`, `business-rules/flashcard-content-limits.md`,
+`data-model/user-entity.md`, `features/ai-flashcard-generation.md`, `features/site-navigation.md`,
+`features/user-login-and-logout.md`.
+
+Discrepancies recorded: the main `leaderboard` spec keeps a stale Purpose ("by the number of flashcards they own"); the product
+word "learning progress" collides with the unused spaced-repetition `LearningProgress` entity; the spec does not say that the
+AI/Manual filter survives switching between the Active and Archived views (the code keeps it).
+
+Unverified: the ranking and archive queries on PostgreSQL are covered by no automated test (they were run once by hand against
+PostgreSQL 14 with a throwaway program that is not in the repository), the error states of archive and restore, and the 100-card
+cap of the Archived view. `leaderboard.md` and `flashcard-archiving.md` are `confidence: medium` because they cite
+`openspec/specs/` files that are not committed yet.

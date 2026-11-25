@@ -2,13 +2,13 @@
 title: Learning progress entity
 type: data-model
 summary: The learning_progress table and LearningProgress entity that hold spaced-repetition state per flashcard, and how it is deleted with its flashcard.
-tags: [learning-progress, spaced-repetition, entity, table, database, review, cascade, ease-factor]
+tags: [learning-progress, spaced-repetition, entity, table, database, review, cascade, ease-factor, unrelated-to-archive]
 sources:
   - Fiszki.Database/Entities/LearningProgress.cs
   - Fiszki.Database/Configurations/LearningProgressConfiguration.cs
   - Fiszki.Database/Migrations/20251014085238_InitialCreate.cs
   - Fiszki.Services/Services/TestDataSeeder.cs
-verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 
@@ -43,6 +43,10 @@ One record per flashcard holding its review schedule for spaced repetition. Stor
 
 ## Lifecycle
 
+**Not the "learning progress" percentage.** The learning progress shown on the Flashcards page and the leaderboard is the
+share of archived ("learned") flashcards and is computed from `ArchivedAt` on the flashcard, see [[flashcard-archiving]]. This
+table is not read or written for it.
+
 In the current code no application flow creates or updates learning-progress records. The
 only code that creates them is the test data seeder
 (`Fiszki.Services/Services/TestDataSeeder.cs` `TestDataSeeder`). The table and mapping are in
@@ -53,3 +57,4 @@ review feature writes these records.
 
 - [[flashcard-entity]]
 - [[flashcard-deletion]]
+- [[flashcard-archiving]]

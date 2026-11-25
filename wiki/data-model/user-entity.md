@@ -12,7 +12,7 @@ sources:
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Fiszki.Services/Services/TestDataSeeder.cs
   - Fiszki.Services/Services/LeaderboardService.cs
-verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 

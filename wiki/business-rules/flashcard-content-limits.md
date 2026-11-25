@@ -15,7 +15,7 @@ sources:
   - Components/Pages/Generate/ProposalReviewDialog.razor
   - Fiszki.Database/Configurations/FlashcardConfiguration.cs
   - Fiszki.Tests/Services/Validation/ValidatorTests.cs
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 

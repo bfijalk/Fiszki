@@ -16,7 +16,7 @@ sources:
   - Program.cs
   - .github/workflows/ci-cd.yml
   - Fiszki.FunctionalTests/Features/Navigation.feature
-verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 
@@ -126,7 +126,7 @@ hierarchy). Verdicts: **True** (matches the code), **False** (the code does not 
 
 | Claim | Verdict | What the code or the repository shows |
 |---|---|---|
-| Core features "Interactive learning sessions" and "Progress tracking" | **False** | Not implemented, see [[learning-progress-entity]]. |
+| Core features "Interactive learning sessions" and "Progress tracking" | **Mostly false** | There is no learning session. A simple progress tracking exists since archiving: the user marks flashcards as learned and sees a learning progress percentage, see [[flashcard-archiving]]; the spaced-repetition table is still unused, see [[learning-progress-entity]]. |
 | Stack lists "ASP.NET Core 8" next to ".NET 10" | **False** | Every project targets .NET 10 (`Fiszki.csproj`). |
 | "Repository Pattern" | **False** | Services use the database context directly. |
 | "CQRS (Command Query)" | **Partly** | Commands are plain records passed to services; there is no query side and no handlers. |

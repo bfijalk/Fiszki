@@ -18,7 +18,7 @@ sources:
   - Fiszki.FunctionalTests/Steps/FlashcardSteps.cs
   - Fiszki.FunctionalTests/PageObjects/FlashcardsPage.cs
   - Fiszki.Services/Services/LeaderboardService.cs
-verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 
@@ -71,7 +71,9 @@ test**, or **code only** (read from the implementation, no automated test).
    (`Fiszki.Tests/Services/FlashcardServiceTests.cs` `CreateAsync_ShouldPersistAndReturnDto`).
    See [[flashcard-ownership]].
 9. **The list and counters update immediately.** The dialog closes, the card appears and the
-   "Total Cards" and "Manual" counters go up (see [[flashcard-list-and-filters]]). The new card is added at the **end** of the visible
+   "Total Cards" and "Manual" counters go up (see [[flashcard-list-and-filters]]); they are re-read from the database,
+   as are the archived count and the learning progress. If the Archived view is open, the new (active) card is not added to
+   that list, only the counters change (`Components/Pages/Flashcards.razor` `CreateCard`). The new card is added at the **end** of the visible
    list; after a reload the list is newest first, so it moves to the top. Backed by: Gherkin for
    "the dialog closes and the card is visible"
    (`Fiszki.FunctionalTests/Features/ManualFlashcardCreation.feature`, scenario "Create a manual flashcard successfully");
@@ -93,7 +95,7 @@ test**, or **code only** (read from the implementation, no automated test).
 
 ### Editing existing flashcards (service only)
 
-- **There is no edit screen.** Every card shows a pencil button with the tooltip "Edit", but it
+- **There is no edit screen.** Every active card shows a pencil button with the tooltip "Edit", but it
   does nothing: the handler is a stub with a TODO
   (`Components/Pages/Flashcards.razor` `EditCard`). Backed by: code only.
 - **The service can update.** `Fiszki.Services/Services/FlashcardService.cs` `UpdateAsync`
