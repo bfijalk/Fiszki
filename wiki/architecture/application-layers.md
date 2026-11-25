@@ -8,7 +8,7 @@ sources:
   - Fiszki.Services/DependencyInjection.cs
   - Fiszki.Services/Services/CustomAuthStateProvider.cs
   - Components/Pages/Flashcards.razor
-verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 

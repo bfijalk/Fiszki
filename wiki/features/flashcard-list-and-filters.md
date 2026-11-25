@@ -1,8 +1,8 @@
 ---
 title: Flashcard list, counters and filters
 type: feature
-summary: What the Flashcards page shows a logged-in user: the loading, error and empty states, the newest-first list capped at 100 cards, the Total, AI and Manual counters that also filter, card and list views, flipping, and what is missing (search, sorting, paging, tags).
-tags: [flashcards, list, flashcards-page, counters, statistics, filter, ai-generated, manual, card-view, list-view, flip, empty-state, loading, error, ordering, limit, newest-first, no-search, no-sorting, no-pagination]
+summary: What the Flashcards page shows a logged-in user: the loading, error and empty states, the newest-first list of active cards capped at 100, the Total, AI and Manual counters (which include archived cards and also filter), the learning progress bar, the Active and Archived switch, card and list views, flipping, and what is missing (search, sorting, paging, tags).
+tags: [flashcards, list, flashcards-page, counters, statistics, filter, ai-generated, manual, card-view, list-view, flip, empty-state, loading, error, ordering, limit, newest-first, no-search, no-sorting, no-pagination, archived, learning-progress, archived-view, active]
 sources:
   - Fiszki.FunctionalTests/Features/FlashcardsUI.feature
   - Components/Pages/Flashcards.razor
@@ -11,11 +11,13 @@ sources:
   - Fiszki.Services/Interfaces/IFlashcardService.cs
   - Fiszki.Services/Services/FlashcardService.cs
   - Fiszki.Services/Models/FlashcardDto.cs
+  - Fiszki.Services/Models/FlashcardSummaryDto.cs
+  - docs/TEST_SELECTORS.md
   - Fiszki.Tests/Services/FlashcardServiceTests.cs
   - Fiszki.FunctionalTests/Steps/FlashcardSteps.cs
   - Fiszki.FunctionalTests/PageObjects/FlashcardsPage.cs
   - Fiszki.FunctionalTests/Hooks/SeededTestUserHooks.cs
-verified_commit: 5367383718e4da80f89f35abf89c2b78f6f682c8
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 
@@ -26,9 +28,10 @@ confidence: high
 The Flashcards page (`/flashcards`) is where a logged-in user lands after signing in. It lists the
 user's own flashcards, shows three counters that double as filters, and lets the user switch
 between a card view and a list view and flip cards to see the answer. From here the user also
-creates ([[manual-flashcard-creation]]), deletes ([[flashcard-deletion]]) and starts generation
-([[ai-flashcard-generation]]). The page has no search, no sorting options, no paging and does not
-show tags.
+creates ([[manual-flashcard-creation]]), deletes ([[flashcard-deletion]]), marks cards as learned
+([[flashcard-archiving]]) and starts generation ([[ai-flashcard-generation]]). The list shows **active** cards
+only; learned cards are in an Archived view on the same page, and a learning progress bar sits under the counters.
+The page has no search, no sorting options, no paging and does not show tags.
 
 ## Business rules
 
@@ -44,11 +47,12 @@ test**, or **code only** (read from the implementation, no automated test).
 3. **A failure replaces the page content with a red message.** The message is "Unable to determine
    current user.", "Invalid user identifier." or the technical text of the error. There is no retry
    button; the user must reload. Backed by: code only (`Components/Pages/Flashcards.razor` `LoadFlashcards`).
-4. **A user with no flashcards sees "No flashcards yet"** with two buttons, "Generate with AI"
+4. **A user with no flashcards at all sees "No flashcards yet"** (a user whose cards are all archived does not, see
+   [[flashcard-archiving]]) with two buttons, "Generate with AI"
    (opens the Generate page) and "Create Manually" (opens the create dialog). Backed by: Gherkin
    (`Fiszki.FunctionalTests/Features/FlashcardsUI.feature`, scenario "Empty flashcards state").
-5. **The list shows the newest flashcards first, at most 100.** Older cards beyond the 100 newest
-   are not shown and there is no way to reach them. Backed by: unit test for the order
+5. **The list shows the newest active flashcards first, at most 100.** Archived cards are not in it. Older cards
+   beyond the 100 newest are not shown and there is no way to reach them. Backed by: unit test for the order
    (`Fiszki.Tests/Services/FlashcardServiceTests.cs` `ListAsync_ReturnsOrdered`); the limit of 100
    comes from code only (`Components/Pages/Flashcards.razor` `LoadFlashcards`).
 6. **Each flashcard shows its question and answer, where it came from and when it was created.**
@@ -61,22 +65,27 @@ test**, or **code only** (read from the implementation, no automated test).
 
 ### Counters and filters
 
-7. **Three counters are shown when there is at least one card:** "Total Cards", "AI Generated" and
-   "Manual". The counters count the cards the page has loaded, so with more than 100 cards they
-   undercount. Backed by: Gherkin for the counters on a seeded collection, checking that AI plus
+7. **Three counters are shown when the user has at least one card:** "Total Cards", "AI Generated" and
+   "Manual". They count **all** the user's cards, archived ones included, from a database count and not from the loaded
+   list, so archiving does not change them and they no longer undercount above 100 cards (rule 5 still caps the list).
+   Backed by code only (`Fiszki.Services/Services/FlashcardService.cs` `GetSummaryAsync`) and by: Gherkin for the counters on a seeded collection, checking that AI plus
    Manual equals Total
-   (`Fiszki.FunctionalTests/Features/FlashcardsUI.feature`, scenario "View existing flashcards and statistics").
-8. **Clicking a counter filters the list by where the cards came from.** Clicking "AI Generated" or
+   (`Fiszki.FunctionalTests/Features/FlashcardsUI.feature`, scenario "View existing flashcards and statistics"; that step
+   also checks the learning progress and the archived count).
+8. **Clicking a counter filters the visible list (active or archived) by where the cards came from.** Clicking "AI Generated" or
    "Manual" shows only those cards and marks that counter with a check; clicking it again, clicking
    "Total Cards" or double-clicking any counter shows all cards again. The counters themselves keep
    their full numbers while a filter is on. Backed by: code only
    (`Components/Pages/Flashcards.razor` `ToggleFilter`, `Components/Pages/Flashcards.razor` `ClearFilter`).
    **No active scenario clicks a filter.**
-9. **A filter that matches nothing leaves the user stuck.** If the chosen filter has no cards (for
-   example "AI Generated" with only manual cards, or after deleting the last card of that kind), the
-   page shows "No flashcards yet" and **hides the counters**, so the filter cannot be cleared until the
-   page is reloaded. Backed by: code only (`Components/Pages/Flashcards.razor` `ApplyFilter`; the same
-   effect is noted in [[flashcard-deletion]]).
+9. **A filter that matches nothing no longer leaves the user stuck.** Since archiving the "No flashcards yet" state is
+   chosen from the user's total number of cards, not from the filtered list. If the chosen filter has no cards (for
+   example "AI Generated" with only manual cards) the counters stay and a short message ("No active flashcards to show.")
+   replaces the list, so the filter can be cleared. Backed by: code only (`Components/Pages/Flashcards.razor`
+   `ApplyFilter`, the empty-list message in the markup); it replaces the old behavior that hid the counters.
+9a. **Learning progress and the archived count sit under the counters**, with an "Active" / "Archived (N)" switch. Backed
+    by: Gherkin (`Fiszki.FunctionalTests/Features/FlashcardArchiving.feature`, scenario "Archiving raises the learning progress and keeps the counters") and OpenSpec (`openspec/specs/flashcard-archiving/spec.md`, requirement
+    "Counters include archived flashcards"). Details are in [[flashcard-archiving]].
 
 ### Views and flipping
 
@@ -96,8 +105,9 @@ test**, or **code only** (read from the implementation, no automated test).
 13. **"Generate More Cards" opens the Generate page; "Add Manual Card" opens the create dialog.** Both
     are shown with the counters. Backed by: Gherkin for the create dialog from the empty state
     (`Fiszki.FunctionalTests/Features/FlashcardsUI.feature`, scenario "Create a manual flashcard from empty state").
-14. **The Edit button does nothing** and the Delete button opens a confirmation dialog. Backed by:
-    code only; see [[manual-flashcard-creation]] and [[flashcard-deletion]].
+14. **Each active card has three buttons: "I learned it", Edit and Delete.** The Edit button does nothing, Delete opens a
+    confirmation dialog and "I learned it" opens the archive dialog. Backed by: Gherkin for the button
+    (`Fiszki.FunctionalTests/Features/FlashcardArchiving.feature`, scenario "Every active flashcard has an I learned it button in both views"); the rest code only; see [[manual-flashcard-creation]], [[flashcard-deletion]] and [[flashcard-archiving]].
 15. **The page does not offer search, sorting, paging or tag display.** Tags typed when creating a
     card are stored but never shown, and the only filter is by source. Backed by: code only (absence).
 
@@ -113,20 +123,23 @@ test**, or **code only** (read from the implementation, no automated test).
 For developers. Layers and wiring: [[application-layers]].
 
 - **Page:** `Components/Pages/Flashcards.razor` (Bootstrap markup). State: `_isLoading`, `_error`,
-  `_allFlashcards` (everything loaded), `_flashcards` (what is shown after the filter),
-  `_selectedFilter`, `_isCardView`, `_flippedCards`. `LoadFlashcards` reads the user id from the
-  `NameIdentifier` claim and calls `IFlashcardService.ListAsync(userId, take: 100)`. The page shows
-  one of four states in order: loading, error, empty (when the **filtered** list is empty), list.
+  `_allFlashcards` (everything loaded for the current view), `_flashcards` (what is shown after the filter),
+  `_selectedFilter`, `_isCardView`, `_flippedCards`, `_showArchived` and `_summary`. `LoadFlashcards` reads the user id
+  from the `NameIdentifier` claim, calls `IFlashcardService.ListAsync(userId, take: 100, state: ...)` for the active or
+  archived view and `IFlashcardService.GetSummaryAsync` for the counters and the progress. The page shows one of four
+  states in order: loading, error, empty (when the user has **no flashcards at all**, `_summary.Total == 0`), list.
+  An empty visible list with a non-empty collection shows a short message instead of the list.
 - **Filter:** `ApplyFilter` builds `_flashcards` from `_allFlashcards` by the creation source text
   ("Ai" or "Manual"); `ToggleFilter` and `ClearFilter` change `_selectedFilter`. The counters are
-  computed from `_allFlashcards`, so they ignore the filter.
-- **Service:** `Fiszki.Services/Services/FlashcardService.cs` `ListAsync` keeps only the user's cards,
+  taken from `_summary`, so they ignore the filter and the view.
+- **Service:** `Fiszki.Services/Services/FlashcardService.cs` `ListAsync` keeps only the user's active cards (or
+  archived ones for the Archived view),
   orders them newest first by creation time, applies `skip` (default 0) and `take`, and limits `take`
   to 1 to 500. The page passes 100 and never passes `skip`, so there is no paging. `GetAsync` exists but
   the page does not use it.
 - **Data shown:** `Fiszki.Services/Models/FlashcardDto.cs` `FlashcardDto` carries id, question, answer,
-  creation source, AI model, tags and both times; the page uses the question, answer, creation
-  source and creation time, and ignores the model, tags and update time.
+  creation source, AI model, tags, both times and the archive time; the page uses the question, answer, creation
+  source and creation time (and, in list view of the Archived view, the "Learned" time), and ignores the model, tags and update time.
 - **Styles:** `wwwroot/css/flashcards.css` styles the filter cards (hover, selected state, check
   animation). The page links it as `~/css/flashcards.css`, a form from Razor Pages, and it is the only
   place that links it. Whether the browser loads it was not verified.
@@ -134,7 +147,8 @@ For developers. Layers and wiring: [[application-layers]].
   `generate-with-ai-button`, `create-manually-button`, `total-cards-stat`, `ai-cards-stat`,
   `manual-cards-stat`, `total-count`, `ai-count`, `manual-count`, `generate-more-cards-button`,
   `add-manual-card-button`, `toggle-view-mode-button`, `flashcards-card-view`, `flashcards-list-view`,
-  `flashcard-item` (card view only; list rows and the edit and delete buttons have none).
+  `flashcard-item` (card view only; list rows have none), `edit-card-button`, `delete-card-button` and the archiving
+  selectors listed in [[flashcard-archiving]].
 
 ### Test coverage
 
@@ -151,13 +165,13 @@ For developers. Layers and wiring: [[application-layers]].
   zero. The step definitions for clicking a filter exist, but no active scenario uses them, and what
   they would assert is only that a count is zero or more
   (`Fiszki.FunctionalTests/Steps/FlashcardSteps.cs` `ThenIShouldSeeOnlyAiGeneratedFlashcards`).
-- **Not tested:** the filters, the stuck filter (rule 9), the limit of 100, the error state, the
+- **Not tested:** the filters (including a filter that matches nothing, rule 9), the limit of 100, the error state, the
   time zone, flipping, and what the Edit button does.
 
 ## Dependencies and side effects
 
 - Shows what [[ai-flashcard-generation]] and [[manual-flashcard-creation]] save, and is the only
-  place to delete cards, see [[flashcard-deletion]].
+  place to delete cards, see [[flashcard-deletion]], and to archive and restore them, see [[flashcard-archiving]].
 - Reads data described in [[flashcard-entity]].
 
 ## Discrepancies
@@ -179,6 +193,7 @@ Older notes disagree with the code. The code wins (see SCHEMA, trust hierarchy).
 
 - [[manual-flashcard-creation]]
 - [[flashcard-deletion]]
+- [[flashcard-archiving]]
 - [[ai-flashcard-generation]]
 - [[flashcard-entity]]
 - [[flashcard-ownership]]

@@ -1,8 +1,8 @@
 ---
 title: Flashcard deletion
 type: feature
-summary: How a logged-in user permanently deletes one of their own flashcards from the Flashcards page, with a confirmation dialog, an ownership check and cascade to learning progress.
-tags: [flashcards, deletion, delete, remove, confirmation, dialog, modal, trash, ownership, permanent, cascade]
+summary: How a logged-in user permanently deletes one of their own flashcards, active or archived, from the Flashcards page, with a confirmation dialog, an ownership check, cascade to learning progress, and the effect on counters, progress and points.
+tags: [flashcards, deletion, delete, remove, confirmation, dialog, modal, trash, ownership, permanent, cascade, archived]
 sources:
   - Fiszki.FunctionalTests/Features/FlashcardDeletion.feature
   - Components/Pages/Flashcards.razor
@@ -11,11 +11,13 @@ sources:
   - Fiszki.Database/Configurations/FlashcardConfiguration.cs
   - Fiszki.Database/Configurations/LearningProgressConfiguration.cs
   - Fiszki.Tests/Services/FlashcardServiceTests.cs
+  - Fiszki.Tests/Services/FlashcardArchivingTests.cs
+  - Fiszki.FunctionalTests/Features/FlashcardArchiving.feature
   - Fiszki.FunctionalTests/Steps/FlashcardSteps.cs
   - Fiszki.FunctionalTests/PageObjects/FlashcardsPage.cs
   - docs/TEST_SELECTORS.md
   - Fiszki.Services/Services/LeaderboardService.cs
-verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 
@@ -25,7 +27,8 @@ confidence: high
 
 A logged-in user can delete a flashcard they own from the Flashcards page (`/flashcards`).
 Deletion is **permanent** and always goes through a **confirmation dialog**. The same
-action is available in the card view and in the list view.
+action is available in the card view and in the list view, and for **archived** flashcards in the Archived view
+(see [[flashcard-archiving]]), where it is the same dialog and the same deletion.
 
 ## Business rules
 
@@ -63,7 +66,11 @@ For analysts. Each rule says how it is backed: **Gherkin** (a `.feature` scenari
    (`Fiszki.Database/Configurations/LearningProgressConfiguration.cs` `OnDelete`).
 10. **The page updates immediately.** After a successful deletion the dialog closes, the
     flashcard disappears from the list, and the three counters ("Total Cards", "AI
-    Generated", "Manual") are recalculated. Backed by: code only
+    Generated", "Manual"), the archived count and the learning progress are re-read from the database. Deleting an
+    archived flashcard lowers Total and the archived count by one and recalculates the progress over the smaller
+    collection (2 of 4 archived, 50%, becomes 1 of 3, 33%). Backed by: Gherkin for the archived case
+    (`Fiszki.FunctionalTests/Features/FlashcardArchiving.feature`, scenario "An archived flashcard can be deleted") and unit
+    test (`Fiszki.Tests/Services/FlashcardArchivingTests.cs` `DeleteAsync_ArchivedCard_Removes_AndChangesTheBase`). Backed by: code only
     (`Components/Pages/Flashcards.razor` `ConfirmDelete`). The Gherkin scenario does not
     assert this, see Test coverage.
 11. **A failure replaces the whole list with an error.** If the current user cannot be
@@ -78,12 +85,11 @@ For analysts. Each rule says how it is backed: **Gherkin** (a `.feature` scenari
 
 ### Behavior worth knowing (code reading, no tests)
 
-- **Filtered empty state.** The "No flashcards yet" state is chosen from the *filtered* list.
-  If a filter (AI Generated or Manual) is selected and its list becomes empty, for example
-  after deleting the last card of that kind while other cards remain, the page shows
-  "No flashcards yet" and the counter cards that clear the filter are not shown. The user has
-  to reload to see the remaining cards. The same happens when a filter with no cards is
-  selected, regardless of deletion. See `Components/Pages/Flashcards.razor` `ApplyFilter` and
+- **Filtered empty list.** Since archiving was added, the "No flashcards yet" state is chosen from the user's total number of
+  cards and not from the *filtered* list. If a filter (AI Generated or Manual) is selected and its list becomes empty,
+  for example after deleting the last card of that kind while other cards remain, the counters stay and a short message
+  replaces the list, so the filter can be cleared. (Before archiving the page showed "No flashcards yet" and hid the
+  counters, which left the user stuck until a reload.) See `Components/Pages/Flashcards.razor` `ApplyFilter` and
   [[flashcard-list-and-filters]].
 - **100-card window.** The page loads only the 100 newest flashcards
   (`Components/Pages/Flashcards.razor` `LoadFlashcards`). Deleting a card does not reload the
@@ -114,15 +120,18 @@ For developers. Layers and wiring: [[application-layers]].
   flashcard up by id **and** user id. If it is not found it returns without error. Otherwise
   it removes the entity and calls `SaveChangesAsync` once.
 - **In-memory update:** after the service call, `ConfirmDelete` removes the card from the
-  in-memory lists `_allFlashcards` and `_flashcards` and from the flipped-cards set. It does
-  not call `ApplyFilter` or reload.
+  in-memory lists `_allFlashcards` and `_flashcards` and from the flipped-cards set, then re-reads the summary
+  (`RefreshSummaryAsync`) for the counters, the archived count and the learning progress. It does
+  not call `ApplyFilter` or reload the list.
+- **Archived cards:** `DeleteAsync` does not look at `ArchivedAt`, so an archived card is deleted exactly like an
+  active one; the Archived view shows the same Delete button (`Components/Pages/Flashcards.razor` `CardActions`).
 - **Data:** [[flashcard-entity]] and [[learning-progress-entity]]; delete behavior is
   configured in `Fiszki.Database/Configurations/FlashcardConfiguration.cs` and
   `Fiszki.Database/Configurations/LearningProgressConfiguration.cs`.
 - **Test selectors:** the dialog has `data-testid` values `delete-confirmation-modal`,
   `confirm-delete-button`, `cancel-delete-button` (X) and `cancel-delete-modal-button`
-  (Cancel), listed in `docs/TEST_SELECTORS.md`. The trash buttons have **no** `data-testid`;
-  they are located by `title="Delete"` or the trash icon.
+  (Cancel), listed in `docs/TEST_SELECTORS.md`. The trash buttons now have `data-testid="delete-card-button"` and
+  still keep `title="Delete"`; older steps locate them by the title or the trash icon.
 
 ### Test coverage
 
@@ -138,14 +147,16 @@ For developers. Layers and wiring: [[application-layers]].
   (`Fiszki.FunctionalTests/Steps/FlashcardSteps.cs` `ThenTheFlashcardShouldBeDeleted`), only
   asserts that the page is not in the loading state and prints whether flashcards remain. It
   does **not** assert that the flashcard disappeared. That the flashcard is really gone is
-  verified only by the service-level unit test. Cancel, error handling and the counters are not
-  tested at all.
+  verified by the service-level unit test and, for the archived case and for the leaderboard points, by the scenarios in
+  `Fiszki.FunctionalTests/Features/FlashcardArchiving.feature` and `Fiszki.FunctionalTests/Features/Leaderboard.feature`,
+  which assert that the card is gone and that counters and points change. Cancel and error handling are not tested.
 
 ## Dependencies and side effects
 
 - Removes the flashcard's learning-progress record (rule 9).
 - Changes the page counters but not the user's generation counters (rule 12).
-- Removes one point from the user on the [[leaderboard]], because points are counted from the flashcards the user owns.
+- Removes the points the card was worth from the user on the [[leaderboard]]: 1 point, or 4 if the card was archived,
+  because points are counted from the flashcards the user owns, see [[flashcard-archiving]].
 - No HTTP API is involved: the page calls the service directly, see [[application-layers]].
 
 ## Discrepancies
@@ -165,6 +176,7 @@ Older planning notes disagree with the code. The code wins (see SCHEMA, trust hi
 ## Related
 
 - [[flashcard-list-and-filters]]
+- [[flashcard-archiving]]
 - [[flashcard-ownership]]
 - [[flashcard-entity]]
 - [[learning-progress-entity]]

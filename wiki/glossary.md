@@ -2,7 +2,7 @@
 title: Glossary
 type: glossary
 summary: Domain terms of the Fiszki project with English synonyms, so that lexical search finds the right page whichever word is used.
-tags: [glossary, terminology, synonyms, leaderboard, points, masked-email]
+tags: [glossary, terminology, synonyms, leaderboard, points, masked-email, archive, learned, learning-progress]
 sources:
   - Fiszki.Database/Entities/Flashcard.cs
   - Fiszki.Database/Entities/LearningProgress.cs
@@ -20,7 +20,7 @@ sources:
   - Components/Pages/Leaderboard.razor
   - Fiszki.Services/Services/LeaderboardService.cs
   - Fiszki.Services/Services/EmailMasker.cs
-verified_commit: cdf3374897d4b0f5eab4affaaba6a6874064698e
+verified_commit: fd1cb20e701b61a782cff20bb553b4ebe7f5fcbe
 confidence: high
 ---
 
@@ -37,7 +37,10 @@ translated by the agent before searching.
 | Back / Answer | back side, explanation | `BackContent`; shown as "Answer" in the UI | [[flashcard-entity]] |
 | Creation source | source, AI generated, manual | `Ai` or `Manual`; drives the "AI Generated" and "Manual" counters | [[flashcard-entity]] |
 | Owner | user, account | The user whose id is stored on a flashcard; only the owner can read, change or delete it | [[flashcard-ownership]] |
-| Learning progress | spaced repetition, review schedule | Per-flashcard review state (ease factor, interval, next review date) | [[learning-progress-entity]] |
+| Learning progress (table) | spaced repetition, review schedule | Per-flashcard review state (ease factor, interval, next review date) in the `learning_progress` table; nothing writes it, and it is **not** the learning progress percentage | [[learning-progress-entity]] |
+| Learning progress (percentage) | progress, progress bar, learned share, percent learned | The share of a user's flashcards that are archived, in whole percent rounded down; shown on the Flashcards page and in the leaderboard, never used for ranking | [[flashcard-archiving]], [[leaderboard]] |
+| Archive / archived | learned, "I learned it", mark as learned, archived view | Marking a flashcard as learned after a confirmation; it leaves the active list, goes to the Archived view, can be restored or deleted, and gives 3 extra points; stored as `ArchivedAt` | [[flashcard-archiving]], [[flashcard-entity]] |
+| Restore | unarchive, undo archive | Returning an archived flashcard to the active list without a confirmation; it loses the 3 extra points | [[flashcard-archiving]] |
 | Delete confirmation dialog | confirm deletion, modal | The "Confirm Deletion" dialog shown before a flashcard is deleted | [[flashcard-deletion]] |
 | Permanent deletion | hard delete, remove | The flashcard row is removed; there is no soft delete, trash or undo | [[flashcard-deletion]] |
 | Idempotent deletion | silent no-op, repeated delete | Deleting an unknown or foreign flashcard id does nothing and raises no error | [[flashcard-deletion]], [[flashcard-ownership]] |
@@ -66,14 +69,14 @@ translated by the agent before searching.
 | Active account | inactive account, IsActive | A flag that blocks login when false; nothing in the application sets it to false | [[user-entity]], [[user-login-and-logout]] |
 | Password hash | BCrypt, stored password | The only form in which the password is stored: a BCrypt hash with work factor 12 | [[credential-rules]], [[user-entity]] |
 | Flashcards page | my flashcards, flashcard list, main screen | The `/flashcards` page: list, counters, views and the entry point for creating, deleting and generating | [[flashcard-list-and-filters]] |
-| Counters | statistics, stat cards, Total Cards, AI Generated, Manual | The three cards at the top of the Flashcards page; they count loaded cards and are also the filter buttons | [[flashcard-list-and-filters]] |
+| Counters | statistics, stat cards, Total Cards, AI Generated, Manual | The three cards at the top of the Flashcards page; they count all the user's cards, archived ones included, and are also the filter buttons | [[flashcard-list-and-filters]], [[flashcard-archiving]] |
 | Filter | filter by source, AI filter, Manual filter | Showing only AI-generated or only manual cards by clicking a counter; no active test covers it | [[flashcard-list-and-filters]] |
 | Card view / List view | grid view, list mode, view mode | The two ways to show flashcards; card view is the default and the only one that can flip cards | [[flashcard-list-and-filters]] |
 | Flip | show answer, show question, turn card | Turning a card in card view to see its back; the state is not saved | [[flashcard-list-and-filters]] |
-| Empty state | no flashcards yet | The "No flashcards yet" message with the "Generate with AI" and "Create Manually" buttons; also shown when a filter matches nothing | [[flashcard-list-and-filters]], [[flashcard-deletion]] |
+| Empty state | no flashcards yet | The "No flashcards yet" message with the "Generate with AI" and "Create Manually" buttons; shown only to a user with no flashcards at all (a filter that matches nothing, or everything archived, shows a short message instead) | [[flashcard-list-and-filters]], [[flashcard-deletion]], [[flashcard-archiving]] |
 | Navigation menu | menu, navbar, sidebar | The side menu: Home first; for logged-in users the Flashcards, Generate and Leaderboard group sits above the open links, separated by a line, with Logout last; visitors see the open links and Login | [[site-navigation]] |
 | Leaderboard | ranking, rank, top users, scoreboard | The `/leaderboard` page that ranks active users by points and tells the user how far the user above is | [[leaderboard]] |
-| Points | score, flashcard count | One point per flashcard a user currently owns, AI and manual alike; deleting a flashcard removes a point | [[leaderboard]] |
+| Points | score, flashcard count, bonus | One point per flashcard a user currently owns, AI and manual alike, plus 3 more for each archived (learned) flashcard, so an archived card is worth 4; deleting or restoring a flashcard takes points back | [[leaderboard]], [[flashcard-archiving]] |
 | Rival | competitor, user above, nearest user above | In the leaderboard banner, the user directly above the current user, or users with exactly the same points | [[leaderboard]] |
 | Masked email | hidden email, anonymized email | How other users appear in the leaderboard: the first two characters, `***` and the domain | [[leaderboard]] |
 | Menu separator | divider, menu line | The thin line between menu groups, shown only to logged-in users | [[site-navigation]] |
